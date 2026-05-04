@@ -1,0 +1,9 @@
+Pacific Islands IPv6 Monitor
+
+Attribution and third-party data:
+
+- NIST USG IPv6 Service Deployment Monitor methodology: https://usgv6-deploymon.nist.gov/
+- APNIC Labs IPv6 measurement JSON: https://data1.labs.apnic.net/ipv6-data-format.html — reuse per feed copyright line stored in JSON snapshots.
+- EEZ overview map: `cmd/web/static/img/EEZ_Oceania.svg` from Wikimedia Commons (File:EEZ_Oceania.svg, STyx, public domain). https://commons.wikimedia.org/wiki/File:EEZ_Oceania.svg
+
+Open-source dependencies: see go.mod / go.sum.

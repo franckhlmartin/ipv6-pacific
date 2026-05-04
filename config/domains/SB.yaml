@@ -1,0 +1,21 @@
+domains:
+  # Public government web is at solomons.gov.sb (not gov.sb)
+  - domain: solomons.gov.sb
+    organization: Government of Solomon Islands
+    sector: Government
+  - domain: ffa.int
+    organization: Pacific Islands Forum Fisheries Agency
+    sector: Regional
+    regional: true
+  - domain: ourtelekom.com.sb
+    organization: Our Telekom Limited
+    sector: Telecommunications
+  - domain: satsol.net
+    organization: SatSol Limited
+    sector: Telecommunications
+  - domain: solkonet.com
+    organization: Solko Network Limited
+    sector: Telecommunications
+  - domain: siscc.com.sb
+    organization: Siscc Limited
+    sector: Telecommunications

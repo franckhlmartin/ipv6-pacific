@@ -1,0 +1,35 @@
+# One list entry per measured zone/site (each becomes its own row in data + UI). Use the
+# registrable name (e.g. itc.gov.fj), not a parent umbrella like gov.fj.
+domains:
+  - domain: usp.ac.fj
+    organization: University of the South Pacific
+    sector: Education
+  - domain: itc.gov.fj
+    organization: Government of Fiji (ITC)
+    sector: Government
+  - domain: met.gov.fj
+    organization: Fiji Meteorological Service
+    sector: Government
+  - domain: fiji.gov.fj
+    organization: Government of Fiji
+    sector: Government
+  - domain: telecom.com.fj
+    organization: Fiji Telecommunications Holding Limited
+    sector: Telecommunications
+  - domain: lightspeed.com.fj
+    organization: Lightspeed Communications Limited
+    sector: Telecommunications
+  - domain: digicelpacific.com
+    organization: Digicel Fiji Limited
+    sector: Telecommunications
+  - domain: vodafone.com.fj
+    organization: Vodafone Fiji Limited
+    sector: Telecommunications
+  - domain: fintel.com.fj
+    organization: Fintel Fiji Limited
+    sector: Telecommunications
+  # Public site is https://forumsec.org (not forumsec.gov)
+  - domain: forumsec.org
+    organization: Pacific Islands Forum Secretariat
+    sector: Regional
+    regional: true

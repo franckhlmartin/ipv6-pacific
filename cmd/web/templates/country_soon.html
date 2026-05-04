@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{.Title}}</title>
+  <link rel="stylesheet" href="/static/css/style.css"/>
+</head>
+<body class="{{.BorderClass}}">
+  <header class="site-header">
+    <p><a href="/">← Pacific Islands IPv6 Monitor</a></p>
+    <h1>{{.Name}} ({{.ISO}})</h1>
+    <p class="meta">Pacific Islands IPv6 Monitor</p>
+  </header>
+
+  <main>
+    <section class="coming-soon-panel">
+      <p class="coming-soon-lead">Monitoring data for this economy is not available yet.</p>
+      <p class="coming-soon-body"><strong>Coming soon</strong> — domain checks and APNIC Labs snapshots will appear here once the collector has run for <strong>{{.Name}}</strong>.</p>
+      <p class="coming-soon-actions"><a href="/" class="coming-soon-home">← Back to home</a></p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Measurements are estimates from a single vantage point and may reflect transient routing or firewall effects.</p>
+  </footer>
+
+  <script src="/static/js/border.js"></script>
+  <script>
+    window.__PROBE_V4__ = {{if .ProbeV4}}"{{.ProbeV4}}"{{else}}""{{end}};
+    window.__PROBE_V6__ = {{if .ProbeV6}}"{{.ProbeV6}}"{{else}}""{{end}};
+  </script>
+</body>
+</html>

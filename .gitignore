@@ -1,0 +1,12 @@
+/data/
+.env
+.env.local
+# TLS material — never commit
+certs/*.pem
+certs/*.key
+certs/*.crt
+*.pem
+*.key
+dist/
+pacific-web
+pacific-collector

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{.Title}}</title>
+  <link rel="stylesheet" href="/static/css/style.css"/>
+</head>
+<body class="{{.BorderClass}}">
+  <header class="site-header">
+    <h1>{{.Title}}</h1>
+    <p class="meta">Estimates based on NIST-style DNS / Mail / Web checks and APNIC Labs IPv6 capability data. Not a compliance certification.</p>
+    <p class="meta">Index generated: {{.Generated}}</p>
+  </header>
+
+  <main>
+    <section class="map-section">
+      <div id="eez-map-root" class="eez-map-wrap" role="img" aria-label="Exclusive economic zones in Oceania and the western Pacific. Click a monitored economy region to open its country page."></div>
+      <p class="notice">{{.EEZNotice}}</p>
+    </section>
+
+    <section>
+      <h2>Economies</h2>
+      <ul class="country-list">
+        {{range .Index.Countries}}
+        <li><a href="/country/{{.ISO2}}">{{.Name}} ({{.ISO2}})</a> — {{.DomainCount}} domains
+          {{if .APNICLabs}}<span class="apnic-chip" title="APNIC Labs IPv6 preferred (raw)">{{printf "%.2f" .APNICLabs.PreferredPct}}% IPv6 preferred</span>{{end}}
+        </li>
+        {{else}}
+        <li>No index yet. Run the <strong>collector</strong> to populate <code>data/</code>.</li>
+        {{end}}
+      </ul>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Methodology: <a href="https://usgv6-deploymon.nist.gov/govmon.html">NIST USG IPv6 Monitor</a> · APNIC Labs: <a href="https://data1.labs.apnic.net/ipv6-data-format.html">IPv6 JSON format</a></p>
+  </footer>
+
+  <script src="/static/js/map-home.js"></script>
+  <script src="/static/js/border.js"></script>
+  <script>
+    window.__PROBE_V4__ = {{if .ProbeV4}}"{{.ProbeV4}}"{{else}}""{{end}};
+    window.__PROBE_V6__ = {{if .ProbeV6}}"{{.ProbeV6}}"{{else}}""{{end}};
+  </script>
+</body>
+</html>

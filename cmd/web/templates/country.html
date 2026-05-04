@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{.Title}}</title>
+  <link rel="stylesheet" href="/static/css/style.css"/>
+</head>
+<body class="{{.BorderClass}}">
+  <header class="site-header">
+    <p><a href="/">← Pacific Islands IPv6 Monitor</a></p>
+    <h1>{{.Name}} — Pacific Islands IPv6 Monitor</h1>
+    <p class="meta">Has data · Last collected {{.Generated}}</p>
+  </header>
+
+  <main>
+    <section class="summary-strip" aria-label="Summary counts">
+      <div class="stat"><span class="stat-label">Total Domains</span><span class="stat-value">{{len .Country.Domains}}</span></div>
+      <div class="stat"><span class="stat-label">DNS (operational)</span><span class="stat-value">{{.Summary.DNS}}</span></div>
+      <div class="stat"><span class="stat-label">Mail (operational)</span><span class="stat-value">{{.Summary.Mail}}</span></div>
+      <div class="stat"><span class="stat-label">Web (operational)</span><span class="stat-value">{{.Summary.Web}}</span></div>
+      <div class="stat"><span class="stat-label">DNSSEC</span><span class="stat-value">{{.Summary.DNSSEC}}</span></div>
+    </section>
+
+    {{if .Country.APNICLabs}}
+    <section class="apnic-banner">
+      <strong>APNIC Labs</strong> (economy {{.ISO}}): IPv6 preferred ≈ {{printf "%.2f" .Country.APNICLabs.PreferredPct}}% of measurements on {{.Country.APNICLabs.Date}}.
+      <a href="https://stats.labs.apnic.net/ipv6/{{.ISO}}" target="_blank" rel="noopener">Open regional stats</a>
+    </section>
+    {{end}}
+
+    <h2>Detailed IPv6 &amp; DNSSEC Service Interface Statistics</h2>
+
+    {{if not .HasResults}}
+    <p class="empty-state">No analysis results yet. Domains are registered but have not been analysed. Run the collector to generate results.</p>
+    {{else}}
+    <div class="table-wrap">
+      <table class="results">
+        <thead>
+          <tr>
+            <th scope="col" class="sortable">
+              <button type="button" class="sort-trigger" data-sort-index="0" title="Sort by domain (click again to reverse)">
+                <span class="sort-trigger__label">Domain</span><span class="sort-indicator" aria-hidden="true"></span>
+              </button>
+            </th>
+            <th scope="col" class="sortable">
+              <button type="button" class="sort-trigger" data-sort-index="1" title="Sort by organization (click again to reverse)">
+                <span class="sort-trigger__label">Organization</span><span class="sort-indicator" aria-hidden="true"></span>
+              </button>
+            </th>
+            <th scope="col" class="sortable">
+              <button type="button" class="sort-trigger" data-sort-index="2" title="Sort by sector (click again to reverse)">
+                <span class="sort-trigger__label">Sector</span><span class="sort-indicator" aria-hidden="true"></span>
+              </button>
+            </th>
+            <th scope="col" class="sortable">
+              <button type="button" class="sort-trigger" data-sort-index="3" data-sort-mode="number" title="Sort by score 0–8 (click again to reverse)">
+                <span class="sort-trigger__label">Score</span><span class="sort-indicator" aria-hidden="true"></span>
+              </button>
+            </th>
+            <th scope="col">DNS</th>
+            <th scope="col">Mail</th>
+            <th scope="col">Web</th>
+            <th scope="col">DNSSEC</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{range .Country.Domains}}
+          <tr>
+            <td><a href="https://{{.Domain}}/" rel="noopener noreferrer">{{.Domain}}</a></td>
+            <td>{{.Organization}}</td>
+            <td>{{.Sector}}</td>
+            <td class="results__score">{{rowScore .}}</td>
+            <td class="cell cell--{{.DNS.Class}}">{{.DNS.Display}}</td>
+            <td class="cell cell--{{.Mail.Class}}">{{.Mail.Display}}</td>
+            <td class="cell cell--{{.Web.Class}}">{{.Web.Display}}</td>
+            <td class="cell cell--{{dnssecCellClass .DNSSEC}}">{{.DNSSEC.Display}}</td>
+          </tr>
+          {{end}}
+        </tbody>
+      </table>
+    </div>
+    {{end}}
+  </main>
+
+  <footer class="site-footer">
+    <p>Measurements are estimates from a single vantage point and may reflect transient routing or firewall effects.</p>
+  </footer>
+
+  <script src="/static/js/border.js"></script>
+  {{if .HasResults}}<script src="/static/js/table-sort.js"></script>{{end}}
+  <script>
+    window.__PROBE_V4__ = {{if .ProbeV4}}"{{.ProbeV4}}"{{else}}""{{end}};
+    window.__PROBE_V6__ = {{if .ProbeV6}}"{{.ProbeV6}}"{{else}}""{{end}};
+  </script>
+</body>
+</html>

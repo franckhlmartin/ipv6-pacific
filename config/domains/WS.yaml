@@ -1,0 +1,8 @@
+domains:
+  - domain: gov.ws
+    organization: Government of Samoa
+    sector: Government
+  - domain: sprep.org
+    organization: Secretariat of the Pacific Regional Environment Programme
+    sector: Regional
+    regional: true

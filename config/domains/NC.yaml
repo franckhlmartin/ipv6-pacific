@@ -1,0 +1,8 @@
+domains:
+  - domain: gouv.nc
+    organization: Government of New Caledonia
+    sector: Government
+  - domain: spc.int
+    organization: Pacific Community (SPC)
+    sector: Regional
+    regional: true
