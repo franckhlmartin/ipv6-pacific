@@ -1,8 +1,20 @@
 domains:
-  - domain: gov.ws
+  - domain: mygov.gov.ws
     organization: Government of Samoa
     sector: Government
   - domain: sprep.org
     organization: Secretariat of the Pacific Regional Environment Programme
     sector: Regional
     regional: true
+  - domain: sbs.gov.ws
+    organization: Samoa Bureau of Statistics
+    sector: Government
+  - domain: mesc.gov.ws
+    organization: Ministry of Education, Sport, and Culture
+    sector: Government
+  - domain: psc.gov.ws
+    organization: Public Service Commission
+    sector: Government
+  - domain: mcit.gov.ws
+    organization: Ministry of Communications, Information Technology, and Telecommunications
+    sector: Government
