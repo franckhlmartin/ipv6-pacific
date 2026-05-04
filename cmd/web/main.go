@@ -94,10 +94,10 @@ func main() {
 	certFile := tlsCertPath(root, getenv("TLS_CERT_FILE", "certs/cert.pem"))
 	keyFile := tlsCertPath(root, getenv("TLS_KEY_FILE", "certs/key.pem"))
 	if _, err := os.Stat(certFile); err != nil {
-		log.Fatalf("TLS cert not found at %s — run ./scripts/gen_dev_certs.sh", certFile)
+		log.Fatalf("TLS cert not usable at %s (PROJECT_ROOT=%q): %v", certFile, root, err)
 	}
 	if _, err := os.Stat(keyFile); err != nil {
-		log.Fatalf("TLS key not found at %s — run ./scripts/gen_dev_certs.sh", keyFile)
+		log.Fatalf("TLS key not readable at %s (PROJECT_ROOT=%q): %v", keyFile, root, err)
 	}
 
 	log.Printf("web listening with TLS on %s (cert %s)", addr, certFile)
@@ -134,8 +134,13 @@ func home(tmpl *template.Template, w http.ResponseWriter, r *http.Request, dataD
 	idxPath := filepath.Join(dataDir, "index.json")
 	raw, err := os.ReadFile(idxPath)
 	var idx model.Index
-	if err == nil {
+	switch {
+	case err == nil:
 		_ = json.Unmarshal(raw, &idx)
+	case os.IsNotExist(err):
+		// empty index below
+	default:
+		log.Printf("home: cannot read %s (check DATA_DIR permissions vs systemd User): %v", idxPath, err)
 	}
 	gen := "—"
 	if !idx.GeneratedAt.IsZero() {
@@ -157,6 +162,7 @@ func home(tmpl *template.Template, w http.ResponseWriter, r *http.Request, dataD
 		"ProbeV4":       probeV4,
 		"ProbeV6":       probeV6,
 		"ShowDualProbe": probeV4 != "" && probeV6 != "",
+		"Nonce":         httpserver.CSPNonce(r),
 	})
 }
 
@@ -206,6 +212,7 @@ func countryPage(tmpl *template.Template, w http.ResponseWriter, r *http.Request
 		"ShowDualProbe": probeV4 != "" && probeV6 != "",
 		"HasResults":    len(cf.Domains) > 0,
 		"Generated":     cf.GeneratedAt.Format(time.RFC3339),
+		"Nonce":         httpserver.CSPNonce(r),
 	})
 }
 
@@ -234,5 +241,6 @@ func countryComingSoon(tmpl *template.Template, w http.ResponseWriter, r *http.R
 		"ProbeV4":       probeV4,
 		"ProbeV6":       probeV6,
 		"ShowDualProbe": probeV4 != "" && probeV6 != "",
+		"Nonce":         httpserver.CSPNonce(r),
 	})
 }

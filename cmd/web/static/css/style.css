@@ -81,7 +81,25 @@ h2 { font-size: 1.15rem; margin-top: 1.5rem; }
 .map-section { padding: 1rem 1.25rem; }
 .notice { font-size: 0.85rem; color: #555; max-width: 70ch; }
 
-.country-list { list-style: none; padding: 0 1.25rem; }
+/* Home: match .site-header / .map-section horizontal inset for heading + list */
+.economies-section {
+  padding: 0 1.25rem 2rem;
+}
+
+/* Country page: heading + table / empty state — same horizontal inset */
+.country-detail-section {
+  padding: 0 1.25rem 2rem;
+}
+.country-detail-section .empty-state {
+  margin-left: 0;
+  margin-right: 0;
+}
+.country-detail-section .table-wrap {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.country-list { list-style: none; padding: 0; margin: 0; }
 .country-list li { padding: 0.35rem 0; border-bottom: 1px solid #eee; }
 
 .apnic-chip {

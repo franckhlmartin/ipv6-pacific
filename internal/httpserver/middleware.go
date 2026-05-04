@@ -1,6 +1,10 @@
 package httpserver
 
 import (
+	"context"
+	"crypto/rand"
+	"encoding/base64"
+	"fmt"
 	"net"
 	"net/http"
 	"strings"
@@ -8,16 +12,31 @@ import (
 	"time"
 )
 
+type cspNonceKey struct{}
+
+// CSPNonce returns the per-request nonce set by SecurityHeaders (empty if missing).
+func CSPNonce(r *http.Request) string {
+	v, _ := r.Context().Value(cspNonceKey{}).(string)
+	return v
+}
+
 // SecurityHeaders adds baseline headers (CSP is relaxed for Leaflet from self + map tiles).
+// Inline scripts in HTML pages must use nonce="{{.Nonce}}" and receive CSPNonce from the request context.
 func SecurityHeaders(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		nonceBytes := make([]byte, 16)
+		_, _ = rand.Read(nonceBytes)
+		nonce := base64.StdEncoding.EncodeToString(nonceBytes)
+		r = r.WithContext(context.WithValue(r.Context(), cspNonceKey{}, nonce))
+
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		w.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
 		w.Header().Set("Permissions-Policy", "geolocation=(), camera=(), microphone=()")
 		// Map tiles: allow OSM, allow unpkg for Leaflet (see templates). Tighten to self-hosted vendor later.
+		// script-src uses a per-request nonce so small inline bootstraps (probe URLs) work without 'unsafe-inline'.
 		csp := strings.Join([]string{
 			"default-src 'self'",
-			"script-src 'self' https://unpkg.com",
+			fmt.Sprintf("script-src 'self' https://unpkg.com 'nonce-%s'", nonce),
 			"style-src 'self' 'unsafe-inline' https://unpkg.com",
 			"img-src 'self' data: https://*.tile.openstreetmap.org",
 			"connect-src 'self' https://unpkg.com",

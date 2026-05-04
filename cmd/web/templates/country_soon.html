@@ -26,7 +26,7 @@
   </footer>
 
   <script src="/static/js/border.js"></script>
-  <script>
+  <script nonce="{{.Nonce}}">
     window.__PROBE_V4__ = {{if .ProbeV4}}"{{.ProbeV4}}"{{else}}""{{end}};
     window.__PROBE_V6__ = {{if .ProbeV6}}"{{.ProbeV6}}"{{else}}""{{end}};
   </script>

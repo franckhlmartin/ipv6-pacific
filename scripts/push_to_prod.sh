@@ -3,7 +3,7 @@ set -euo pipefail
 
 # shellcheck disable=SC2034
 # Production destination (e.g. franck@www.peachymango.org:/opt/peachymango/)
-PROD_DEST="franck@www.bookerpal.com:/opt/pacific-monitor/"
+PROD_DEST="franck@www.bookerpal.com:/opt/ipv6-pacific/"
 
 cd "$(dirname "$0")/.."
 if [[ ! -f go.mod ]] || [[ ! -d cmd/web ]] || [[ ! -d cmd/collector ]]; then

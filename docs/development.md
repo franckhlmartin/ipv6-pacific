@@ -62,9 +62,55 @@ nohup ./scripts/start_collector.sh -country=FJ >> collector.log 2>&1 &
 
 Use two terminals for **web + collector** during integration testing.
 
+## Commit workflow
+
+See **`docs/commit-workflow.md`** (check changes since last push, doc updates, commit/push).
+
 ## Deploy
 
-See `scripts/push_to_prod.sh`. Set `PROD_DEST` to your `user@host:/path`. Builds Linux `pacific-web` and `pacific-collector`, rsyncs code + config — **never** ships `.env`.
+### Build and rsync
+
+See `scripts/push_to_prod.sh`. Set `PROD_DEST` to your `user@host:/path`. It builds Linux **`pacific-web`** and **`pacific-collector`**, rsyncs code + config — **never** ships `.env`.
+
+On the server, create **`/opt/ipv6-pacific/.env`** from `.env.example` (set `DATA_DIR`, `LISTEN`, `TLS_CERT_FILE`, `TLS_KEY_FILE`, etc.). The web binary loads `.env` / `.env.local` from **`WorkingDirectory`**. Run the collector as a separate service or cron so `data/` stays populated. **`data/` must be readable by the web service user** (e.g. `franck`). If you sometimes run the collector as **root**, set **`COLLECTOR_DATA_USER=franck`** (and optionally **`COLLECTOR_DATA_GROUP`**) so each successful run **`chown`s `DATA_DIR`** after writing; otherwise use **`chown -R franck:franck data`** or run the collector as **`User=franck`**. Without that, the UI can show “No index yet” even when `index.json` exists.
+
+### systemd service (web)
+
+Install a unit such as **`/etc/systemd/system/ipv6-pacific-web.service`** (adjust `User`, `Group`, and paths if needed):
+
+```ini
+[Unit]
+Description=Pacific IPv6 Monitor (web)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=franck
+Group=franck
+WorkingDirectory=/opt/ipv6-pacific
+# Optional: systemd can load env instead of/in addition to .env — use one consistent approach
+# EnvironmentFile=/opt/ipv6-pacific/.env
+ExecStart=/opt/ipv6-pacific/pacific-web
+Restart=on-failure
+RestartSec=5
+# Hardening (adjust if something breaks)
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Then:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now ipv6-pacific-web
+sudo systemctl status ipv6-pacific-web
+```
+
+Put a reverse proxy in front if you terminate public TLS elsewhere; see `docs/security.md` for an **nginx** example (`pacific.ipv6forum.com`) and **`X-Forwarded-For`**.
 
 ## TLS / dual-stack border
 

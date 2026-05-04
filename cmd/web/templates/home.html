@@ -19,7 +19,7 @@
       <p class="notice">{{.EEZNotice}}</p>
     </section>
 
-    <section>
+    <section class="economies-section">
       <h2>Economies</h2>
       <ul class="country-list">
         {{range .Index.Countries}}
@@ -39,7 +39,7 @@
 
   <script src="/static/js/map-home.js"></script>
   <script src="/static/js/border.js"></script>
-  <script>
+  <script nonce="{{.Nonce}}">
     window.__PROBE_V4__ = {{if .ProbeV4}}"{{.ProbeV4}}"{{else}}""{{end}};
     window.__PROBE_V6__ = {{if .ProbeV6}}"{{.ProbeV6}}"{{else}}""{{end}};
   </script>

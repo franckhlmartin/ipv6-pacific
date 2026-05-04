@@ -142,6 +142,7 @@ func finishIndex(dataDir string, pacific *config.PacificList) error {
 		return err
 	}
 	log.Printf("[collector] index written %s", idxPath)
+	applyDataOwnership(dataDir)
 	return nil
 }
 
