@@ -1,0 +1,13 @@
+domains:
+  - domain: tuvalu.tv
+    organization: Government of Tuvalu
+    sector: Government
+  - domain: tuvalutelecom.tv    
+    organization: Tuvalu Telecommunications Corporation
+    sector: Telecommunications
+  - domain: finance.gov.tv
+    organization: Ministry of Finance
+    sector: Government
+  - domain: tectuvalu.tv
+    organization: Tuvalu Electricity Corporation
+    sector: Energy
