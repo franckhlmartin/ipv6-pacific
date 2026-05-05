@@ -30,14 +30,86 @@
     'Wallis and Futuna (Fr)': 'WF',
   };
 
-  fetch('/static/img/EEZ_Oceania.svg')
-    .then(function (r) {
+  function buildPreferredByISO(indexPayload) {
+    var out = {};
+    if (!indexPayload || !indexPayload.countries) {
+      return out;
+    }
+    for (var k = 0; k < indexPayload.countries.length; k++) {
+      var row = indexPayload.countries[k];
+      if (!row || !row.iso2) {
+        continue;
+      }
+      var al = row.apnic_labs;
+      if (al && typeof al.preferred_pc_raw === 'number' && !isNaN(al.preferred_pc_raw)) {
+        out[String(row.iso2).toUpperCase()] = al.preferred_pc_raw;
+      }
+    }
+    return out;
+  }
+
+  // Red → green ramp (5 stops, piecewise linear in RGB). Stops at 0%, 25%, 50%, 75%, 100%.
+  var PREFERRED_PCT_GRADIENT = [
+    { pct: 0, hex: '#FF0000' },
+    { pct: 25, hex: '#E04A24' },
+    { pct: 50, hex: '#8FA822' },
+    { pct: 75, hex: '#47C41B' },
+    { pct: 100, hex: '#00FF00' },
+  ];
+
+  function hexToRgb(hex) {
+    var h = hex.replace(/^#/, '');
+    return {
+      r: parseInt(h.slice(0, 2), 16),
+      g: parseInt(h.slice(2, 4), 16),
+      b: parseInt(h.slice(4, 6), 16),
+    };
+  }
+
+  function fillForPreferredPct(pct) {
+    var p = Math.max(0, Math.min(100, pct));
+    var stops = PREFERRED_PCT_GRADIENT;
+    if (p <= stops[0].pct) {
+      return stops[0].hex;
+    }
+    if (p >= stops[stops.length - 1].pct) {
+      return stops[stops.length - 1].hex;
+    }
+    var i = 0;
+    while (i < stops.length - 1 && p > stops[i + 1].pct) {
+      i++;
+    }
+    var a = stops[i];
+    var b = stops[i + 1];
+    var u = (p - a.pct) / (b.pct - a.pct);
+    var ca = hexToRgb(a.hex);
+    var cb = hexToRgb(b.hex);
+    var r = Math.round(ca.r + (cb.r - ca.r) * u);
+    var g = Math.round(ca.g + (cb.g - ca.g) * u);
+    var bl = Math.round(ca.b + (cb.b - ca.b) * u);
+    return 'rgb(' + r + ',' + g + ',' + bl + ')';
+  }
+
+  var NO_APNIC_FILL = '#9aa3b2';
+
+  Promise.all([
+    fetch('/static/img/EEZ_Oceania.svg').then(function (r) {
       if (!r.ok) {
         throw new Error('fetch failed');
       }
       return r.text();
-    })
-    .then(function (svgText) {
+    }),
+    fetch('/api/index.json')
+      .then(function (r) {
+        return r.ok ? r.json() : null;
+      })
+      .catch(function () {
+        return null;
+      }),
+  ])
+    .then(function (results) {
+      var svgText = results[0];
+      var preferredByISO = buildPreferredByISO(results[1]);
       var parser = new DOMParser();
       var doc = parser.parseFromString(svgText, 'image/svg+xml');
       var svg = doc.documentElement;
@@ -102,10 +174,25 @@
         }
         path.classList.add('eez-region--linked');
         path.setAttribute('data-iso2', iso);
+        var pct = preferredByISO[iso];
+        if (pct != null) {
+          path.style.setProperty('fill', fillForPreferredPct(pct));
+          path.setAttribute('data-ipv6-preferred-pct', String(pct));
+          titleEl.textContent =
+            label + ' — ' + pct.toFixed(2) + '% IPv6 preferred (APNIC Labs estimate)';
+          path.setAttribute(
+            'aria-label',
+            label + ' — ' + pct.toFixed(2) + '% IPv6 preferred — open monitoring page'
+          );
+        } else {
+          path.style.setProperty('fill', NO_APNIC_FILL);
+          path.setAttribute('aria-label', label + ' — open monitoring page');
+        }
+        path.style.setProperty('stroke', '#4b5563');
+        path.style.setProperty('stroke-width', '0.25');
         path.style.cursor = 'pointer';
         path.setAttribute('tabindex', '0');
         path.setAttribute('role', 'link');
-        path.setAttribute('aria-label', label + ' — open monitoring page');
 
         path.addEventListener('click', function (iso2) {
           return function (e) {
