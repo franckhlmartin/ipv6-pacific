@@ -3,7 +3,7 @@
 Go services:
 
 - **`cmd/collector`** — measures configured domains (NIST-style DNS / Mail / Web + simplified DNSSEC), ingests **APNIC Labs** `v6economy/{CC}.json`, writes `data/countries/{ISO2}.json` and `data/index.json`.
-- **`cmd/web`** — serves the Afrinic-inspired UI, JSON API, and Pacific EEZ overview (`static/img/EEZ_Oceania.svg`, Wikimedia Commons).
+- **`cmd/web`** — serves the Afrinic-inspired UI, JSON API, Pacific EEZ overview (`static/img/EEZ_Oceania.svg`), and a sortable home economies table; the map and Deploy % / IPv6 pref. % cells use the same red→green ramp. `index.json` includes `deployment_score_pct` per economy (mean RowScore / 8 × 100).
 
 Quick start:
 

@@ -21,15 +21,45 @@
 
     <section class="economies-section">
       <h2>Economies</h2>
-      <ul class="country-list">
-        {{range .Index.Countries}}
-        <li><a href="/country/{{.ISO2}}">{{.Name}} ({{.ISO2}})</a> — {{.DomainCount}} domains
-          {{if .APNICLabs}}<span class="apnic-chip" title="APNIC Labs IPv6 preferred (raw)">{{printf "%.2f" .APNICLabs.PreferredPct}}% IPv6 preferred</span>{{end}}
-        </li>
-        {{else}}
-        <li>No index yet. Run the <strong>collector</strong> to populate <code>data/</code>.</li>
-        {{end}}
-      </ul>
+      {{if .Index.Countries}}
+      <div class="economies-table-wrap">
+        <table class="economies-table" id="economies-table">
+          <caption class="visually-hidden">Monitored economies; column headers sort the table.</caption>
+          <thead>
+            <tr>
+              <th scope="col" data-sort-col="name" aria-sort="none">
+                <button type="button" class="economies-sort-btn" data-sort-col="name">Economy</button>
+              </th>
+              <th scope="col" class="col-num" data-sort-col="domains" aria-sort="none">
+                <button type="button" class="economies-sort-btn" data-sort-col="domains">Domains</button>
+              </th>
+              <th scope="col" class="col-num economies-th-pct" data-sort-col="deploy" aria-sort="none">
+                <button type="button" class="economies-sort-btn" data-sort-col="deploy" title="Mean RowScore / 8">Deploy %</button>
+              </th>
+              <th scope="col" class="col-num economies-th-pct" data-sort-col="apnic" aria-sort="none">
+                <button type="button" class="economies-sort-btn" data-sort-col="apnic" title="APNIC Labs IPv6 preferred">IPv6 pref. %</button>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {{range .Index.Countries}}
+            <tr
+              data-sort-name="{{.Name}}"
+              data-sort-domains="{{.DomainCount}}"
+              data-sort-deploy="{{printf "%.6f" .DeploymentScorePct}}"
+              data-sort-apnic="{{if .APNICLabs}}{{printf "%.6f" .APNICLabs.PreferredPct}}{{end}}">
+              <td><a href="/country/{{.ISO2}}">{{.Name}}</a> <span class="economies-iso">({{.ISO2}})</span></td>
+              <td class="col-num">{{.DomainCount}}</td>
+              <td class="col-num economies-pct" data-pct="{{if gt .DomainCount 0}}{{printf "%.6f" .DeploymentScorePct}}{{end}}">{{if gt .DomainCount 0}}{{printf "%.1f" .DeploymentScorePct}}%{{else}}—{{end}}</td>
+              <td class="col-num economies-pct" data-pct="{{if .APNICLabs}}{{printf "%.6f" .APNICLabs.PreferredPct}}{{end}}">{{if .APNICLabs}}{{printf "%.2f" .APNICLabs.PreferredPct}}%{{else}}—{{end}}</td>
+            </tr>
+            {{end}}
+          </tbody>
+        </table>
+      </div>
+      {{else}}
+      <p class="economies-empty">No index yet. Run the <strong>collector</strong> to populate <code>data/</code>.</p>
+      {{end}}
     </section>
   </main>
 
@@ -37,7 +67,9 @@
     <p>Methodology: <a href="https://usgv6-deploymon.nist.gov/govmon.html">NIST USG IPv6 Monitor</a> · APNIC Labs: <a href="https://data1.labs.apnic.net/ipv6-data-format.html">IPv6 JSON format</a></p>
   </footer>
 
+  <script src="/static/js/pct-color-ramp.js"></script>
   <script src="/static/js/map-home.js"></script>
+  <script src="/static/js/economies-table.js"></script>
   <script src="/static/js/border.js"></script>
   <script nonce="{{.Nonce}}">
     window.__PROBE_V4__ = {{if .ProbeV4}}"{{.ProbeV4}}"{{else}}""{{end}};

@@ -41,3 +41,31 @@ func TestRowScoreDNSSECUnsigned(t *testing.T) {
 		t.Fatalf("RowScore = %d want 0", got)
 	}
 }
+
+func TestEconomyDeploymentScorePct(t *testing.T) {
+	maxed := model.DomainResult{
+		DNS:    model.ServiceColumn{Class: model.DeployIPv6Only},
+		Mail:   model.ServiceColumn{Class: model.DeployIPv6Only},
+		Web:    model.ServiceColumn{Class: model.DeployIPv6Only},
+		DNSSEC: model.DNSSECColumn{State: "signed"},
+	}
+	if EconomyDeploymentScorePct(nil) != 0 {
+		t.Fatalf("empty want 0")
+	}
+	if got := EconomyDeploymentScorePct([]model.DomainResult{maxed}); got != 100 {
+		t.Fatalf("one maxed domain = %v want 100", got)
+	}
+	if got := EconomyDeploymentScorePct([]model.DomainResult{maxed, maxed}); got != 100 {
+		t.Fatalf("two maxed = %v want 100", got)
+	}
+	half := model.DomainResult{
+		DNS:    model.ServiceColumn{Class: model.DeployDual},
+		Mail:   model.ServiceColumn{Class: model.DeployDual},
+		Web:    model.ServiceColumn{Class: model.DeployDual},
+		DNSSEC: model.DNSSECColumn{State: "unsigned"},
+	}
+	// RowScore = 1+1+1+0 = 3; 3/8 * 100 = 37.5
+	if got := EconomyDeploymentScorePct([]model.DomainResult{half}); got != 37.5 {
+		t.Fatalf("half-ish row = %v want 37.5", got)
+	}
+}

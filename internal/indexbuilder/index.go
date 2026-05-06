@@ -9,6 +9,7 @@ import (
 
 	"github.com/pacific-monitor/pacific-monitor/internal/config"
 	"github.com/pacific-monitor/pacific-monitor/internal/model"
+	"github.com/pacific-monitor/pacific-monitor/internal/scoring"
 	"github.com/pacific-monitor/pacific-monitor/internal/storage"
 	"github.com/pacific-monitor/pacific-monitor/internal/summary"
 )
@@ -48,11 +49,12 @@ func Rebuild(dataDir string, pacific *config.PacificList) error {
 		}
 		iso := strings.ToUpper(strings.TrimSuffix(e.Name(), ".json"))
 		ic := model.IndexCountry{
-			ISO2:        iso,
-			Name:        cf.Name,
-			DomainCount: len(cf.Domains),
-			Summary:     summary.FromDomains(cf.Domains),
-			APNICLabs:   cf.APNICLabs,
+			ISO2:               iso,
+			Name:               cf.Name,
+			DomainCount:        len(cf.Domains),
+			Summary:            summary.FromDomains(cf.Domains),
+			DeploymentScorePct: scoring.EconomyDeploymentScorePct(cf.Domains),
+			APNICLabs:          cf.APNICLabs,
 		}
 		if m, ok := meta[iso]; ok {
 			if m.Name != "" {

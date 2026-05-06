@@ -99,8 +99,114 @@ h2 { font-size: 1.15rem; margin-top: 1.5rem; }
   padding-right: 0;
 }
 
-.country-list { list-style: none; padding: 0; margin: 0; }
-.country-list li { padding: 0.35rem 0; border-bottom: 1px solid #eee; }
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.economies-empty {
+  margin: 0.5rem 0 0;
+  color: #444;
+}
+
+.economies-table-wrap {
+  overflow-x: auto;
+  margin-top: 0.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.economies-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.economies-table caption {
+  padding: 0;
+}
+
+.economies-table th,
+.economies-table td {
+  padding: 0.5rem 0.65rem;
+  border-bottom: 1px solid #eee;
+  vertical-align: middle;
+}
+
+.economies-table thead th {
+  background: #f9fafb;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Deploy % / IPv6 pref. %: same red→green ramp as the map (see pct-color-ramp.js) */
+.economies-table thead th.economies-th-pct {
+  background-color: #f9fafb;
+  background-image: linear-gradient(90deg, rgba(255, 0, 0, 0.14) 0%, rgba(143, 168, 34, 0.12) 50%, rgba(0, 255, 0, 0.12) 100%);
+}
+
+.economies-table td.economies-pct {
+  font-weight: 600;
+}
+
+.economies-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.economies-table tbody tr:hover {
+  background: #fafafa;
+}
+
+.economies-sort-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0.15rem 0;
+  font: inherit;
+  font-weight: 600;
+  color: inherit;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: inherit;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 2px;
+}
+
+.economies-sort-btn:hover {
+  color: #2563eb;
+}
+
+.economies-sort-btn:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.economies-iso {
+  color: #6b7280;
+  font-size: 0.9em;
+}
+
+.economies-table .col-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.deploy-score-chip {
+  font-size: 0.85rem;
+  color: #374151;
+}
 
 .apnic-chip {
   display: inline-block;

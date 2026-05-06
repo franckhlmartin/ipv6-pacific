@@ -1,4 +1,5 @@
 (function () {
+  var global = typeof window !== 'undefined' ? window : globalThis;
   var root = document.getElementById('eez-map-root');
   if (!root) {
     return;
@@ -48,49 +49,16 @@
     return out;
   }
 
-  // Red → green ramp (5 stops, piecewise linear in RGB). Stops at 0%, 25%, 50%, 75%, 100%.
-  var PREFERRED_PCT_GRADIENT = [
-    { pct: 0, hex: '#FF0000' },
-    { pct: 25, hex: '#E04A24' },
-    { pct: 50, hex: '#8FA822' },
-    { pct: 75, hex: '#47C41B' },
-    { pct: 100, hex: '#00FF00' },
-  ];
-
-  function hexToRgb(hex) {
-    var h = hex.replace(/^#/, '');
-    return {
-      r: parseInt(h.slice(0, 2), 16),
-      g: parseInt(h.slice(2, 4), 16),
-      b: parseInt(h.slice(4, 6), 16),
+  var ramp = global.PacificPctColorRamp;
+  if (!ramp || typeof ramp.colorForPct !== 'function') {
+    ramp = {
+      colorForPct: function () {
+        return '#9aa3b2';
+      },
+      NO_DATA_GRAY: '#9aa3b2',
     };
+    console.error('PacificPctColorRamp missing; load pct-color-ramp.js before map-home.js');
   }
-
-  function fillForPreferredPct(pct) {
-    var p = Math.max(0, Math.min(100, pct));
-    var stops = PREFERRED_PCT_GRADIENT;
-    if (p <= stops[0].pct) {
-      return stops[0].hex;
-    }
-    if (p >= stops[stops.length - 1].pct) {
-      return stops[stops.length - 1].hex;
-    }
-    var i = 0;
-    while (i < stops.length - 1 && p > stops[i + 1].pct) {
-      i++;
-    }
-    var a = stops[i];
-    var b = stops[i + 1];
-    var u = (p - a.pct) / (b.pct - a.pct);
-    var ca = hexToRgb(a.hex);
-    var cb = hexToRgb(b.hex);
-    var r = Math.round(ca.r + (cb.r - ca.r) * u);
-    var g = Math.round(ca.g + (cb.g - ca.g) * u);
-    var bl = Math.round(ca.b + (cb.b - ca.b) * u);
-    return 'rgb(' + r + ',' + g + ',' + bl + ')';
-  }
-
-  var NO_APNIC_FILL = '#9aa3b2';
 
   Promise.all([
     fetch('/static/img/EEZ_Oceania.svg').then(function (r) {
@@ -176,7 +144,7 @@
         path.setAttribute('data-iso2', iso);
         var pct = preferredByISO[iso];
         if (pct != null) {
-          path.style.setProperty('fill', fillForPreferredPct(pct));
+          path.style.setProperty('fill', ramp.colorForPct(pct));
           path.setAttribute('data-ipv6-preferred-pct', String(pct));
           titleEl.textContent =
             label + ' — ' + pct.toFixed(2) + '% IPv6 preferred (APNIC Labs estimate)';
@@ -185,7 +153,7 @@
             label + ' — ' + pct.toFixed(2) + '% IPv6 preferred — open monitoring page'
           );
         } else {
-          path.style.setProperty('fill', NO_APNIC_FILL);
+          path.style.setProperty('fill', ramp.NO_DATA_GRAY);
           path.setAttribute('aria-label', label + ' — open monitoring page');
         }
         path.style.setProperty('stroke', '#4b5563');

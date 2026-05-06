@@ -6,6 +6,9 @@ import (
 	"github.com/pacific-monitor/pacific-monitor/internal/model"
 )
 
+// MaxRowScore is the maximum points returned by RowScore (four columns × 2).
+const MaxRowScore = 8
+
 // RowScore sums per-column points for DNS, Mail, Web, and DNSSEC (0–8).
 // Deploy classes: ipv4_only and unknown → 0 (orange / grey), dual_stack → 1 (blue), ipv6_only → 2 (green).
 //
@@ -57,4 +60,19 @@ func DNSSECCellClass(col model.DNSSECColumn) string {
 	default:
 		return string(model.DeployUnknown)
 	}
+}
+
+// EconomyDeploymentScorePct is the economy-wide deployment score as a percentage (0–100).
+// For each domain it uses RowScore (0–MaxRowScore); the result is the average fraction of
+// the maximum, times 100, so economies with different domain counts remain comparable.
+func EconomyDeploymentScorePct(domains []model.DomainResult) float64 {
+	n := len(domains)
+	if n == 0 {
+		return 0
+	}
+	var sum int
+	for _, d := range domains {
+		sum += RowScore(d)
+	}
+	return 100 * float64(sum) / float64(MaxRowScore*n)
 }
