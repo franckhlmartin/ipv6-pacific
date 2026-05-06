@@ -99,7 +99,8 @@ type APNICSnapshot struct {
 	Date         string    `json:"date"` // measurement date YYYY-MM-DD
 	Updated      string    `json:"updated,omitempty"`
 	Preferred    float64   `json:"preferred_raw,omitempty"`
-	PreferredPct float64   `json:"preferred_pc_raw,omitempty"`
-	Seen         float64   `json:"seen_raw,omitempty"`
+	// No omitempty: 0% is valid data; omitting the field made clients treat it like “no APNIC”.
+	PreferredPct float64 `json:"preferred_pc_raw"`
+	Seen         float64 `json:"seen_raw,omitempty"`
 	FetchedAt    time.Time `json:"fetched_at"`
 }

@@ -1,8 +1,23 @@
 domains:
-  - domain: gouv.nc
+  - domain: congres.nc
     organization: Government of New Caledonia
     sector: Government
   - domain: spc.int
     organization: Pacific Community (SPC)
     sector: Regional
     regional: true
+  - domain: opt.nc
+    organization: Office des Postes et Télécommunications
+    sector: Telecommunications
+  - domain: helia.nc
+    organization: Helia New Caledonia
+    sector: Telecommunications
+  - domain: gouv.nc
+    organization: Government of New Caledonia
+    sector: Government
+  - domain: lagoon.nc
+    organization: Lagoon New Caledonia
+    sector: Telecommunications
+  - domain: nautile.nc
+    organization: Nautile New Caledonia
+    sector: Telecommunications

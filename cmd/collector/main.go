@@ -160,6 +160,9 @@ func collectCountry(ctx context.Context, root, dataDir string, pacific *config.P
 	}
 
 	out := filepath.Join(dataDir, "countries", strings.ToUpper(c.ISO2)+".json")
+	// Build into *.json.partial; rename to *.json only after the full pass (domains + APNIC)
+	// so the live file — and the public site — never flip to an in-progress snapshot.
+	stagingPath := out + ".partial"
 
 	var prevAPNIC *model.APNICSnapshot
 	var prevDomains []model.DomainResult
@@ -180,7 +183,7 @@ func collectCountry(ctx context.Context, root, dataDir string, pacific *config.P
 			Domains:          results,
 			APNICLabs:        ap,
 		}
-		return storage.WriteJSON(out, cf)
+		return storage.WriteJSON(stagingPath, cf)
 	}
 
 	nDom := len(df.Domains)
@@ -236,7 +239,7 @@ func collectCountry(ctx context.Context, root, dataDir string, pacific *config.P
 			return err
 		}
 		if verbose {
-			log.Printf("[collector] %s: updated %s (%d/%d domains, collected_at=%s)", c.ISO2, out, i+1, nDom, res.CollectedAt.Format(time.RFC3339Nano))
+			log.Printf("[collector] %s: updated staging %s (%d/%d domains, collected_at=%s)", c.ISO2, stagingPath, i+1, nDom, res.CollectedAt.Format(time.RFC3339Nano))
 		}
 	}
 
@@ -261,7 +264,10 @@ func collectCountry(ctx context.Context, root, dataDir string, pacific *config.P
 	if err := writeCountry(results, ap); err != nil {
 		return err
 	}
-	log.Printf("[collector] %s: wrote %s (%d domain row(s))", c.ISO2, out, len(results))
+	if err := os.Rename(stagingPath, out); err != nil {
+		return fmt.Errorf("publish %s: %w", out, err)
+	}
+	log.Printf("[collector] %s: published %s (%d domain row(s))", c.ISO2, out, len(results))
 	return finishIndex(dataDir, pacific)
 }
 
