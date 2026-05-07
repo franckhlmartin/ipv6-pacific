@@ -132,3 +132,16 @@ func uniqueIPs(in []net.IP) []net.IP {
 	}
 	return out
 }
+
+func dnsLegendExplanation() LegendCheckExplanation {
+	return LegendCheckExplanation{
+		ID:           "dns",
+		Title:        "DNS",
+		Format:       "[NS count] v6 configured/reachable/operational [location]",
+		PlainMeaning: "Shows how many authoritative name servers exist, and how many IPv6 endpoints are configured, responsive, and operational.",
+		Notes: []string{
+			"Configured/Reachable/Operational maps to DNS server endpoints discovered from NS records.",
+			"Location tags indicate hosting locality context for the tested domain.",
+		},
+	}
+}

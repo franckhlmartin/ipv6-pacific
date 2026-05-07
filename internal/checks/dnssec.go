@@ -32,3 +32,16 @@ func checkDNSSEC(ctx context.Context, apex string, cfg Config) model.DNSSECColum
 	// Full chain validation deferred; mark signed for v1.
 	return model.DNSSECColumn{State: "signed", Summary: "S/?/?", Display: "S/?/? (partial)"}
 }
+
+func dnssecLegendExplanation() LegendCheckExplanation {
+	return LegendCheckExplanation{
+		ID:           "dnssec",
+		Title:        "DNSSEC",
+		Format:       "S/?/? (partial), U/-/-, or error text",
+		PlainMeaning: "Shows whether DNSKEY data is observed at the apex (signed), absent (unsigned), or unavailable due to lookup error.",
+		Notes: []string{
+			"S/?/? (partial) indicates partial DNSSEC signal only.",
+			"Full chain validation is not yet performed by this checker.",
+		},
+	}
+}

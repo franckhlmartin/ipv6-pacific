@@ -6,14 +6,14 @@ import (
 	"github.com/pacific-monitor/pacific-monitor/internal/model"
 )
 
-// MaxRowScore is the maximum points returned by RowScore (four columns × 2).
-const MaxRowScore = 8
+// MaxRowScore is the maximum points returned by RowScore (four columns × 1).
+const MaxRowScore = 4
 
-// RowScore sums per-column points for DNS, Mail, Web, and DNSSEC (0–8).
-// Deploy classes: ipv4_only and unknown → 0 (orange / grey), dual_stack → 1 (blue), ipv6_only → 2 (green).
+// RowScore sums per-column points for DNS, Mail, Web, and DNSSEC (0–4).
+// Deploy classes: ipv4_only and unknown → 0 (orange / grey), dual_stack → 1 (blue), ipv6_only → 1 (green).
 //
-// DNSSEC points (same 0/2 scale as a “column”; blue is unused until we distinguish e.g. chain-validated):
-//   - signed (DNSKEY present at apex; chain check deferred in collector) → 2 / green
+// DNSSEC points (0/1 scale as a “column”):
+//   - signed (DNSKEY present at apex; chain check deferred in collector) → 1 / green
 //   - unsigned → 0 / orange
 //   - error or unknown state → 0 / grey
 func RowScore(d model.DomainResult) int {
@@ -25,9 +25,7 @@ func RowScore(d model.DomainResult) int {
 
 func pointsClass(c model.DeployClass) int {
 	switch c {
-	case model.DeployIPv6Only:
-		return 2
-	case model.DeployDual:
+	case model.DeployIPv6Only, model.DeployDual:
 		return 1
 	case model.DeployIPv4Only, model.DeployUnknown:
 		return 0
@@ -39,7 +37,7 @@ func pointsClass(c model.DeployClass) int {
 func pointsDNSSEC(col model.DNSSECColumn) int {
 	switch strings.ToLower(col.State) {
 	case "signed":
-		return 2
+		return 1
 	case "unsigned", "error", "":
 		return 0
 	default:

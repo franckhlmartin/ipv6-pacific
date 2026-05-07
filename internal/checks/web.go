@@ -182,3 +182,16 @@ func httpHeadFamily(ctx context.Context, rawURL string, timeout time.Duration, t
 	resp.Body.Close()
 	return resp.StatusCode < 500
 }
+
+func webLegendExplanation() LegendCheckExplanation {
+	return LegendCheckExplanation{
+		ID:           "web",
+		Title:        "Web",
+		Format:       "[site count] v6 configured/reachable/operational [location]",
+		PlainMeaning: "Shows IPv6 web endpoint readiness for the discovered HTTPS host. Operational means family-specific HTTPS requests complete successfully.",
+		Notes: []string{
+			"Configured/Reachable are derived from discovered A/AAAA records on the final web host.",
+			"Operational reflects request success by family (tcp4 and tcp6 tested separately).",
+		},
+	}
+}

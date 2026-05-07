@@ -115,3 +115,37 @@ Put a reverse proxy in front if you terminate public TLS elsewhere; see `docs/se
 ## TLS / dual-stack border
 
 Optional env **`PROBE_V4_URL`** and **`PROBE_V6_URL`** must point to two distinct hostnames that resolve **A-only** and **AAAA-only** respectively, with TLS SAN coverage, for the blue “dual-stack” browser border. Without them, the UI falls back to **IPv4 vs IPv6 connection** coloring only.
+
+## Adding a new test column (contract)
+
+When adding a new checker or changing checker output, keep collection logic, user-facing legend text, and score semantics aligned.
+
+Required structure:
+
+- Implement the checker in `internal/checks` and keep compact cell output deterministic.
+- Add checker-owned legend metadata in the same package so UI text lives with the test logic:
+  - update `internal/checks/legend.go` aggregator
+  - provide a per-check explanation function in the checker file (pattern used by DNS/Mail/Web/DNSSEC)
+- Use shared status classes consistently (`ipv4_only`, `dual_stack`, `ipv6_only`, `unknown`) for color semantics in the web table.
+
+Required outcome semantics:
+
+- Keep compact output decodable: include what each count/triplet means (Configured / Reachable / Operational).
+- If a test has partial assurance (like DNSSEC currently), include explicit wording that avoids over-claiming.
+- Unknown/error states must remain safe defaults and must not be scored as healthy.
+
+Scoring integration rules:
+
+- If the new test affects score, update `internal/scoring/score.go`:
+  - `RowScore(...)` composition
+  - point mapping rules
+  - `MaxRowScore` if row maximum changes
+  - `EconomyDeploymentScorePct(...)` denominator assumptions
+- Update score legend text in `internal/scoring/legend.go` so `/country/{ISO}` explains the new formula exactly.
+
+PR validation checklist for new tests:
+
+- Country page renders with no template errors on `https://127.0.0.1:8082/country/FJ`.
+- End-of-page legend explains the new checker format and meaning.
+- Status colors and points are still consistent with scoring implementation.
+- Lints pass for touched files and no existing behavior regresses for DNS/Mail/Web/DNSSEC.

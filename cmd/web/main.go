@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
+	"github.com/pacific-monitor/pacific-monitor/internal/checks"
 	"github.com/pacific-monitor/pacific-monitor/internal/config"
 	"github.com/pacific-monitor/pacific-monitor/internal/httpserver"
 	"github.com/pacific-monitor/pacific-monitor/internal/model"
@@ -41,7 +42,7 @@ func main() {
 	allowed := config.AllowedISO(pacific)
 
 	tmpl, err := template.New("").Funcs(template.FuncMap{
-		"rowScore":         scoring.RowScore,
+		"rowScore":        scoring.RowScore,
 		"dnssecCellClass": scoring.DNSSECCellClass,
 	}).ParseFS(templateFS, "templates/*.html")
 	if err != nil {
@@ -200,19 +201,30 @@ func countryPage(tmpl *template.Template, w http.ResponseWriter, r *http.Request
 	probeV4 := os.Getenv("PROBE_V4_URL")
 	probeV6 := os.Getenv("PROBE_V6_URL")
 	sum := summary.FromDomains(cf.Domains)
+	economyScorePct := scoring.EconomyDeploymentScorePct(cf.Domains)
+	checkLegend := checks.CountryLegendCheckExplanations()
+	statusLegend := checks.CountryLegendStatusItems()
+	locationLegend := checks.CountryLegendLocationItems()
+	scoreLegend := scoring.CountryScoreLegend()
+	log.Printf("country legend rendered iso=%s status_items=%d check_items=%d location_items=%d has_results=%t", iso, len(statusLegend), len(checkLegend), len(locationLegend), len(cf.Domains) > 0)
 	_ = tmpl.ExecuteTemplate(w, "country.html", map[string]any{
-		"ISO":           iso,
-		"Name":          name,
-		"Country":       cf,
-		"Summary":       sum,
-		"Title":         name + " — Pacific Islands IPv6 Monitor",
-		"BorderClass":   borderClass,
-		"ProbeV4":       probeV4,
-		"ProbeV6":       probeV6,
-		"ShowDualProbe": probeV4 != "" && probeV6 != "",
-		"HasResults":    len(cf.Domains) > 0,
-		"Generated":     cf.GeneratedAt.Format(time.RFC3339),
-		"Nonce":         httpserver.CSPNonce(r),
+		"ISO":             iso,
+		"Name":            name,
+		"Country":         cf,
+		"Summary":         sum,
+		"Title":           name + " — Pacific Islands IPv6 Monitor",
+		"BorderClass":     borderClass,
+		"ProbeV4":         probeV4,
+		"ProbeV6":         probeV6,
+		"ShowDualProbe":   probeV4 != "" && probeV6 != "",
+		"HasResults":      len(cf.Domains) > 0,
+		"EconomyScorePct": economyScorePct,
+		"Generated":       cf.GeneratedAt.Format(time.RFC3339),
+		"LegendStatus":    statusLegend,
+		"LegendChecks":    checkLegend,
+		"LegendLocation":  locationLegend,
+		"ScoreLegend":     scoreLegend,
+		"Nonce":           httpserver.CSPNonce(r),
 	})
 }
 

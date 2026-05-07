@@ -126,3 +126,16 @@ func smtpEhlo(ctx context.Context, addr string, timeout time.Duration) bool {
 	}
 	return false
 }
+
+func mailLegendExplanation() LegendCheckExplanation {
+	return LegendCheckExplanation{
+		ID:           "mail",
+		Title:        "Mail",
+		Format:       "[MX count] v4 smtp configured/reachable/operational v6 smtp configured/reachable/operational [location]",
+		PlainMeaning: "Shows MX footprint and SMTP health per IP family. Operational means an SMTP banner and EHLO exchange succeeded on port 25.",
+		Notes: []string{
+			"v4 and v6 SMTP are measured separately.",
+			"MX presence without successful SMTP handshake can still produce non-operational results.",
+		},
+	}
+}

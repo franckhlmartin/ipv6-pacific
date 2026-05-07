@@ -20,6 +20,8 @@
       <div class="stat"><span class="stat-label">Mail (operational)</span><span class="stat-value">{{.Summary.Mail}}</span></div>
       <div class="stat"><span class="stat-label">Web (operational)</span><span class="stat-value">{{.Summary.Web}}</span></div>
       <div class="stat"><span class="stat-label">DNSSEC</span><span class="stat-value">{{.Summary.DNSSEC}}</span></div>
+      <div class="stat"><span class="stat-label">Economy score</span><span class="stat-value stat-value--pct" data-pct="{{if .HasResults}}{{printf "%.6f" .EconomyScorePct}}{{end}}">{{if .HasResults}}{{printf "%.1f" .EconomyScorePct}}%{{else}}—{{end}}</span></div>
+      <div class="stat"><span class="stat-label">IPv6 pref. %</span><span class="stat-value stat-value--pct" data-pct="{{if .Country.APNICLabs}}{{printf "%.6f" .Country.APNICLabs.PreferredPct}}{{end}}">{{if .Country.APNICLabs}}{{printf "%.2f" .Country.APNICLabs.PreferredPct}}%{{else}}—{{end}}</span></div>
     </section>
 
     {{if .Country.APNICLabs}}
@@ -55,7 +57,7 @@
               </button>
             </th>
             <th scope="col" class="sortable">
-              <button type="button" class="sort-trigger" data-sort-index="3" data-sort-mode="number" title="Sort by score 0–8 (click again to reverse)">
+              <button type="button" class="sort-trigger" data-sort-index="3" data-sort-mode="number" title="Sort by score 0–4 (click again to reverse)">
                 <span class="sort-trigger__label">Score</span><span class="sort-indicator" aria-hidden="true"></span>
               </button>
             </th>
@@ -83,12 +85,64 @@
     </div>
       {{end}}
     </section>
+
+    <section class="country-legend-section" aria-label="Result legend and score methodology" data-legend-version="v1">
+      <h2>How to Read Results</h2>
+      <p class="country-legend-intro">Each test cell combines a color status and a compact technical summary. The notes below explain both in plain language.</p>
+
+      <h3>Status and points</h3>
+      <ul class="legend-list">
+        {{range .LegendStatus}}
+        <li class="legend-list__item">
+          <span class="legend-chip cell--{{.Class}}">{{.Label}}</span>
+          <span>{{.Description}} ({{.Points}} point{{if ne .Points 1}}s{{end}} per column)</span>
+        </li>
+        {{end}}
+      </ul>
+
+      <h3>Per-test output format</h3>
+      <div class="legend-check-grid">
+        {{range .LegendChecks}}
+        <article class="legend-check-card">
+          <h4>{{.Title}}</h4>
+          <p><strong>Format:</strong> <code>{{.Format}}</code></p>
+          <p><strong>Meaning:</strong> {{.PlainMeaning}}</p>
+          {{if .Notes}}
+          <ul>
+            {{range .Notes}}
+            <li>{{.}}</li>
+            {{end}}
+          </ul>
+          {{end}}
+        </article>
+        {{end}}
+      </div>
+
+      <h3>Location tag key</h3>
+      <ul class="legend-list">
+        {{range .LegendLocation}}
+        <li class="legend-list__item"><code>[{{.Tag}}]</code> <strong>{{.Label}}</strong>: {{.Description}}</li>
+        {{end}}
+      </ul>
+
+      <h3>How score is built</h3>
+      <p><strong>Row score:</strong> {{.ScoreLegend.RowRange}}. {{.ScoreLegend.RowFormula}}</p>
+      <ul class="legend-list">
+        {{range .ScoreLegend.StatusMappings}}
+        <li class="legend-list__item"><span>{{.Label}}:</span> <span>{{.Points}} point{{if ne .Points 1}}s{{end}}</span></li>
+        {{end}}
+      </ul>
+      <p>{{.ScoreLegend.DNSSECRule}}</p>
+      <p><strong>Economy score:</strong> {{.ScoreLegend.EconomyFormula}}</p>
+    </section>
   </main>
 
   <footer class="site-footer">
     <p>Measurements are estimates from a single vantage point and may reflect transient routing or firewall effects.</p>
   </footer>
 
+  <script src="/static/js/pct-color-ramp.js"></script>
+  <script src="/static/js/country-summary-strip.js"></script>
   <script src="/static/js/border.js"></script>
   {{if .HasResults}}<script src="/static/js/table-sort.js"></script>{{end}}
   <script nonce="{{.Nonce}}">

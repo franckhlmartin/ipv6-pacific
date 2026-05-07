@@ -13,8 +13,8 @@ func TestRowScore(t *testing.T) {
 		Web:    model.ServiceColumn{Class: model.DeployIPv6Only},
 		DNSSEC: model.DNSSECColumn{State: "signed"},
 	}
-	if got := RowScore(d); got != 0+1+2+2 {
-		t.Fatalf("RowScore = %d want 5", got)
+	if got := RowScore(d); got != 0+1+1+1 {
+		t.Fatalf("RowScore = %d want 3", got)
 	}
 }
 
@@ -64,8 +64,8 @@ func TestEconomyDeploymentScorePct(t *testing.T) {
 		Web:    model.ServiceColumn{Class: model.DeployDual},
 		DNSSEC: model.DNSSECColumn{State: "unsigned"},
 	}
-	// RowScore = 1+1+1+0 = 3; 3/8 * 100 = 37.5
-	if got := EconomyDeploymentScorePct([]model.DomainResult{half}); got != 37.5 {
-		t.Fatalf("half-ish row = %v want 37.5", got)
+	// RowScore = 1+1+1+0 = 3; 3/4 * 100 = 75
+	if got := EconomyDeploymentScorePct([]model.DomainResult{half}); got != 75 {
+		t.Fatalf("half-ish row = %v want 75", got)
 	}
 }

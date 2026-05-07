@@ -24,14 +24,14 @@ type Index struct {
 
 // IndexCountry summarizes one economy for the map and listing APIs.
 type IndexCountry struct {
-	ISO2                 string            `json:"iso2"`
-	Name                 string            `json:"name"`
-	DomainCount          int               `json:"domain_count"`
-	Summary              DeploymentSummary `json:"summary"`
-	DeploymentScorePct   float64           `json:"deployment_score_pct"` // mean RowScore / 8 · 100 (0–100); comparable across economies
-	Centroid             []float64         `json:"centroid,omitempty"` // [lon, lat] for GeoJSON/map
-	APNICLabs            *APNICSnapshot    `json:"apnic_labs,omitempty"`
-	LastCollected        *time.Time        `json:"last_collected,omitempty"`
+	ISO2               string            `json:"iso2"`
+	Name               string            `json:"name"`
+	DomainCount        int               `json:"domain_count"`
+	Summary            DeploymentSummary `json:"summary"`
+	DeploymentScorePct float64           `json:"deployment_score_pct"` // mean RowScore / 4 · 100 (0–100); comparable across economies
+	Centroid           []float64         `json:"centroid,omitempty"`   // [lon, lat] for GeoJSON/map
+	APNICLabs          *APNICSnapshot    `json:"apnic_labs,omitempty"`
+	LastCollected      *time.Time        `json:"last_collected,omitempty"`
 }
 
 // DeploymentSummary rolls up domain deployment classes for counters on /country header.
@@ -95,13 +95,13 @@ type DNSSECColumn struct {
 
 // APNICSnapshot is merged from v6economy/{CC}.json latest row.
 type APNICSnapshot struct {
-	Copyright    string    `json:"copyright,omitempty"`
-	SourceURL    string    `json:"source_url"`
-	Date         string    `json:"date"` // measurement date YYYY-MM-DD
-	Updated      string    `json:"updated,omitempty"`
-	Preferred    float64   `json:"preferred_raw,omitempty"`
+	Copyright string  `json:"copyright,omitempty"`
+	SourceURL string  `json:"source_url"`
+	Date      string  `json:"date"` // measurement date YYYY-MM-DD
+	Updated   string  `json:"updated,omitempty"`
+	Preferred float64 `json:"preferred_raw,omitempty"`
 	// No omitempty: 0% is valid data; omitting the field made clients treat it like “no APNIC”.
-	PreferredPct float64 `json:"preferred_pc_raw"`
-	Seen         float64 `json:"seen_raw,omitempty"`
+	PreferredPct float64   `json:"preferred_pc_raw"`
+	Seen         float64   `json:"seen_raw,omitempty"`
 	FetchedAt    time.Time `json:"fetched_at"`
 }

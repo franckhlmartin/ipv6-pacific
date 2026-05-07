@@ -98,6 +98,59 @@ h2 { font-size: 1.15rem; margin-top: 1.5rem; }
   padding-left: 0;
   padding-right: 0;
 }
+.country-legend-section {
+  margin: 0 1.25rem 2rem;
+  padding: 1rem 1.1rem;
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+}
+.country-legend-section h2 {
+  margin-top: 0;
+}
+.country-legend-intro {
+  margin: 0 0 0.75rem;
+  color: #333;
+}
+.legend-list {
+  margin: 0.4rem 0 1rem;
+  padding-left: 1.2rem;
+}
+.legend-list__item {
+  margin: 0.3rem 0;
+}
+.legend-chip {
+  display: inline-block;
+  min-width: 6.2rem;
+  margin-right: 0.35rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  font-weight: 600;
+}
+.legend-check-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.7rem;
+  margin-bottom: 1rem;
+}
+.legend-check-card {
+  background: #fafafa;
+  border: 1px solid #ececec;
+  border-radius: 6px;
+  padding: 0.7rem 0.8rem;
+}
+.legend-check-card h4 {
+  margin: 0 0 0.45rem;
+  font-size: 1rem;
+}
+.legend-check-card p {
+  margin: 0.2rem 0;
+}
+.legend-check-card ul {
+  margin: 0.4rem 0 0;
+  padding-left: 1.1rem;
+}
 
 .visually-hidden {
   position: absolute;
@@ -235,6 +288,11 @@ h2 { font-size: 1.15rem; margin-top: 1.5rem; }
 }
 .stat-label { font-size: 0.75rem; color: #555; text-transform: uppercase; letter-spacing: 0.04em; }
 .stat-value { font-size: 1.5rem; font-weight: 600; }
+.stat-value--pct {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  border-radius: 6px;
+}
 
 .apnic-banner {
   margin: 0 1.25rem 1rem;
