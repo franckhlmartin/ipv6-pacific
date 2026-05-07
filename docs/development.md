@@ -118,7 +118,11 @@ Optional env **`PROBE_V4_URL`** and **`PROBE_V6_URL`** must point to two distinc
 
 At startup, **`pacific-web` logs** either that dual-stack probes are configured or that it will use **`/api/client-ip-family` only**. The HTML should contain non-empty `window.__PROBE_V4__` / `window.__PROBE_V6__` (the inline bootstrap runs **before** `border.js`); probe **`fetch()` requests go to those hostnames**, so they appear in **those vhosts’** access logs, not necessarily on `pacific.ipv6forum.com`. **`Content-Security-Policy` `connect-src`** is extended automatically from `PROBE_*` origins so those fetches are permitted.
 
-The app’s **`GET /api/healthz`** responses include **`Access-Control-Allow-Origin`** (default `*`, override with **`HEALTHZ_CORS_ALLOW_ORIGIN`**) so the main page can read the probe response cross-origin. If a **reverse proxy** answers `/api/healthz` without forwarding to `pacific-web`, add the same CORS headers (or proxy to the app) on the **ipv4 / ipv6 probe** vhosts.
+The app’s **`GET /api/healthz`** responses are JSON: **`{"ok":true}`** plus **`"ip"`** (client address as seen by that request, using the same **`RemoteIP`** / **`X-Forwarded-For`** rules as elsewhere) when known. The border script uses **`ip`** from each probe response in the **connection details** modal. Responses include **`Access-Control-Allow-Origin`** (default `*`, override with **`HEALTHZ_CORS_ALLOW_ORIGIN`**) so the main page can read the body cross-origin. If a **reverse proxy** answers `/api/healthz` without forwarding to `pacific-web`, add the same CORS headers (or proxy to the app) on the **ipv4 / ipv6 probe** vhosts and include **`ip`** in the JSON if operators synthesize the response.
+
+**`GET /api/client-ip-family`** returns **`family`** (`ipv4` or `ipv6`) and **`ip`** for the browser’s connection to the **main** site when dual-stack probe URLs are not configured; that endpoint is **rate-limited** like other `/api/*` routes (see `docs/security.md`). The header shows **IPv4 only**, **IPv6 only**, or **Dual stack** (matching table legend wording) with optional details in a dialog.
+
+For **privacy and trust** assumptions when showing addresses in the UI, see **`docs/security.md`** (Client IP in UI).
 
 ## Adding a new test column (contract)
 

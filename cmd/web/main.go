@@ -75,7 +75,11 @@ func main() {
 	healthz := func(w http.ResponseWriter, r *http.Request) {
 		applyHealthzCORS(w)
 		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte(`{"ok":true}`))
+		payload := struct {
+			OK bool   `json:"ok"`
+			IP string `json:"ip,omitempty"`
+		}{OK: true, IP: httpserver.RemoteIP(r)}
+		_ = json.NewEncoder(w).Encode(payload)
 	}
 	mux.HandleFunc("GET /api/healthz", healthz)
 	mux.HandleFunc("OPTIONS /api/healthz", func(w http.ResponseWriter, r *http.Request) {
@@ -88,7 +92,10 @@ func main() {
 		if httpserver.IsIPv6Client(r) {
 			v = "ipv6"
 		}
-		json.NewEncoder(w).Encode(map[string]string{"family": v})
+		_ = json.NewEncoder(w).Encode(map[string]string{
+			"family": v,
+			"ip":     httpserver.RemoteIP(r),
+		})
 	})
 
 	probeConnect := httpserver.ConnectSrcFromProbeEnv()
