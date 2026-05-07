@@ -1,7 +1,10 @@
 :root {
-  --color-ipv4-only: #FFA500;
-  --color-dual: #0000FF;
-  --color-ipv6-only: #008000;
+  --status-ipv4-only-rgb: 255, 165, 0;
+  --status-dual-stack-rgb: 0, 0, 255;
+  --status-ipv6-only-rgb: 0, 128, 0;
+  --color-ipv4-only: rgb(var(--status-ipv4-only-rgb));
+  --color-dual: rgb(var(--status-dual-stack-rgb));
+  --color-ipv6-only: rgb(var(--status-ipv6-only-rgb));
   --border-width: 6px;
 }
 
@@ -362,9 +365,9 @@ h2 { font-size: 1.15rem; margin-top: 1.5rem; }
   white-space: nowrap;
 }
 
-.cell--ipv4_only { background-color: rgba(255, 165, 0, 0.35); }
-.cell--dual_stack { background-color: rgba(0, 0, 255, 0.25); color: #111; }
-.cell--ipv6_only { background-color: rgba(0, 128, 0, 0.35); }
+.cell--ipv4_only { background-color: rgba(var(--status-ipv4-only-rgb), 0.35); }
+.cell--dual_stack { background-color: rgba(var(--status-dual-stack-rgb), 0.25); color: #111; }
+.cell--ipv6_only { background-color: rgba(var(--status-ipv6-only-rgb), 0.35); }
 .cell--unknown { background-color: #f0f0f0; }
 
 .empty-state {

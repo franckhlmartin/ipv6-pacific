@@ -143,11 +143,11 @@
 
   <script src="/static/js/pct-color-ramp.js"></script>
   <script src="/static/js/country-summary-strip.js"></script>
-  <script src="/static/js/border.js"></script>
   {{if .HasResults}}<script src="/static/js/table-sort.js"></script>{{end}}
   <script nonce="{{.Nonce}}">
     window.__PROBE_V4__ = {{if .ProbeV4}}"{{.ProbeV4}}"{{else}}""{{end}};
     window.__PROBE_V6__ = {{if .ProbeV6}}"{{.ProbeV6}}"{{else}}""{{end}};
   </script>
+  <script src="/static/js/border.js"></script>
 </body>
 </html>

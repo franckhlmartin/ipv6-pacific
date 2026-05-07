@@ -72,7 +72,7 @@ See **`docs/commit-workflow.md`** (check changes since last push, doc updates, c
 
 See `scripts/push_to_prod.sh`. Set `PROD_DEST` to your `user@host:/path`. It builds Linux **`pacific-web`** and **`pacific-collector`**, rsyncs code + config — **never** ships `.env`.
 
-On the server, create **`/opt/ipv6-pacific/.env`** from `.env.example` (set `DATA_DIR`, `LISTEN`, `TLS_CERT_FILE`, `TLS_KEY_FILE`, etc.). The web binary loads `.env` / `.env.local` from **`WorkingDirectory`**. Run the collector as a separate service or cron so `data/` stays populated. **`data/` must be readable by the web service user** (e.g. `franck`). If you sometimes run the collector as **root**, set **`COLLECTOR_DATA_USER=franck`** (and optionally **`COLLECTOR_DATA_GROUP`**) so each successful run **`chown`s `DATA_DIR`** after writing; otherwise use **`chown -R franck:franck data`** or run the collector as **`User=franck`**. Without that, the UI can show “No index yet” even when `index.json` exists.
+On the server, create **`/opt/ipv6-pacific/.env`** from `.env.example` (set `DATA_DIR`, `LISTEN`, `TLS_CERT_FILE`, `TLS_KEY_FILE`, etc.). **`pacific-web` and `pacific-collector` load `.env` / `.env.local` from the directory containing the executable (after resolving symlinks), then from the process working directory** — whichever comes first populates variables, and `godotenv` does not overwrite names already set in the environment. Prefer **`WorkingDirectory=/opt/ipv6-pacific`** so relative paths in `.env` (e.g. `PROJECT_ROOT=.`, cert paths) stay correct. If **`Environment=` or `EnvironmentFile=` pre-defines a key** (even as empty), values from `.env` for that key are skipped; remove duplicate keys from the unit if probes or other vars look unset. Run the collector as a separate service or cron so `data/` stays populated. **`data/` must be readable by the web service user** (e.g. `franck`). If you sometimes run the collector as **root**, set **`COLLECTOR_DATA_USER=franck`** (and optionally **`COLLECTOR_DATA_GROUP`**) so each successful run **`chown`s `DATA_DIR`** after writing; otherwise use **`chown -R franck:franck data`** or run the collector as **`User=franck`**. Without that, the UI can show “No index yet” even when `index.json` exists.
 
 ### systemd service (web)
 
@@ -115,6 +115,10 @@ Put a reverse proxy in front if you terminate public TLS elsewhere; see `docs/se
 ## TLS / dual-stack border
 
 Optional env **`PROBE_V4_URL`** and **`PROBE_V6_URL`** must point to two distinct hostnames that resolve **A-only** and **AAAA-only** respectively, with TLS SAN coverage, for the blue “dual-stack” browser border. Without them, the UI falls back to **IPv4 vs IPv6 connection** coloring only.
+
+At startup, **`pacific-web` logs** either that dual-stack probes are configured or that it will use **`/api/client-ip-family` only**. The HTML should contain non-empty `window.__PROBE_V4__` / `window.__PROBE_V6__` (the inline bootstrap runs **before** `border.js`); probe **`fetch()` requests go to those hostnames**, so they appear in **those vhosts’** access logs, not necessarily on `pacific.ipv6forum.com`. **`Content-Security-Policy` `connect-src`** is extended automatically from `PROBE_*` origins so those fetches are permitted.
+
+The app’s **`GET /api/healthz`** responses include **`Access-Control-Allow-Origin`** (default `*`, override with **`HEALTHZ_CORS_ALLOW_ORIGIN`**) so the main page can read the probe response cross-origin. If a **reverse proxy** answers `/api/healthz` without forwarding to `pacific-web`, add the same CORS headers (or proxy to the app) on the **ipv4 / ipv6 probe** vhosts.
 
 ## Adding a new test column (contract)
 

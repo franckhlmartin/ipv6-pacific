@@ -12,18 +12,17 @@ import (
 	"strings"
 	"time"
 
-	"github.com/joho/godotenv"
 	"github.com/pacific-monitor/pacific-monitor/internal/apniclabs"
 	"github.com/pacific-monitor/pacific-monitor/internal/checks"
 	"github.com/pacific-monitor/pacific-monitor/internal/config"
+	"github.com/pacific-monitor/pacific-monitor/internal/dotenv"
 	"github.com/pacific-monitor/pacific-monitor/internal/indexbuilder"
 	"github.com/pacific-monitor/pacific-monitor/internal/model"
 	"github.com/pacific-monitor/pacific-monitor/internal/storage"
 )
 
 func main() {
-	_ = godotenv.Load(".env")
-	_ = godotenv.Load(".env.local")
+	dotenv.Load()
 
 	runOnce := flag.Bool("run-once", false, "collect then exit: all countries, or only --country if set")
 	verbose := flag.Bool("verbose", false, "per-domain progress logs (defaults on when using -run-once)")

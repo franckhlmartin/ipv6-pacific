@@ -12,9 +12,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/joho/godotenv"
 	"github.com/pacific-monitor/pacific-monitor/internal/checks"
 	"github.com/pacific-monitor/pacific-monitor/internal/config"
+	"github.com/pacific-monitor/pacific-monitor/internal/dotenv"
 	"github.com/pacific-monitor/pacific-monitor/internal/httpserver"
 	"github.com/pacific-monitor/pacific-monitor/internal/model"
 	"github.com/pacific-monitor/pacific-monitor/internal/scoring"
@@ -28,8 +28,7 @@ var templateFS embed.FS
 var staticFS embed.FS
 
 func main() {
-	_ = godotenv.Load(".env")
-	_ = godotenv.Load(".env.local")
+	dotenv.Load()
 
 	dataDir := getenv("DATA_DIR", "./data")
 	addr := getenv("LISTEN", ":8082")
@@ -73,9 +72,15 @@ func main() {
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 		w.Write([]byte("Contact: mailto:security@example.com\nPreferred-Languages: en\n"))
 	})
-	mux.HandleFunc("GET /api/healthz", func(w http.ResponseWriter, r *http.Request) {
+	healthz := func(w http.ResponseWriter, r *http.Request) {
+		applyHealthzCORS(w)
 		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(`{"ok":true}`))
+	}
+	mux.HandleFunc("GET /api/healthz", healthz)
+	mux.HandleFunc("OPTIONS /api/healthz", func(w http.ResponseWriter, r *http.Request) {
+		applyHealthzCORS(w)
+		w.WriteHeader(http.StatusNoContent)
 	})
 	mux.HandleFunc("GET /api/client-ip-family", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -86,7 +91,8 @@ func main() {
 		json.NewEncoder(w).Encode(map[string]string{"family": v})
 	})
 
-	handler := httpserver.SecurityHeaders(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	probeConnect := httpserver.ConnectSrcFromProbeEnv()
+	handler := httpserver.SecurityHeaders(probeConnect, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if strings.HasPrefix(r.URL.Path, "/api/") && r.URL.Path != "/api/healthz" && !rl.Allow(httpserver.RemoteIP(r)) {
 			http.Error(w, "too many requests", http.StatusTooManyRequests)
 			return
@@ -101,6 +107,12 @@ func main() {
 	}
 	if _, err := os.Stat(keyFile); err != nil {
 		log.Fatalf("TLS key not readable at %s (PROJECT_ROOT=%q): %v", keyFile, root, err)
+	}
+
+	if pv4, pv6 := os.Getenv("PROBE_V4_URL"), os.Getenv("PROBE_V6_URL"); pv4 != "" && pv6 != "" {
+		log.Print("web: dual-stack border probes configured (PROBE_V4_URL and PROBE_V6_URL set)")
+	} else {
+		log.Print("web: dual-stack border probes not configured — UI will call /api/client-ip-family only; set both PROBE_V4_URL and PROBE_V6_URL in .env (see docs/development.md)")
 	}
 
 	log.Printf("web listening with TLS on %s (cert %s)", addr, certFile)
@@ -121,6 +133,18 @@ func getenv(k, d string) string {
 		return v
 	}
 	return d
+}
+
+// applyHealthzCORS allows fetch() from the main site to probe hostnames that serve the same /api/healthz.
+// Set HEALTHZ_CORS_ALLOW_ORIGIN to a single origin (e.g. https://pacific.ipv6forum.com); default is *.
+func applyHealthzCORS(w http.ResponseWriter) {
+	allow := strings.TrimSpace(os.Getenv("HEALTHZ_CORS_ALLOW_ORIGIN"))
+	if allow == "" {
+		allow = "*"
+	}
+	w.Header().Set("Access-Control-Allow-Origin", allow)
+	w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+	w.Header().Set("Access-Control-Max-Age", "86400")
 }
 
 func serveFile(w http.ResponseWriter, path string) {

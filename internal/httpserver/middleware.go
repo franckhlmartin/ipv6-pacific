@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"net/url"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -20,9 +22,38 @@ func CSPNonce(r *http.Request) string {
 	return v
 }
 
+// ConnectSrcFromProbeEnv returns extra CSP connect-src tokens (scheme://host) for PROBE_V4_URL /
+// PROBE_V6_URL so the border script can fetch() those origins.
+func ConnectSrcFromProbeEnv() []string {
+	seen := make(map[string]struct{})
+	var out []string
+	for _, key := range []string{"PROBE_V4_URL", "PROBE_V6_URL"} {
+		raw := strings.TrimSpace(os.Getenv(key))
+		if raw == "" {
+			continue
+		}
+		u, err := url.Parse(raw)
+		if err != nil || u.Host == "" {
+			continue
+		}
+		scheme := u.Scheme
+		if scheme == "" {
+			scheme = "https"
+		}
+		token := scheme + "://" + u.Host
+		if _, ok := seen[token]; ok {
+			continue
+		}
+		seen[token] = struct{}{}
+		out = append(out, token)
+	}
+	return out
+}
+
 // SecurityHeaders adds baseline headers (CSP is relaxed for Leaflet from self + map tiles).
 // Inline scripts in HTML pages must use nonce="{{.Nonce}}" and receive CSPNonce from the request context.
-func SecurityHeaders(h http.Handler) http.Handler {
+// extraConnectSrc adds origins for cross-origin fetch (e.g. IPv4/IPv6 probe health URLs).
+func SecurityHeaders(extraConnectSrc []string, h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		nonceBytes := make([]byte, 16)
 		_, _ = rand.Read(nonceBytes)
@@ -34,12 +65,19 @@ func SecurityHeaders(h http.Handler) http.Handler {
 		w.Header().Set("Permissions-Policy", "geolocation=(), camera=(), microphone=()")
 		// Map tiles: allow OSM, allow unpkg for Leaflet (see templates). Tighten to self-hosted vendor later.
 		// script-src uses a per-request nonce so small inline bootstraps (probe URLs) work without 'unsafe-inline'.
+		connectParts := []string{"'self'", "https://unpkg.com"}
+		for _, o := range extraConnectSrc {
+			o = strings.TrimSpace(o)
+			if o != "" {
+				connectParts = append(connectParts, o)
+			}
+		}
 		csp := strings.Join([]string{
 			"default-src 'self'",
 			fmt.Sprintf("script-src 'self' https://unpkg.com 'nonce-%s'", nonce),
 			"style-src 'self' 'unsafe-inline' https://unpkg.com",
 			"img-src 'self' data: https://*.tile.openstreetmap.org",
-			"connect-src 'self' https://unpkg.com",
+			fmt.Sprintf("connect-src %s", strings.Join(connectParts, " ")),
 			"font-src 'self' https://unpkg.com",
 			"object-src 'none'",
 			"base-uri 'self'",
