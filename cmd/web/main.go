@@ -24,7 +24,7 @@ import (
 //go:embed templates/*.html
 var templateFS embed.FS
 
-//go:embed static/css static/js static/img
+//go:embed static/css static/js static/img static/well-known/pki-validation/starfield.html
 var staticFS embed.FS
 
 func main() {
@@ -50,11 +50,13 @@ func main() {
 	}
 
 	static, _ := fs.Sub(staticFS, "static")
+	wellKnown, _ := fs.Sub(staticFS, "static/well-known")
 	rl := httpserver.NewRateLimit(20, 40)
 	mux := http.NewServeMux()
 
 	// Use explicit GET for static assets so Go 1.22+ ServeMux does not conflict with "GET /".
 	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.FS(static))))
+	mux.Handle("GET /.well-known/", http.StripPrefix("/.well-known/", http.FileServer(http.FS(wellKnown))))
 	mux.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) { home(tmpl, w, r, dataDir, pacific) })
 	mux.HandleFunc("GET /country/{iso}", func(w http.ResponseWriter, r *http.Request) { countryPage(tmpl, w, r, dataDir, pacific, allowed) })
 	mux.HandleFunc("GET /api/index.json", func(w http.ResponseWriter, r *http.Request) { serveFile(w, filepath.Join(dataDir, "index.json")) })
