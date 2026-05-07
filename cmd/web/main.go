@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"embed"
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"io/fs"
 	"log"
@@ -17,14 +19,16 @@ import (
 	"github.com/pacific-monitor/pacific-monitor/internal/dotenv"
 	"github.com/pacific-monitor/pacific-monitor/internal/httpserver"
 	"github.com/pacific-monitor/pacific-monitor/internal/model"
+	"github.com/pacific-monitor/pacific-monitor/internal/ogmap"
 	"github.com/pacific-monitor/pacific-monitor/internal/scoring"
+	"github.com/pacific-monitor/pacific-monitor/internal/siteurl"
 	"github.com/pacific-monitor/pacific-monitor/internal/summary"
 )
 
-//go:embed templates/*.html
+//go:embed templates/*.html templates/partials/*.html
 var templateFS embed.FS
 
-//go:embed static/css static/js static/img static/well-known/pki-validation/starfield.html
+//go:embed static/css static/js static/img static/robots.txt static/well-known/pki-validation/starfield.html
 var staticFS embed.FS
 
 func main() {
@@ -43,7 +47,7 @@ func main() {
 	tmpl, err := template.New("").Funcs(template.FuncMap{
 		"rowScore":        scoring.RowScore,
 		"dnssecCellClass": scoring.DNSSECCellClass,
-	}).ParseFS(templateFS, "templates/*.html")
+	}).ParseFS(templateFS, "templates/*.html", "templates/partials/*.html")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -51,11 +55,16 @@ func main() {
 	static, _ := fs.Sub(staticFS, "static")
 	wellKnown, _ := fs.Sub(staticFS, "static/well-known")
 	rl := httpserver.NewRateLimit(20, 40)
+	ogRL := httpserver.NewRateLimit(15, 30)
 	mux := http.NewServeMux()
 
 	// Use explicit GET for static assets so Go 1.22+ ServeMux does not conflict with "GET /".
 	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.FS(static))))
 	mux.Handle("GET /.well-known/", http.StripPrefix("/.well-known/", http.FileServer(http.FS(wellKnown))))
+	mux.HandleFunc("GET /robots.txt", serveRobotsTxt)
+	mux.HandleFunc("GET /og/map.png", func(w http.ResponseWriter, r *http.Request) {
+		serveOGMapPNG(w, r, dataDir)
+	})
 	mux.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) { home(tmpl, w, r, dataDir, pacific) })
 	mux.HandleFunc("GET /country/{iso}", func(w http.ResponseWriter, r *http.Request) { countryPage(tmpl, w, r, dataDir, pacific, allowed) })
 	mux.HandleFunc("GET /api/index.json", func(w http.ResponseWriter, r *http.Request) { serveFile(w, filepath.Join(dataDir, "index.json")) })
@@ -100,7 +109,12 @@ func main() {
 
 	probeConnect := httpserver.ConnectSrcFromProbeEnv()
 	handler := httpserver.SecurityHeaders(probeConnect, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if strings.HasPrefix(r.URL.Path, "/api/") && r.URL.Path != "/api/healthz" && !rl.Allow(httpserver.RemoteIP(r)) {
+		ip := httpserver.RemoteIP(r)
+		if strings.HasPrefix(r.URL.Path, "/og/") && !ogRL.Allow(ip) {
+			http.Error(w, "too many requests", http.StatusTooManyRequests)
+			return
+		}
+		if strings.HasPrefix(r.URL.Path, "/api/") && r.URL.Path != "/api/healthz" && !rl.Allow(ip) {
 			http.Error(w, "too many requests", http.StatusTooManyRequests)
 			return
 		}
@@ -120,6 +134,10 @@ func main() {
 		log.Print("web: dual-stack border probes configured (PROBE_V4_URL and PROBE_V6_URL set)")
 	} else {
 		log.Print("web: dual-stack border probes not configured — UI will call /api/client-ip-family only; set both PROBE_V4_URL and PROBE_V6_URL in .env (see docs/development.md)")
+	}
+
+	if strings.TrimSpace(os.Getenv("PUBLIC_SITE_URL")) == "" {
+		log.Print("web: PUBLIC_SITE_URL is unset — canonical and Open Graph URLs use each request's Host; set PUBLIC_SITE_URL when behind a reverse proxy (see .env.example)")
 	}
 
 	log.Printf("web listening with TLS on %s (cert %s)", addr, certFile)
@@ -154,6 +172,16 @@ func applyHealthzCORS(w http.ResponseWriter) {
 	w.Header().Set("Access-Control-Max-Age", "86400")
 }
 
+func serveRobotsTxt(w http.ResponseWriter, r *http.Request) {
+	data, err := staticFS.ReadFile("static/robots.txt")
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	_, _ = w.Write(data)
+}
+
 func serveFile(w http.ResponseWriter, path string) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	raw, err := os.ReadFile(path)
@@ -162,6 +190,83 @@ func serveFile(w http.ResponseWriter, path string) {
 		return
 	}
 	w.Write(raw)
+}
+
+func seoMerge(r *http.Request, data map[string]any, title, metaDescription string) {
+	p := r.URL.Path
+	if p == "" {
+		p = "/"
+	}
+	data["MetaDescription"] = metaDescription
+	data["CanonicalURL"] = siteurl.AbsoluteURL(r, p)
+	data["OgTitle"] = title
+	data["OgSiteName"] = "Pacific Islands IPv6 Monitor"
+	data["OgImageURL"] = siteurl.AbsoluteURL(r, "/og/map.png")
+}
+
+func serveOGMapPNG(w http.ResponseWriter, r *http.Request, dataDir string) {
+	ctx, cancel := context.WithTimeout(r.Context(), 15*time.Second)
+	defer cancel()
+
+	indexPath := filepath.Join(dataDir, "index.json")
+	indexJSON, err := os.ReadFile(indexPath)
+	if err != nil {
+		if !os.IsNotExist(err) {
+			log.Printf("og map: read index: %v", err)
+		}
+		indexJSON = []byte("{}")
+	}
+
+	svgBytes, err := staticFS.ReadFile("static/img/EEZ_Oceania.svg")
+	if err != nil {
+		log.Printf("og map: read svg: %v", err)
+		writeOGFallback(w)
+		return
+	}
+
+	type gen struct {
+		png  []byte
+		etag string
+		err  error
+	}
+	ch := make(chan gen, 1)
+	go func() {
+		png, etag, err := ogmap.BuildMapPNG(indexJSON, svgBytes)
+		ch <- gen{png: png, etag: etag, err: err}
+	}()
+
+	select {
+	case <-ctx.Done():
+		log.Print("og map: generation timed out")
+		writeOGFallback(w)
+	case out := <-ch:
+		if out.err != nil {
+			log.Printf("og map: build: %v", out.err)
+			writeOGFallback(w)
+			return
+		}
+		w.Header().Set("Content-Type", "image/png")
+		w.Header().Set("Cache-Control", "public, max-age=300")
+		w.Header().Set("ETag", `"`+out.etag+`"`)
+		if inm := strings.Trim(r.Header.Get("If-None-Match"), `"`); inm != "" && inm == out.etag {
+			w.WriteHeader(http.StatusNotModified)
+			return
+		}
+		_, _ = w.Write(out.png)
+	}
+}
+
+func writeOGFallback(w http.ResponseWriter) {
+	b, err := ogmap.FallbackPNG()
+	if err != nil {
+		http.Error(w, "internal error", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "image/png")
+	w.Header().Set("Cache-Control", "public, max-age=3600")
+	w.Header().Set("ETag", `"og-fallback-v1"`)
+	w.WriteHeader(http.StatusOK)
+	_, _ = w.Write(b)
 }
 
 func home(tmpl *template.Template, w http.ResponseWriter, r *http.Request, dataDir string, pacific *config.PacificList) {
@@ -187,9 +292,11 @@ func home(tmpl *template.Template, w http.ResponseWriter, r *http.Request, dataD
 	}
 	probeV4 := os.Getenv("PROBE_V4_URL")
 	probeV6 := os.Getenv("PROBE_V6_URL")
-	_ = tmpl.ExecuteTemplate(w, "home.html", map[string]any{
+	pageTitle := "Pacific Islands IPv6 Monitor"
+	metaDesc := "Pacific Islands IPv6 Monitor — IPv6 deployment estimates for Pacific economies from DNS, mail, and web checks plus APNIC Labs capability data."
+	data := map[string]any{
 		"Index":         idx,
-		"Title":         "Pacific Islands IPv6 Monitor",
+		"Title":         pageTitle,
 		"BorderClass":   borderClass,
 		"Generated":     gen,
 		"EEZNotice":     "EEZ overview map: Wikimedia Commons — File:EEZ_Oceania.svg (author STyx, public domain). Source: https://commons.wikimedia.org/wiki/File:EEZ_Oceania.svg",
@@ -197,7 +304,9 @@ func home(tmpl *template.Template, w http.ResponseWriter, r *http.Request, dataD
 		"ProbeV6":       probeV6,
 		"ShowDualProbe": probeV4 != "" && probeV6 != "",
 		"Nonce":         httpserver.CSPNonce(r),
-	})
+	}
+	seoMerge(r, data, pageTitle, metaDesc)
+	_ = tmpl.ExecuteTemplate(w, "home.html", data)
 }
 
 func countryPage(tmpl *template.Template, w http.ResponseWriter, r *http.Request, dataDir string, pacific *config.PacificList, allowed map[string]struct{}) {
@@ -240,12 +349,14 @@ func countryPage(tmpl *template.Template, w http.ResponseWriter, r *http.Request
 	locationLegend := checks.CountryLegendLocationItems()
 	scoreLegend := scoring.CountryScoreLegend()
 	log.Printf("country legend rendered iso=%s status_items=%d check_items=%d location_items=%d has_results=%t", iso, len(statusLegend), len(checkLegend), len(locationLegend), len(cf.Domains) > 0)
-	_ = tmpl.ExecuteTemplate(w, "country.html", map[string]any{
+	pageTitle := name + " — Pacific Islands IPv6 Monitor"
+	metaDesc := fmt.Sprintf("%s — IPv6 deployment estimates from DNS, mail, web checks and APNIC Labs data (Pacific Islands IPv6 Monitor).", name)
+	data := map[string]any{
 		"ISO":             iso,
 		"Name":            name,
 		"Country":         cf,
 		"Summary":         sum,
-		"Title":           name + " — Pacific Islands IPv6 Monitor",
+		"Title":           pageTitle,
 		"BorderClass":     borderClass,
 		"ProbeV4":         probeV4,
 		"ProbeV6":         probeV6,
@@ -258,7 +369,9 @@ func countryPage(tmpl *template.Template, w http.ResponseWriter, r *http.Request
 		"LegendLocation":  locationLegend,
 		"ScoreLegend":     scoreLegend,
 		"Nonce":           httpserver.CSPNonce(r),
-	})
+	}
+	seoMerge(r, data, pageTitle, metaDesc)
+	_ = tmpl.ExecuteTemplate(w, "country.html", data)
 }
 
 func countryComingSoon(tmpl *template.Template, w http.ResponseWriter, r *http.Request, iso string, pacific *config.PacificList) {
@@ -278,14 +391,18 @@ func countryComingSoon(tmpl *template.Template, w http.ResponseWriter, r *http.R
 	}
 	probeV4 := os.Getenv("PROBE_V4_URL")
 	probeV6 := os.Getenv("PROBE_V6_URL")
-	_ = tmpl.ExecuteTemplate(w, "country_soon.html", map[string]any{
+	pageTitle := name + " — Pacific Islands IPv6 Monitor"
+	metaDesc := fmt.Sprintf("%s — Pacific Islands IPv6 Monitor; collector results for this economy are not yet published.", name)
+	data := map[string]any{
 		"ISO":           iso,
 		"Name":          name,
-		"Title":         name + " — Pacific Islands IPv6 Monitor",
+		"Title":         pageTitle,
 		"BorderClass":   borderClass,
 		"ProbeV4":       probeV4,
 		"ProbeV6":       probeV6,
 		"ShowDualProbe": probeV4 != "" && probeV6 != "",
 		"Nonce":         httpserver.CSPNonce(r),
-	})
+	}
+	seoMerge(r, data, pageTitle, metaDesc)
+	_ = tmpl.ExecuteTemplate(w, "country_soon.html", data)
 }

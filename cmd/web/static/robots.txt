@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# JSON APIs are for clients and tools, not meant for general indexing
+Disallow: /api/

@@ -1,0 +1,14 @@
+{{define "seo"}}
+  <meta name="description" content="{{.MetaDescription}}">
+  <link rel="canonical" href="{{.CanonicalURL}}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="{{.OgSiteName}}">
+  <meta property="og:title" content="{{.OgTitle}}">
+  <meta property="og:description" content="{{.MetaDescription}}">
+  <meta property="og:url" content="{{.CanonicalURL}}">
+  <meta property="og:image" content="{{.OgImageURL}}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{.OgTitle}}">
+  <meta name="twitter:description" content="{{.MetaDescription}}">
+  <meta name="twitter:image" content="{{.OgImageURL}}">
+{{end}}

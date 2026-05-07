@@ -62,6 +62,16 @@ nohup ./scripts/start_collector.sh -country=FJ >> collector.log 2>&1 &
 
 Use two terminals for **web + collector** during integration testing.
 
+## SEO and Open Graph
+
+HTML responses include `meta`/`link` tags for description, canonical URL, Open Graph, and Twitter Cards (`cmd/web/templates/partials/seo.html`).
+
+Set **`PUBLIC_SITE_URL`** in `.env` to your public HTTPS origin when TLS terminates in front of Go (reverse proxy, CDN). If unset, canonical and social URLs derive from each request’s **`Host`** (and forwarded HTTPS hints).
+
+**`GET /og/map.png`** renders the EEZ overview map as a **1200×630 PNG** using embedded **`EEZ_Oceania.svg`** and **`data/index.json`**. Coloring matches the homepage EEZ map: **`pct-color-ramp.js`** stops and interpolation in **`internal/ogmap/ramp.go`**, and **only APNIC Labs `preferred_pc_raw`** drives the percentage (same rule as **`map-home.js`** — no deployment-score substitute). Gray means missing Labs data, same as in the browser. Responses include **`ETag`** and **`Cache-Control: public, max-age=300`**. On failure, the handler still returns **HTTP 200** with a small fallback PNG so `og:image` stays valid for crawlers.
+
+Rasterization is pure Go (**oksvg** + **rasterx**).
+
 ## Commit workflow
 
 See **`docs/commit-workflow.md`** (check changes since last push, doc updates, commit/push).
