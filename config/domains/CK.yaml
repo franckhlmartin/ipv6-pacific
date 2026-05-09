@@ -1,0 +1,64 @@
+domains:
+  - domain: btib.gov.ck
+    organization: Business Trade and Investment Board
+    sector: Government
+  - domain: ck
+    organization: Government of the Cook Islands
+    sector: Government
+  - domain: crownlawcookislands.co.ck
+    organization: Crown Law Office
+    sector: Government
+  - domain: education.gov.ck
+    organization: Ministry of Education
+    sector: Government
+  - domain: emci.gov.ck
+    organization: Emergency Management Cook Islands
+    sector: Government
+  - domain: health.gov.ck
+    organization: Te Marae Ora (Ministry of Health)
+    sector: Government
+  - domain: ici.gov.ck
+    organization: Ministry of Infrastructure Cook Islands
+    sector: Government
+  - domain: intaff.gov.ck
+    organization: Ministry of Internal Affairs
+    sector: Government
+  - domain: justice.gov.ck
+    organization: Ministry of Justice
+    sector: Government
+  - domain: kukinet.co.ck
+    organization: Kuk i Net
+    sector: Telecommunications
+  - domain: maraemoana.gov.ck
+    organization: Marae Moana Cook Islands Marine Park
+    sector: Government
+  - domain: mfai.gov.ck
+    organization: Ministry of Foreign Affairs and Immigration
+    sector: Government
+  - domain: mfem.gov.ck
+    organization: Ministry of Finance and Economic Management
+    sector: Government
+  - domain: mmr.gov.ck
+    organization: Ministry of Marine Resources
+    sector: Government
+  - domain: parliament.gov.ck
+    organization: Parliament of the Cook Islands
+    sector: Government
+  - domain: pmoffice.gov.ck
+    organization: Office of the Prime Minister
+    sector: Government
+  - domain: psc.gov.ck
+    organization: Office of the Public Service Commissioner
+    sector: Government
+  - domain: sbma.gov.ck
+    organization: Cook Islands Seabed Minerals Authority
+    sector: Government
+  - domain: stats.gov.ck
+    organization: Cook Islands Statistics Office
+    sector: Government
+  - domain: transport.gov.ck
+    organization: Ministry of Transport
+    sector: Government
+  - domain: vodafone.co.ck
+    organization: Vodafone Cook Islands
+    sector: Telecommunications

@@ -1,0 +1,31 @@
+domains:
+  - domain: ndevbpalau.com
+    organization: National Development Bank of Palau
+    sector: Government
+  - domain: palaucourts.gov.pw
+    organization: Republic of Palau Judiciary
+    sector: Government
+  - domain: palaugov.pw
+    organization: Republic of Palau (national government portal)
+    sector: Government
+  - domain: palaulaw.gov.pw
+    organization: Palau National Code (Office of the Attorney General)
+    sector: Government
+  - domain: palautravel.pw
+    organization: Palau Entry Form / official travel declaration portal
+    sector: Government
+  - domain: palaunationalmuseum.pw
+    organization: Belau National Museum
+    sector: Government
+  - domain: pcc.palau.edu
+    organization: Palau Community College
+    sector: Education
+  - domain: pnccpalau.com
+    organization: Palau National Communications Corporation
+    sector: Telecommunications
+  - domain: ppuc.com
+    organization: Palau Public Utilities Corporation
+    sector: Energy
+  - domain: pristineparadisepalau.com
+    organization: Palau Visitors Authority
+    sector: Government

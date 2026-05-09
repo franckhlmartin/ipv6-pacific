@@ -1,0 +1,37 @@
+domains:
+  - domain: mof.gov.mh
+    organization: Ministry of Finance, Banking and Postal Services
+    sector: Government
+  - domain: nta.mh
+    organization: Marshall Islands National Telecommunications Authority
+    sector: Telecommunications
+  - domain: pss.edu.mh
+    organization: Republic of the Marshall Islands Public School System
+    sector: Education
+  - domain: rmiagoffice.com
+    organization: Office of the Attorney General
+    sector: Government
+  - domain: rmicourts.org
+    organization: Republic of the Marshall Islands Judiciary
+    sector: Government
+  - domain: rmiepa.com
+    organization: Marshall Islands Environmental Protection Authority
+    sector: Government
+  - domain: rmieppso.org
+    organization: Economic Policy, Planning and Statistics Office
+    sector: Government
+  - domain: rmigov.com
+    organization: Office of the President and Cabinet
+    sector: Government
+  - domain: rmimimra.com
+    organization: Marshall Islands Marine Resources Authority
+    sector: Government
+  - domain: rmioag.com
+    organization: Office of the Auditor-General
+    sector: Government
+  - domain: rmiparliament.org
+    organization: Nitijela (Parliament of the Marshall Islands)
+    sector: Government
+  - domain: visitmarshallislands.mh
+    organization: Visit Marshall Islands (official tourism)
+    sector: Government

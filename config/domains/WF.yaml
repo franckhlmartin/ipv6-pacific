@@ -1,0 +1,25 @@
+domains:
+  - domain: assembleeterritoriale.wf
+    organization: Assemblée territoriale de Wallis-et-Futuna
+    sector: Government
+  - domain: ccima.wf
+    organization: Chambre de commerce et d'industrie, des métiers et d'agriculture (CCIMA)
+    sector: Government
+  - domain: loina.wf
+    organization: Loina (telecommunications and internet portal)
+    sector: Telecommunications
+  - domain: spt.wf
+    organization: Service des Postes et des Télécommunications de Wallis-et-Futuna
+    sector: Telecommunications
+  - domain: statistique.wf
+    organization: Service territorial de la statistique et des études économiques (STSEE)
+    sector: Government
+  - domain: wallis-et-futuna.gouv.fr
+    organization: Services de l'État et du territoire (Wallis-et-Futuna)
+    sector: Government
+  - domain: wallis-et-futuna.wf
+    organization: Portail territorial Wallis-et-Futuna
+    sector: Government
+  - domain: wallis-futuna.travel
+    organization: Office du tourisme des Îles Wallis et Futuna
+    sector: Government

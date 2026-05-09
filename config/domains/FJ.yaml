@@ -1,35 +1,92 @@
 # One list entry per measured zone/site (each becomes its own row in data + UI). Use the
 # registrable name (e.g. itc.gov.fj), not a parent umbrella like gov.fj.
 domains:
-  - domain: usp.ac.fj
-    organization: University of the South Pacific
-    sector: Education
-  - domain: itc.gov.fj
-    organization: Government of Fiji (ITC)
+  - domain: ag.gov.fj
+    organization: Office of the Attorney-General
     sector: Government
-  - domain: met.gov.fj
-    organization: Fiji Meteorological Service
+  - domain: agriculture.gov.fj
+    organization: Ministry of Agriculture and Waterways
     sector: Government
-  - domain: fiji.gov.fj
-    organization: Government of Fiji
-    sector: Government
-  - domain: telecom.com.fj
-    organization: Fiji Telecommunications Holding Limited
-    sector: Telecommunications
-  - domain: lightspeed.com.fj
-    organization: Lightspeed Communications Limited
+  - domain: digicelfiji.com
+    organization: Digicel Fiji Limited
     sector: Telecommunications
   - domain: digicelpacific.com
     organization: Digicel Fiji Limited
     sector: Telecommunications
-  - domain: vodafone.com.fj
-    organization: Vodafone Fiji Limited
-    sector: Telecommunications
+  - domain: digital.gov.fj
+    organization: DigitalFIJI / MyFiji@Gov
+    sector: Government
+  - domain: education.gov.fj
+    organization: Ministry of Education, Heritage and Arts
+    sector: Government
+  - domain: fiji.gov.fj
+    organization: Government of Fiji
+    sector: Government
+  - domain: fiji.travel
+    organization: Tourism Fiji
+    sector: Government
+  - domain: finance.gov.fj
+    organization: Ministry of Finance
+    sector: Government
   - domain: fintel.com.fj
     organization: Fintel Fiji Limited
     sector: Telecommunications
+  - domain: flrc.gov.fj
+    organization: Fiji Law Reform Commission
+    sector: Government
+  - domain: foreignaffairs.gov.fj
+    organization: Ministry of Foreign Affairs
+    sector: Government
   # Public site is https://forumsec.org (not forumsec.gov)
   - domain: forumsec.org
     organization: Pacific Islands Forum Secretariat
     sector: Regional
     regional: true
+  - domain: health.gov.fj
+    organization: Ministry of Health and Medical Services
+    sector: Government
+  - domain: immigration.gov.fj
+    organization: Ministry of Immigration
+    sector: Government
+  - domain: itc.gov.fj
+    organization: Government of Fiji (ITC)
+    sector: Government
+  - domain: justice.gov.fj
+    organization: Ministry of Justice
+    sector: Government
+  - domain: lightspeed.com.fj
+    organization: Lightspeed Communications Limited
+    sector: Telecommunications
+  - domain: mcs.gov.fj
+    organization: Ministry of Civil Service
+    sector: Government
+  - domain: mcttt.gov.fj
+    organization: Ministry of Commerce, Trade, Tourism and Transport
+    sector: Government
+  - domain: met.gov.fj
+    organization: Fiji Meteorological Service
+    sector: Government
+  - domain: parliament.gov.fj
+    organization: Parliament of the Republic of Fiji
+    sector: Government
+  - domain: pmoffice.gov.fj
+    organization: Office of the Prime Minister
+    sector: Government
+  - domain: police.gov.fj
+    organization: Fiji Police Force
+    sector: Government
+  - domain: rbf.gov.fj
+    organization: Reserve Bank of Fiji
+    sector: Government
+  - domain: statsfiji.gov.fj
+    organization: Fiji Bureau of Statistics
+    sector: Government
+  - domain: telecom.com.fj
+    organization: Fiji Telecommunications Holding Limited
+    sector: Telecommunications
+  - domain: usp.ac.fj
+    organization: University of the South Pacific
+    sector: Education
+  - domain: vodafone.com.fj
+    organization: Vodafone Fiji Limited
+    sector: Telecommunications

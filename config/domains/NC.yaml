@@ -1,23 +1,47 @@
 domains:
+  - domain: canl.nc
+    organization: Can'l
+    sector: Telecommunications
   - domain: congres.nc
-    organization: Government of New Caledonia
+    organization: Congress of New Caledonia
     sector: Government
-  - domain: spc.int
-    organization: Pacific Community (SPC)
-    sector: Regional
-    regional: true
-  - domain: opt.nc
-    organization: Office des Postes et Télécommunications
-    sector: Telecommunications
-  - domain: helia.nc
-    organization: Helia New Caledonia
-    sector: Telecommunications
+  - domain: demarches.gouv.nc
+    organization: Government of New Caledonia (online procedures)
+    sector: Government
+  - domain: eec.nc
+    organization: Énergies de la Calédonie (EEC Engie)
+    sector: Energy
+  - domain: enercal.nc
+    organization: Enercal
+    sector: Energy
   - domain: gouv.nc
     organization: Government of New Caledonia
     sector: Government
+  - domain: helia.nc
+    organization: Helia New Caledonia
+    sector: Telecommunications
   - domain: lagoon.nc
     organization: Lagoon New Caledonia
     sector: Telecommunications
   - domain: nautile.nc
     organization: Nautile New Caledonia
     sector: Telecommunications
+  - domain: opt.nc
+    organization: Office des Postes et Télécommunications
+    sector: Telecommunications
+  - domain: province-iles.nc
+    organization: Province des Îles Loyauté
+    sector: Government
+  - domain: province-nord.nc
+    organization: Province Nord
+    sector: Government
+  - domain: province-sud.nc
+    organization: Province Sud
+    sector: Government
+  - domain: service-public.nc
+    organization: Service-public Nouvelle-Calédonie
+    sector: Government
+  - domain: spc.int
+    organization: Pacific Community (SPC)
+    sector: Regional
+    regional: true

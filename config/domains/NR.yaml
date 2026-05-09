@@ -1,0 +1,28 @@
+domains:
+  - domain: cenpac.net.nr
+    organization: Cenpac Net (internet services)
+    sector: Telecommunications
+  - domain: digicelnauru.com
+    organization: Digicel Nauru
+    sector: Telecommunications
+  - domain: justice.gov.nr
+    organization: Department of Justice and Border Control
+    sector: Government
+  - domain: nauru.gov.nr
+    organization: Government of Nauru
+    sector: Government
+  - domain: naurufinance.info
+    organization: Department of Finance
+    sector: Government
+  - domain: naurugov.nr
+    organization: Government of Nauru
+    sector: Government
+  - domain: naurutourism.com.nr
+    organization: Nauru Tourism Corporation
+    sector: Government
+  - domain: nmc.gov.nr
+    organization: Nauru Medical Centre
+    sector: Government
+  - domain: stats.gov.nr
+    organization: Nauru Bureau of Statistics
+    sector: Government

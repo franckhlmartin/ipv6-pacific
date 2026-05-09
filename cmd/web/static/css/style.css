@@ -185,20 +185,27 @@ h2 { font-size: 1.15rem; margin-top: 1.5rem; }
 }
 
 .eez-map-wrap {
-  margin: 0;
-  width: 100%;
+  margin-inline: auto;
+  width: fit-content;
+  max-width: 100%;
   border-radius: 6px;
   overflow: hidden;
   /* Same as ocean rect fill (#c6ecff) so letterboxing matches the map */
   background: #c6ecff;
   border: 1px solid #cfe0f0;
 }
+/* Sized from vw + vh so width does not collapse when .eez-map-wrap is width: fit-content
+   (percentage bases can resolve too small). Height cap ~3× prior 520px / 70vh when space allows. */
 .eez-map-wrap .eez-map-svg {
   display: block;
-  width: 100%;
+  margin-inline: auto;
+  width: min(
+    calc(100vw - 2.5rem),
+    calc(min(1560px, 90vh) * 385 / 215)
+  );
   height: auto;
   aspect-ratio: 385 / 215;
-  max-height: min(520px, 70vh);
+  max-height: min(1560px, 90vh);
 }
 .eez-map-wrap .eez-region--linked:focus {
   outline: 2px solid #0066cc;
@@ -226,6 +233,12 @@ h2 { font-size: 1.15rem; margin-top: 1.5rem; }
   padding: 0 1.25rem 2rem;
 }
 
+.economies-contrib {
+  margin-top: 0.35rem;
+  margin-bottom: 0.65rem;
+  max-width: 70ch;
+}
+
 /* Country page: heading + table / empty state — same horizontal inset */
 .country-detail-section {
   padding: 0 1.25rem 2rem;
@@ -237,6 +250,10 @@ h2 { font-size: 1.15rem; margin-top: 1.5rem; }
 .country-detail-section .table-wrap {
   padding-left: 0;
   padding-right: 0;
+}
+
+.country-detail-section .economies-contrib {
+  margin-top: 1rem;
 }
 .country-legend-section {
   margin: 0 1.25rem 2rem;

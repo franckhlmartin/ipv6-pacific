@@ -16,4 +16,4 @@ cp .env.example .env.local
 
 Then open **`https://127.0.0.1:8082/`** (trust the dev certificate when prompted).
 
-Documentation: `docs/development.md`, `docs/security.md`, `docs/commit-workflow.md`, `config/README.md`.
+**Documentation:** start at **[docs/index.md](docs/index.md)** — layered index; open linked files only as needed (small context window).

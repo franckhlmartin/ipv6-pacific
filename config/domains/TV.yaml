@@ -1,13 +1,58 @@
 domains:
-  - domain: tuvalu.tv
-    organization: Government of Tuvalu
+  - domain: developmentbank.tv
+    organization: Development Bank of Tuvalu
     sector: Government
-  - domain: tuvalutelecom.tv    
-    organization: Tuvalu Telecommunications Corporation
-    sector: Telecommunications
   - domain: finance.gov.tv
-    organization: Ministry of Finance
+    organization: Ministry of Finance and Economic Development
+    sector: Government
+  - domain: homeaffairs.gov.tv
+    organization: Department of Home Affairs
+    sector: Government
+  - domain: ict.gov.tv
+    organization: Department of Information and Communications Technology
+    sector: Government
+  - domain: meys.gov.tv
+    organization: Ministry of Education, Youth and Sports
+    sector: Government
+  - domain: nationalbankoftuvalu.com
+    organization: National Bank of Tuvalu
+    sector: Government
+  - domain: parliament.gov.tv
+    organization: Parliament of Tuvalu
+    sector: Government
+  - domain: stats.gov.tv
+    organization: Central Statistics Division
     sector: Government
   - domain: tectuvalu.tv
     organization: Tuvalu Electricity Corporation
     sector: Energy
+  - domain: timelesstuvalu.com
+    organization: Timeless Tuvalu
+    sector: Government
+  - domain: trade.gov.tv
+    organization: Department of Trade
+    sector: Government
+  - domain: tuvalu-legislation.tv
+    organization: Tuvalu Legislation (official legislation portal)
+    sector: Government
+  - domain: tuvalu.tv
+    organization: Government of Tuvalu
+    sector: Government
+  - domain: tuvaluaudit.tv
+    organization: Office of the Auditor General
+    sector: Government
+  - domain: tuvalufisheries.tv
+    organization: Tuvalu Fisheries Authority
+    sector: Government
+  - domain: tuvalutourism.com
+    organization: Tuvalu Tourism
+    sector: Government
+  - domain: tuvalutelecom.tv
+    organization: Tuvalu Telecommunications Corporation
+    sector: Telecommunications
+  - domain: tuvmet.tv
+    organization: Tuvalu Meteorological Service
+    sector: Government
+  - domain: tvship.com
+    organization: Tuvalu Ship Registry
+    sector: Government

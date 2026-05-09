@@ -1,0 +1,88 @@
+domains:
+  - domain: cck.ki
+    organization: Communications Commission of Kiribati
+    sector: Government
+  - domain: employment.gov.ki
+    organization: Ministry of Labour and Human Resources Development
+    sector: Government
+  - domain: internalaffairs.gov.ki
+    organization: Ministry of Culture and Internal Affairs
+    sector: Government
+  - domain: kao.gov.ki
+    organization: Kiribati Audit Office
+    sector: Government
+  - domain: kic.org.ki
+    organization: Kiribati Insurance Corporation
+    sector: Government
+  - domain: kit.edu.ki
+    organization: Kiribati Institute of Technology
+    sector: Education
+  - domain: kiribati.gov.ki
+    organization: Government of Kiribati
+    sector: Government
+  - domain: kiribatijudiciary.gov.ki
+    organization: Judiciary of Kiribati
+    sector: Government
+  - domain: ktc.edu.ki
+    organization: Kiribati Teachers College
+    sector: Education
+  - domain: legal.gov.ki
+    organization: Office of the Attorney General
+    sector: Government
+  - domain: mcic.gov.ki
+    organization: Ministry of Commerce, Industry and Cooperatives
+    sector: Government
+  - domain: melad.gov.ki
+    organization: Ministry of Environment, Lands and Agriculture Development
+    sector: Government
+  - domain: mfed.gov.ki
+    organization: Ministry of Finance and Economic Development
+    sector: Government
+  - domain: mfa.gov.ki
+    organization: Ministry of Foreign Affairs and Immigration
+    sector: Government
+  - domain: mfmrd.gov.ki
+    organization: Ministry of Fisheries and Marine Resources Development
+    sector: Government
+  - domain: mhms.gov.ki
+    organization: Ministry of Health and Medical Services
+    sector: Government
+  - domain: mict.gov.ki
+    organization: Ministry of Information, Communications and Transport
+    sector: Government
+  - domain: mise.gov.ki
+    organization: Ministry of Infrastructure and Sustainable Energy
+    sector: Government
+  - domain: mlpid.gov.ki
+    organization: Ministry of Line and Phoenix Islands Development
+    sector: Government
+  - domain: moe.gov.ki
+    organization: Ministry of Education
+    sector: Government
+  - domain: mpwu.gov.ki
+    organization: Ministry of Public Works and Utilities
+    sector: Government
+  - domain: mwysa.gov.ki
+    organization: Ministry of Women, Youth, Sports and Social Affairs
+    sector: Government
+  - domain: nso.gov.ki
+    organization: Kiribati National Statistics Office
+    sector: Government
+  - domain: opl.org.ki
+    organization: Office of the Public Legal Service
+    sector: Government
+  - domain: parliament.gov.ki
+    organization: Maneaba ni Maungatabu (Parliament of Kiribati)
+    sector: Government
+  - domain: police.gov.ki
+    organization: Kiribati Police Service
+    sector: Government
+  - domain: president.gov.ki
+    organization: Office of the President
+    sector: Government
+  - domain: pso.gov.ki
+    organization: Public Service Office
+    sector: Government
+  - domain: vodafone.com.ki
+    organization: Vodafone Kiribati
+    sector: Telecommunications

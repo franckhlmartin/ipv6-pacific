@@ -1,21 +1,54 @@
 domains:
   # Public government web is at solomons.gov.sb (not gov.sb)
-  - domain: solomons.gov.sb
-    organization: Government of Solomon Islands
+  - domain: attorneygenerals.gov.sb
+    organization: Attorney General's Chambers
+    sector: Government
+  - domain: cbsi.com.sb
+    organization: Central Bank of Solomon Islands
+    sector: Government
+  - domain: customs.gov.sb
+    organization: Solomon Islands Customs and Excise Division
     sector: Government
   - domain: ffa.int
     organization: Pacific Islands Forum Fisheries Agency
     sector: Regional
     regional: true
+  - domain: immigration.gov.sb
+    organization: Solomon Islands Immigration Division
+    sector: Government
+  - domain: mfaet.gov.sb
+    organization: Ministry of Foreign Affairs and External Trade
+    sector: Government
+  - domain: mpgis.gov.sb
+    organization: Ministry of Provincial Government and Institutional Strengthening
+    sector: Government
   - domain: ourtelekom.com.sb
     organization: Our Telekom Limited
     sector: Telecommunications
+  - domain: parliament.gov.sb
+    organization: National Parliament of Solomon Islands
+    sector: Government
+  - domain: pso.gov.sb
+    organization: Public Solicitor's Office
+    sector: Government
+  - domain: rsipf.gov.sb
+    organization: Royal Solomon Islands Police Force
+    sector: Government
   - domain: satsol.net
     organization: SatSol Limited
-    sector: Telecommunications
-  - domain: solkonet.com
-    organization: Solko Network Limited
     sector: Telecommunications
   - domain: siscc.com.sb
     organization: Siscc Limited
     sector: Telecommunications
+  - domain: solkonet.com
+    organization: Solko Network Limited
+    sector: Telecommunications
+  - domain: solomons.gov.sb
+    organization: Government of Solomon Islands
+    sector: Government
+  - domain: statistics.gov.sb
+    organization: Solomon Islands National Statistics Office
+    sector: Government
+  - domain: visitsolomons.com.sb
+    organization: Tourism Solomons
+    sector: Government

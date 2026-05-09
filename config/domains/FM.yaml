@@ -1,0 +1,40 @@
+domains:
+  - domain: cfsm.gov.fm
+    organization: Congress of the Federated States of Micronesia
+    sector: Government
+  - domain: dfa.gov.fm
+    organization: Department of Foreign Affairs
+    sector: Government
+  - domain: dofa.gov.fm
+    organization: Department of Finance and Administration
+    sector: Government
+  - domain: doj.gov.fm
+    organization: Department of Justice
+    sector: Government
+  - domain: fsmpio.fm
+    organization: FSM Public Information Office
+    sector: Government
+  - domain: fsmtc.fm
+    organization: FSM Telecommunications Corporation
+    sector: Telecommunications
+  - domain: fsmsupremecourt.org
+    organization: Supreme Court of the Federated States of Micronesia
+    sector: Government
+  - domain: gov.fm
+    organization: Government of the Federated States of Micronesia
+    sector: Government
+  - domain: hsa.gov.fm
+    organization: Department of Health and Social Affairs
+    sector: Government
+  - domain: national.doe.fm
+    organization: National Department of Education
+    sector: Education
+  - domain: rd.gov.fm
+    organization: Department of Resources and Development
+    sector: Government
+  - domain: stats.gov.fm
+    organization: FSM Statistics Division
+    sector: Government
+  - domain: visit-micronesia.fm
+    organization: Visit Micronesia (official tourism)
+    sector: Government

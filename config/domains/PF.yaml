@@ -1,0 +1,46 @@
+domains:
+  - domain: assemblee.pf
+    organization: Assemblée de la Polynésie française
+    sector: Government
+  - domain: education.pf
+    organization: "Direction de l'éducation et des enseignements"
+    sector: Government
+  - domain: fonction-publique.gov.pf
+    organization: Fonction publique de Polynésie française
+    sector: Government
+  - domain: hina.pf
+    organization: HINA (Tahiti Tourisme)
+    sector: Government
+  - domain: ispf.pf
+    organization: Institut de la statistique de la Polynésie française
+    sector: Government
+  - domain: mes-demarches.gov.pf
+    organization: Mes-Démarches (online administrative procedures)
+    sector: Government
+  - domain: onati.pf
+    organization: ONATi (Groupe OPT / Vini)
+    sector: Telecommunications
+  - domain: opt.pf
+    organization: Office des Postes et Télécommunications (Groupe OPT)
+    sector: Telecommunications
+  - domain: presidence.pf
+    organization: Présidence de la Polynésie française
+    sector: Government
+  - domain: ressources-marines.gov.pf
+    organization: Direction des Ressources Marines
+    sector: Government
+  - domain: service-public.pf
+    organization: NET.pf (administration portal)
+    sector: Government
+  - domain: sg-bdp.pf
+    organization: Banque de Polynésie
+    sector: Government
+  - domain: tahititourisme.pf
+    organization: Tahiti Tourisme
+    sector: Government
+  - domain: urbanisme.gov.pf
+    organization: "Direction de l'urbanisme"
+    sector: Government
+  - domain: vodafone.pf
+    organization: Vodafone Polynesia
+    sector: Telecommunications

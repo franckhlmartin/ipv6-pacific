@@ -1,0 +1,43 @@
+domains:
+  - domain: ago.gov.to
+    organization: Attorney General's Office
+    sector: Government
+  - domain: communications.gov.to
+    organization: Ministry of Communications
+    sector: Government
+  - domain: digitaltransformation.gov.to
+    organization: Office of Digital Transformation
+    sector: Government
+  - domain: education.gov.to
+    organization: Ministry of Education and Training
+    sector: Government
+  - domain: finance.gov.to
+    organization: Ministry of Finance
+    sector: Government
+  - domain: lands.gov.to
+    organization: Ministry of Lands and Natural Resources
+    sector: Government
+  - domain: parliament.gov.to
+    organization: Legislative Assembly of Tonga
+    sector: Government
+  - domain: pmo.gov.to
+    organization: Prime Minister's Office
+    sector: Government
+  - domain: psc.gov.to
+    organization: Public Service Commission
+    sector: Government
+  - domain: revenue.gov.to
+    organization: Inland Revenue Department
+    sector: Government
+  - domain: tongafish.gov.to
+    organization: Ministry of Fisheries
+    sector: Government
+  - domain: tongastats.gov.to
+    organization: Tonga Statistics Department
+    sector: Government
+  - domain: matangitonga.to
+    organization: Matangi Tonga
+    sector: News
+  - domain: tcc.to
+    organization: Tonga Communications Corporation
+    sector: Telecommunications

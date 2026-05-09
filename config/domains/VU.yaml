@@ -2,3 +2,34 @@ domains:
   - domain: gov.vu
     organization: Government of Vanuatu
     sector: Government
+  - domain: pmo.gov.vu
+    organization: Prime Minister's Office
+    sector: Government
+  - domain: doft.gov.vu
+    organization: Department of Finance
+    sector: Government
+  - domain: parliament.gov.vu
+    organization: National Parliament of Vanuatu
+    sector: Government
+  - domain: immigration.gov.vu
+    organization: Immigration Department of Vanuatu
+    sector: Government
+  - domain: vancitizenship.gov.vu
+    organization: Vanuatu Citizenship Office
+    sector: Government
+  - domain: pacificlinkvu.com
+    organization: Pacific Link Vanuatu Limited
+    sector: Telecommunications
+  - domain: vodafone.com.vu
+    organization: Vodafone Vanuatu Limited
+    sector: Telecommunications
+  - domain: interchange.vu
+    organization: Interchange Vanuatu Limited
+    sector: Telecommunications
+  - domain: wantok.vu
+    organization: Wantok Vanuatu Limited
+    sector: Telecommunications
+  - domain: investvanuatu.vu
+    organization: Invest Vanuatu Limited
+    sector: Government
+    

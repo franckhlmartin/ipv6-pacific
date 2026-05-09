@@ -1,11 +1,46 @@
 domains:
+  - domain: ag.gov.ws
+    organization: Office of the Attorney General
+    sector: Government
+  - domain: digicelsamoa.com
+    organization: Digicel Samoa
+    sector: Telecommunications
+  - domain: health.gov.ws
+    organization: Ministry of Health
+    sector: Government
+  - domain: maf.gov.ws
+    organization: Ministry of Agriculture and Fisheries
+    sector: Government
+  - domain: mcil.gov.ws
+    organization: Ministry of Commerce, Industry and Labour
+    sector: Government
+  - domain: mcit.gov.ws
+    organization: Ministry of Communications, Information Technology, and Telecommunications
+    sector: Government
+  - domain: mfat.gov.ws
+    organization: Ministry of Foreign Affairs and Trade
+    sector: Government
+  - domain: mjca.gov.ws
+    organization: Ministry of Justice and Courts Administration
+    sector: Government
+  - domain: mof.gov.ws
+    organization: Ministry of Finance
+    sector: Government
+  - domain: mnre.gov.ws
+    organization: Ministry of Natural Resources and Environment
+    sector: Government
   - domain: mygov.gov.ws
     organization: Government of Samoa
     sector: Government
-  - domain: sprep.org
-    organization: Secretariat of the Pacific Regional Environment Programme
-    sector: Regional
-    regional: true
+  - domain: regulator.gov.ws
+    organization: Office of the Regulator
+    sector: Government
+  - domain: samoagovt.ws
+    organization: Government of Samoa (services directory)
+    sector: Government
+  - domain: samoapolice.ws
+    organization: Samoa Police
+    sector: Government
   - domain: sbs.gov.ws
     organization: Samoa Bureau of Statistics
     sector: Government
@@ -15,6 +50,10 @@ domains:
   - domain: psc.gov.ws
     organization: Public Service Commission
     sector: Government
-  - domain: mcit.gov.ws
-    organization: Ministry of Communications, Information Technology, and Telecommunications
-    sector: Government
+  - domain: sprep.org
+    organization: Secretariat of the Pacific Regional Environment Programme
+    sector: Regional
+    regional: true
+  - domain: vodafone.com.ws
+    organization: Vodafone Samoa
+    sector: Telecommunications

@@ -1,0 +1,25 @@
+domains:
+  - domain: gov.nu
+    organization: Government of Niue
+    sector: Government
+  - domain: iusn.nu
+    organization: Internet Users Society Niue
+    sector: Telecommunications
+  - domain: mof.gov.nu
+    organization: Ministry of Finance
+    sector: Government
+  - domain: nic.gov.nu
+    organization: Niue .nu Domain Registry
+    sector: Government
+  - domain: niueisland.com
+    organization: Niue Tourism
+    sector: Government
+  - domain: niuestatistics.nu
+    organization: Niue Statistics Office
+    sector: Government
+  - domain: telecomniue.com
+    organization: Telecom Niue
+    sector: Telecommunications
+  - domain: wifination.nu
+    organization: Niue WiFi Nation
+    sector: Telecommunications

@@ -1,0 +1,46 @@
+domains:
+  - domain: americansamoa.gov
+    organization: American Samoa Government
+    sector: Government
+  - domain: americansamoa.travel
+    organization: Visit American Samoa (official tourism)
+    sector: Government
+  - domain: americansamoaport.as.gov
+    organization: American Samoa Department of Port Administration
+    sector: Government
+  - domain: amsamoadoe.com
+    organization: American Samoa Department of Education
+    sector: Education
+  - domain: aselectionoffice.gov
+    organization: American Samoa Election Office
+    sector: Government
+  - domain: asfono.gov
+    organization: Legislature of American Samoa (Fono)
+    sector: Government
+  - domain: astca.as
+    organization: American Samoa Telecommunications Authority
+    sector: Telecommunications
+  - domain: bluesky.as
+    organization: Bluesky Communications
+    sector: Telecommunications
+  - domain: dhss.as
+    organization: Department of Human and Social Services
+    sector: Government
+  - domain: dmwr.as.gov
+    organization: Department of Marine and Wildlife Resources
+    sector: Government
+  - domain: doc.as.gov
+    organization: Department of Commerce
+    sector: Government
+  - domain: doa.as.gov
+    organization: Department of Agriculture
+    sector: Government
+  - domain: legalaffairs.as.gov
+    organization: Department of Legal Affairs
+    sector: Government
+  - domain: osas.as
+    organization: Office of the Secretary of American Samoa
+    sector: Government
+  - domain: procurement.as.gov
+    organization: Office of Procurement
+    sector: Government

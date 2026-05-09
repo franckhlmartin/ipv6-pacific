@@ -1,0 +1,40 @@
+domains:
+  - domain: chcc.health
+    organization: Commonwealth Healthcare Corporation
+    sector: Government
+  - domain: cnmileg.net
+    organization: Northern Marianas Commonwealth Legislature
+    sector: Government
+  - domain: commerce.gov.mp
+    organization: Department of Commerce (incl. Central Statistics Division)
+    sector: Government
+  - domain: cucgov.org
+    organization: Commonwealth Utilities Corporation
+    sector: Energy
+  - domain: dps.gov.mp
+    organization: Department of Public Safety
+    sector: Government
+  - domain: finance.gov.mp
+    organization: Department of Finance
+    sector: Government
+  - domain: governor.cnmi.gov
+    organization: Office of the Governor and Lieutenant Governor
+    sector: Government
+  - domain: ite.net
+    organization: IT&E (telecommunications, Guam and CNMI)
+    sector: Telecommunications
+  - domain: labor.cnmi.gov
+    organization: Department of Labor
+    sector: Government
+  - domain: marianas.edu
+    organization: Northern Marianas College
+    sector: Education
+  - domain: mymarianas.com
+    organization: Marianas Visitors Authority (official tourism)
+    sector: Government
+  - domain: nmijudiciary.gov
+    organization: Commonwealth Judiciary (CNMI Judiciary)
+    sector: Government
+  - domain: opa.cnmi.gov
+    organization: Office of the Public Auditor
+    sector: Government

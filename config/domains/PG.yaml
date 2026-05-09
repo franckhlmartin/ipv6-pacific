@@ -1,15 +1,63 @@
 domains:
-  - domain: parliament.gov.pg
-    organization: National Parliament of Papua New Guinea
+  - domain: bankpng.gov.pg
+    organization: Bank of Papua New Guinea
     sector: Government
-  - domain: info.gov.pg
-    organization: Information and News Portal of Papua New Guinea
+  - domain: bsp.com.pg
+    organization: Bank South Pacific
+    sector: Government
+  - domain: defence.gov.pg
+    organization: Papua New Guinea Defence Force
+    sector: Government
+  - domain: dfa.gov.pg
+    organization: Department of Foreign Affairs
+    sector: Government
+  - domain: digicelpng.com
+    organization: Digicel PNG Limited
+    sector: Telecommunications
+  - domain: education.gov.pg
+    organization: Department of Education
+    sector: Government
+  - domain: emstret.com
+    organization: Emstret Papua New Guinea Limited
+    sector: Telecommunications
+  - domain: health.gov.pg
+    organization: Department of Health
+    sector: Government
+  - domain: ica.gov.pg
+    organization: Immigration and Citizenship Authority
     sector: Government
   - domain: ict.gov.pg
     organization: Papua New Guinea Information and Communication Technology Authority
     sector: Government
+  - domain: info.gov.pg
+    organization: Information and News Portal of Papua New Guinea
+    sector: Government
+  - domain: justice.gov.pg
+    organization: Department of Justice and Attorney General
+    sector: Government
+  - domain: kacific.com
+    organization: Kacific Papua New Guinea Limited
+    sector: Telecommunications
+  - domain: kinect.com.pg
+    organization: Kinect Papua New Guinea Limited
+    sector: Telecommunications
   - domain: nbc.com.pg
     organization: National Broadcasting Corporation of Papua New Guinea
+    sector: Government
+  - domain: nicta.gov.pg
+    organization: National Information and Communication Technology Authority of Papua New Guinea
+    sector: Government
+  - domain: nso.gov.pg
+    organization: National Statistical Office
+    sector: Government
+  - domain: online.net.pg
+    organization: Online Papua New Guinea Limited
+    sector: Telecommunications
+  - domain: papuanewguinea.travel
+    organization: Papua New Guinea Tourism Promotion Authority
+    sector: Government
+  - domain: parliament.gov.pg
+    organization: National Parliament of Papua New Guinea
     sector: Government
   - domain: pmnec.gov.pg
     organization: Papua New Guinea Prime Minister's Office
@@ -17,21 +65,12 @@ domains:
   - domain: telikom.com.pg
     organization: Telikom Papua New Guinea Limited
     sector: Telecommunications
-  - domain: nicta.gov.pg
-    organization: National Information and Communication Technology Authority of Papua New Guinea
+  - domain: treasury.gov.pg
+    organization: Department of Treasury
     sector: Government
+  - domain: vodafone.com.pg
+    organization: Vodafone PNG Limited
+    sector: Telecommunications
   - domain: wisp-png.com
     organization: Wireless Internet Service Provider of Papua New Guinea
-    sector: Telecommunications
-  - domain: kinect.com.pg
-    organization: Kinect Papua New Guinea Limited
-    sector: Telecommunications
-  - domain: online.net.pg
-    organization: Online Papua New Guinea Limited
-    sector: Telecommunications
-  - domain: emstret.com
-    organization: Emstret Papua New Guinea Limited
-    sector: Telecommunications
-  - domain: kacific.com
-    organization: Kacific Papua New Guinea Limited
     sector: Telecommunications
