@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{.Title}}</title>
+  {{template "seo" .}}
+  {{template "analyticsHead" .}}
+  <link rel="stylesheet" href="/static/css/style.css"/>
+</head>
+<body class="{{.BorderClass}}">
+  {{template "cookieBanner" .}}
+  <header class="site-header">
+    <div class="site-header__lead">
+      <p><a href="/">← Pacific Islands IPv6 Monitor</a></p>
+      <h1>About</h1>
+      <p class="meta">Pacific Islands IPv6 Council and this monitoring site.</p>
+    </div>
+    <div class="site-header__conn">
+      <button type="button" class="conn-status-btn" id="conn-status-btn"
+        aria-expanded="false" aria-haspopup="dialog" aria-controls="conn-status-dialog"
+        aria-busy="true" aria-disabled="true" disabled>
+        <span class="conn-status-btn__swatch" aria-hidden="true"></span>
+        <span class="conn-status-btn__label">Checking…</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="country-detail-section" aria-labelledby="about-purpose">
+      <h2 id="about-purpose">This site and the council</h2>
+      <p>This monitor supports the goal of the <a href="https://www.ipv6forum.com/" target="_blank" rel="noopener">IPv6 Forum</a> chapter for the Pacific—the <strong>Pacific Islands IPv6 Council</strong>—to help IPv6 deployment across Pacific Island economies. The pages here publish deployment-oriented measurements (DNS, mail, web, DNSSEC, and APNIC Labs–style capability signals). They are estimates from measurement, not a compliance certification.</p>
+    </section>
+
+    <section class="country-detail-section" aria-labelledby="about-release">
+      <h2 id="about-release">IPv6 Council Pacific Islands — founding announcement</h2>
+      <p class="meta">April 22, 2026 · Pacific Islands / Luxembourg</p>
+      <p>The IPv6 Forum welcomed the Pacific Islands with the establishment of their IPv6 Council, led by <a href="https://www.peachymango.org/">Franck Martin</a> as President. The council aims to bring together stakeholders from government, telecom and ISPs, industry, and academia to shape an IPv6 roadmap and vision for the Pacific Islands in the next-generation Internet.</p>
+      <blockquote>
+        <p>“The IPv6 Council Pacific Islands will attract key stakeholders from government, Telecom/ISPs, industry and academia to design the IPv6 roadmap and vision together for Pacific Islands to embrace the New Internet World based on IPv6.”</p>
+        <p>— Franck Martin, President</p>
+      </blockquote>
+      <blockquote>
+        <p>“The IPv6 Council Pacific Islands has been created to extend to the Pacific Islands Internet community a strong voice and representation in the new Internet World to create momentum in deploying IPv6.”</p>
+        <p>— Latif Ladid, IPv6 Forum President</p>
+      </blockquote>
+      <p><a href="https://lnkd.in/dgXWqhyG" target="_blank" rel="noopener">Read the release</a></p>
+    </section>
+
+    <section class="country-detail-section" aria-labelledby="about-why-v6">
+      <h2 id="about-why-v6">Why IPv6</h2>
+      <p>The Internet has relied on IPv4 for decades. IPv4 address space is depleted and operational constraints grow; IPv6 preserves what works today while adding vastly more address space, clearer operational models (including stateless autoconfiguration), stronger foundations for security and evolution, and room to connect people and services at scale.</p>
+    </section>
+
+    <section class="country-detail-section" aria-labelledby="about-council">
+      <h2 id="about-council">About IPv6 Council Pacific Islands</h2>
+      <p>The IPv6 Council Pacific Islands is a chapter of the IPv6 Forum dedicated to advancing IPv6 in the Pacific Islands. Comprised of individual members (rather than corporate sponsors alone), its mission is to provide technical leadership and practical direction for integrating IPv6 across networking and telecommunications infrastructure—present and future.</p>
+      <p>The council’s prime objective is to promote coordinated uptake of IPv6 with support from industry, education, research, and government so that access to technology and knowledge can be broader and more equitable.</p>
+    </section>
+
+    <section class="country-detail-section" aria-labelledby="about-president">
+      <h2 id="about-president">President — Franck Martin</h2>
+      <p><a href="https://www.peachymango.org/">Franck Martin</a> serves as President of the IPv6 Council Pacific Islands. Born and raised in France, he lived many years in Fiji and has worked across the Pacific; he is now based in San Francisco. His background combines deep ties to the region with years of building communities and platforms—organizing events, supporting artists and venues, and founding tools such as <a href="https://www.bookerpal.com/about">BookerPal</a> to streamline how performers and events connect.</p>
+      <p>He is also an electronic musician and composer; for more background see his <a href="https://www.peachymango.org/epk">electronic press kit</a> at PeachyMango.</p>
+    </section>
+  </main>
+
+  {{template "siteFooter" .}}
+
+  <dialog id="conn-status-dialog" class="conn-status-dialog" aria-labelledby="conn-status-dialog-title">
+    <div class="conn-status-dialog__inner">
+      <h2 id="conn-status-dialog-title" class="conn-status-dialog__title">Your connection to this site</h2>
+      <p class="conn-status-dialog__subtitle">How we categorized your connection.</p>
+      <p class="conn-status-dialog__note">Addresses reflect what our servers see for each request. With NAT, VPNs, or proxies they may show a client, edge, or shared address—not your device’s only possible address.</p>
+      <dl class="conn-status-dialog__addrs">
+        <div class="conn-status-dialog__row">
+          <dt>IPv4</dt>
+          <dd id="conn-status-ipv4">Not available</dd>
+        </div>
+        <div class="conn-status-dialog__row">
+          <dt>IPv6</dt>
+          <dd id="conn-status-ipv6">Not available</dd>
+        </div>
+      </dl>
+      <button type="button" class="conn-status-dialog__close">Close</button>
+    </div>
+  </dialog>
+
+  <script src="/static/js/pct-color-ramp.js"></script>
+  <script nonce="{{.Nonce}}">
+    window.__PROBE_V4__ = {{if .ProbeV4}}"{{.ProbeV4}}"{{else}}""{{end}};
+    window.__PROBE_V6__ = {{if .ProbeV6}}"{{.ProbeV6}}"{{else}}""{{end}};
+  </script>
+  <script src="/static/js/conn-status-ui.js"></script>
+  <script src="/static/js/border.js"></script>
+  <script src="/static/js/cookie-consent.js" defer></script>
+</body>
+</html>

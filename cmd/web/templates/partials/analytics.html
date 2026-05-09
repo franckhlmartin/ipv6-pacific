@@ -1,0 +1,25 @@
+{{define "analyticsHead"}}
+  <script nonce="{{.Nonce}}">
+    (function () {
+      var KEY = 'ipv6-pacific-cookie-consent';
+      var stored = null;
+      try { stored = localStorage.getItem(KEY); } catch (e) {}
+      var analyticsGranted = stored === 'accepted';
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      window.gtag = gtag;
+      gtag('consent', 'default', {
+        analytics_storage: analyticsGranted ? 'granted' : 'denied',
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        wait_for_update: 500
+      });
+    })();
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-NRYXXK9595"></script>
+  <script nonce="{{.Nonce}}">
+    gtag('js', new Date());
+    gtag('config', 'G-NRYXXK9595');
+  </script>
+{{end}}

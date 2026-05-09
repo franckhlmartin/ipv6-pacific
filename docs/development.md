@@ -72,6 +72,16 @@ Set **`PUBLIC_SITE_URL`** in `.env` to your public HTTPS origin when TLS termina
 
 Rasterization is pure Go (**oksvg** + **rasterx**).
 
+### Sitemap (Google / Bing)
+
+**`GET /sitemap.xml`** returns a [sitemaps.org](https://www.sitemaps.org/protocol.html) **urlset** for indexable HTML pages: home (`/`), about (`/about`), and one URL per economy in `config/pacific_iso2.yaml` as `/country/{ISO2}`. `lastmod` for `/` comes from `data/index.json`’s `generated_at`; for country pages it uses the on-disk mtime of `data/countries/{ISO2}.json` when that file exists.
+
+Implementation: **`serveSitemap`** in [`cmd/web/sitemap.go`](../cmd/web/sitemap.go), registered in [`cmd/web/main.go`](../cmd/web/main.go). **`GET /robots.txt`** serves the embedded rules from `cmd/web/static/robots.txt` and appends a fully qualified **`Sitemap:`** line built with the same origin logic as canonical URLs (`siteurl`), so crawlers discover `/sitemap.xml` without hard-coding the public hostname.
+
+**When you add a new public HTML route** that should be crawled, update **`serveSitemap`** in the same change so the new path appears in the urlset. Do **not** list JSON APIs (`/api/…`), static assets, **`/og/map.png`**, or health-style endpoints — align with [`cmd/web/static/robots.txt`](../cmd/web/static/robots.txt) (`Disallow: /api/`).
+
+For production, set **`PUBLIC_SITE_URL`** so every `<loc>` and the robots **`Sitemap:`** URL use your real HTTPS origin (same as canonical / Open Graph).
+
 ## Commit workflow
 
 See **`docs/commit-workflow.md`** (check changes since last push, doc updates, commit/push).

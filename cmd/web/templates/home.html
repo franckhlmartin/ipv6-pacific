@@ -5,9 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{.Title}}</title>
   {{template "seo" .}}
+  {{template "analyticsHead" .}}
   <link rel="stylesheet" href="/static/css/style.css"/>
 </head>
 <body class="{{.BorderClass}}">
+  {{template "cookieBanner" .}}
   <header class="site-header">
     <div class="site-header__lead">
       <h1>{{.Title}}</h1>
@@ -75,9 +77,7 @@
     </section>
   </main>
 
-  <footer class="site-footer">
-    <p>Methodology: <a href="https://usgv6-deploymon.nist.gov/govmon.html">NIST USG IPv6 Monitor</a> · APNIC Labs: <a href="https://data1.labs.apnic.net/ipv6-data-format.html">IPv6 JSON format</a></p>
-  </footer>
+  {{template "siteFooter" .}}
 
   <dialog id="conn-status-dialog" class="conn-status-dialog" aria-labelledby="conn-status-dialog-title">
     <div class="conn-status-dialog__inner">
@@ -107,5 +107,6 @@
   </script>
   <script src="/static/js/conn-status-ui.js"></script>
   <script src="/static/js/border.js"></script>
+  <script src="/static/js/cookie-consent.js" defer></script>
 </body>
 </html>

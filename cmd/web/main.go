@@ -62,10 +62,14 @@ func main() {
 	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.FS(static))))
 	mux.Handle("GET /.well-known/", http.StripPrefix("/.well-known/", http.FileServer(http.FS(wellKnown))))
 	mux.HandleFunc("GET /robots.txt", serveRobotsTxt)
+	mux.HandleFunc("GET /sitemap.xml", func(w http.ResponseWriter, r *http.Request) {
+		serveSitemap(w, r, dataDir, pacific)
+	})
 	mux.HandleFunc("GET /og/map.png", func(w http.ResponseWriter, r *http.Request) {
 		serveOGMapPNG(w, r, dataDir)
 	})
 	mux.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) { home(tmpl, w, r, dataDir, pacific) })
+	mux.HandleFunc("GET /about", func(w http.ResponseWriter, r *http.Request) { aboutPage(tmpl, w, r) })
 	mux.HandleFunc("GET /country/{iso}", func(w http.ResponseWriter, r *http.Request) { countryPage(tmpl, w, r, dataDir, pacific, allowed) })
 	mux.HandleFunc("GET /api/index.json", func(w http.ResponseWriter, r *http.Request) { serveFile(w, filepath.Join(dataDir, "index.json")) })
 	// {iso} must be a full path segment (Go 1.22+); use /api/countries/FJ not .../FJ.json
@@ -178,8 +182,24 @@ func serveRobotsTxt(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
+	var lines []string
+	for _, line := range strings.Split(string(data), "\n") {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+		if strings.HasPrefix(strings.ToLower(line), "sitemap:") {
+			continue
+		}
+		lines = append(lines, line)
+	}
+	body := strings.Join(lines, "\n")
+	if body != "" {
+		body += "\n"
+	}
+	body += "\nSitemap: " + siteurl.AbsoluteURL(r, "/sitemap.xml") + "\n"
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	_, _ = w.Write(data)
+	_, _ = w.Write([]byte(body))
 }
 
 func serveFile(w http.ResponseWriter, path string) {
@@ -295,18 +315,42 @@ func home(tmpl *template.Template, w http.ResponseWriter, r *http.Request, dataD
 	pageTitle := "Pacific Islands IPv6 Monitor"
 	metaDesc := "Pacific Islands IPv6 Monitor — IPv6 deployment estimates for Pacific economies from DNS, mail, and web checks plus APNIC Labs capability data."
 	data := map[string]any{
-		"Index":         idx,
-		"Title":         pageTitle,
-		"BorderClass":   borderClass,
-		"Generated":     gen,
-		"EEZNotice":     "EEZ overview map: Wikimedia Commons — File:EEZ_Oceania.svg (author STyx, public domain). Source: https://commons.wikimedia.org/wiki/File:EEZ_Oceania.svg",
-		"ProbeV4":       probeV4,
-		"ProbeV6":       probeV6,
-		"ShowDualProbe": probeV4 != "" && probeV6 != "",
-		"Nonce":         httpserver.CSPNonce(r),
+		"Index":          idx,
+		"Title":          pageTitle,
+		"BorderClass":    borderClass,
+		"FooterVariant":  "home",
+		"Generated":      gen,
+		"EEZNotice":      "EEZ overview map: Wikimedia Commons — File:EEZ_Oceania.svg (author STyx, public domain). Source: https://commons.wikimedia.org/wiki/File:EEZ_Oceania.svg",
+		"ProbeV4":        probeV4,
+		"ProbeV6":        probeV6,
+		"ShowDualProbe":  probeV4 != "" && probeV6 != "",
+		"Nonce":          httpserver.CSPNonce(r),
 	}
 	seoMerge(r, data, pageTitle, metaDesc)
 	_ = tmpl.ExecuteTemplate(w, "home.html", data)
+}
+
+func aboutPage(tmpl *template.Template, w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	borderClass := "border--ipv4"
+	if httpserver.IsIPv6Client(r) {
+		borderClass = "border--ipv6"
+	}
+	probeV4 := os.Getenv("PROBE_V4_URL")
+	probeV6 := os.Getenv("PROBE_V6_URL")
+	pageTitle := "About — Pacific Islands IPv6 Monitor"
+	metaDesc := "Pacific Islands IPv6 Council and this deployment monitor — IPv6 roadmap for the Pacific, measurements, and council leadership."
+	data := map[string]any{
+		"Title":          pageTitle,
+		"BorderClass":    borderClass,
+		"FooterVariant":  "about",
+		"ProbeV4":        probeV4,
+		"ProbeV6":        probeV6,
+		"ShowDualProbe":  probeV4 != "" && probeV6 != "",
+		"Nonce":          httpserver.CSPNonce(r),
+	}
+	seoMerge(r, data, pageTitle, metaDesc)
+	_ = tmpl.ExecuteTemplate(w, "about.html", data)
 }
 
 func countryPage(tmpl *template.Template, w http.ResponseWriter, r *http.Request, dataDir string, pacific *config.PacificList, allowed map[string]struct{}) {
@@ -358,6 +402,7 @@ func countryPage(tmpl *template.Template, w http.ResponseWriter, r *http.Request
 		"Summary":         sum,
 		"Title":           pageTitle,
 		"BorderClass":     borderClass,
+		"FooterVariant":   "country",
 		"ProbeV4":         probeV4,
 		"ProbeV6":         probeV6,
 		"ShowDualProbe":   probeV4 != "" && probeV6 != "",
@@ -394,14 +439,15 @@ func countryComingSoon(tmpl *template.Template, w http.ResponseWriter, r *http.R
 	pageTitle := name + " — Pacific Islands IPv6 Monitor"
 	metaDesc := fmt.Sprintf("%s — Pacific Islands IPv6 Monitor; collector results for this economy are not yet published.", name)
 	data := map[string]any{
-		"ISO":           iso,
-		"Name":          name,
-		"Title":         pageTitle,
-		"BorderClass":   borderClass,
-		"ProbeV4":       probeV4,
-		"ProbeV6":       probeV6,
-		"ShowDualProbe": probeV4 != "" && probeV6 != "",
-		"Nonce":         httpserver.CSPNonce(r),
+		"ISO":            iso,
+		"Name":           name,
+		"Title":          pageTitle,
+		"BorderClass":    borderClass,
+		"FooterVariant":  "country",
+		"ProbeV4":        probeV4,
+		"ProbeV6":        probeV6,
+		"ShowDualProbe":  probeV4 != "" && probeV6 != "",
+		"Nonce":          httpserver.CSPNonce(r),
 	}
 	seoMerge(r, data, pageTitle, metaDesc)
 	_ = tmpl.ExecuteTemplate(w, "country_soon.html", data)

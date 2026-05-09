@@ -1,0 +1,14 @@
+{{define "siteFooter"}}
+<footer class="site-footer">
+{{- if eq .FooterVariant "about"}}
+  <p><a href="/">← Home</a> · <a href="/about">About</a></p>
+  <p>Measurements are estimates and not a certification.</p>
+{{- else if eq .FooterVariant "home"}}
+  <p><a href="/about">About</a></p>
+  <p>Methodology: <a href="https://usgv6-deploymon.nist.gov/govmon.html">NIST USG IPv6 Monitor</a> · APNIC Labs: <a href="https://data1.labs.apnic.net/ipv6-data-format.html">IPv6 JSON format</a></p>
+{{- else}}
+  <p><a href="/about">About</a></p>
+  <p>Measurements are estimates from a single vantage point and may reflect transient routing or firewall effects.</p>
+{{- end}}
+</footer>
+{{end}}

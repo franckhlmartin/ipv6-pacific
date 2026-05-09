@@ -1,0 +1,25 @@
+{{define "cookieBanner"}}
+  <div id="cookie-banner-root" class="cookie-banner" role="region" aria-label="Cookie notice">
+    <div class="cookie-banner__inner">
+      <p class="cookie-banner__text">This site uses cookies. By continuing to use the site, you accept our use of cookies for analytics. You can also choose Accept or Reject below.</p>
+      <div class="cookie-banner__actions">
+        <button type="button" class="cookie-banner__btn cookie-banner__btn--primary" id="cookie-banner-accept">Accept</button>
+        <button type="button" class="cookie-banner__btn" id="cookie-banner-reject">Reject</button>
+      </div>
+    </div>
+  </div>
+  <script nonce="{{.Nonce}}">
+    (function () {
+      var KEY = 'ipv6-pacific-cookie-consent';
+      var el = document.getElementById('cookie-banner-root');
+      if (!el) return;
+      try {
+        var v = localStorage.getItem(KEY);
+        if (v === 'accepted' || v === 'rejected') {
+          el.hidden = true;
+          el.setAttribute('aria-hidden', 'true');
+        }
+      } catch (e) {}
+    })();
+  </script>
+{{end}}

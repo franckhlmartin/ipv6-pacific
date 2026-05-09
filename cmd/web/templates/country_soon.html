@@ -5,9 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{.Title}}</title>
   {{template "seo" .}}
+  {{template "analyticsHead" .}}
   <link rel="stylesheet" href="/static/css/style.css"/>
 </head>
 <body class="{{.BorderClass}}">
+  {{template "cookieBanner" .}}
   <header class="site-header">
     <div class="site-header__lead">
       <p><a href="/">← Pacific Islands IPv6 Monitor</a></p>
@@ -32,9 +34,7 @@
     </section>
   </main>
 
-  <footer class="site-footer">
-    <p>Measurements are estimates from a single vantage point and may reflect transient routing or firewall effects.</p>
-  </footer>
+  {{template "siteFooter" .}}
 
   <dialog id="conn-status-dialog" class="conn-status-dialog" aria-labelledby="conn-status-dialog-title">
     <div class="conn-status-dialog__inner">
@@ -61,5 +61,6 @@
   </script>
   <script src="/static/js/conn-status-ui.js"></script>
   <script src="/static/js/border.js"></script>
+  <script src="/static/js/cookie-consent.js" defer></script>
 </body>
 </html>

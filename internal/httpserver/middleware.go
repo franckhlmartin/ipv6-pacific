@@ -65,7 +65,13 @@ func SecurityHeaders(extraConnectSrc []string, h http.Handler) http.Handler {
 		w.Header().Set("Permissions-Policy", "geolocation=(), camera=(), microphone=()")
 		// Map tiles: allow OSM, allow unpkg for Leaflet (see templates). Tighten to self-hosted vendor later.
 		// script-src uses a per-request nonce so small inline bootstraps (probe URLs) work without 'unsafe-inline'.
-		connectParts := []string{"'self'", "https://unpkg.com"}
+		connectParts := []string{
+			"'self'",
+			"https://unpkg.com",
+			"https://www.google-analytics.com",
+			"https://*.google-analytics.com",
+			"https://stats.g.doubleclick.net",
+		}
 		for _, o := range extraConnectSrc {
 			o = strings.TrimSpace(o)
 			if o != "" {
@@ -74,9 +80,9 @@ func SecurityHeaders(extraConnectSrc []string, h http.Handler) http.Handler {
 		}
 		csp := strings.Join([]string{
 			"default-src 'self'",
-			fmt.Sprintf("script-src 'self' https://unpkg.com 'nonce-%s'", nonce),
+			fmt.Sprintf("script-src 'self' https://unpkg.com https://www.googletagmanager.com 'nonce-%s'", nonce),
 			"style-src 'self' 'unsafe-inline' https://unpkg.com",
-			"img-src 'self' data: https://*.tile.openstreetmap.org",
+			"img-src 'self' data: https://*.tile.openstreetmap.org https://www.google-analytics.com https://www.googletagmanager.com",
 			fmt.Sprintf("connect-src %s", strings.Join(connectParts, " ")),
 			"font-src 'self' https://unpkg.com",
 			"object-src 'none'",
