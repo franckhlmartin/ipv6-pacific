@@ -72,6 +72,10 @@ domains:
   - domain: pmoffice.gov.fj
     organization: Office of the Prime Minister
     sector: Government
+  - domain: pita.org.fj
+    organization: Pacific Islands Telecommunications Association
+    sector: Regional
+    regional: true
   - domain: police.gov.fj
     organization: Fiji Police Force
     sector: Government

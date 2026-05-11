@@ -16,6 +16,7 @@ List each regional organization **once**, under its **headquarters** economy’s
 | `ffa.int` | SB |
 | `spc.int` | NC |
 | `forumsec.org` | FJ |
+| `pita.org.fj` | FJ |
 | `sprep.org` | WS |
 
 Use **`sector: Regional`** and **`regional: true`** on those entries.
