@@ -1,4 +1,6 @@
 /data/
+__pycache__/
+*.py[cod]
 .env
 .env.local
 # TLS material — never commit
