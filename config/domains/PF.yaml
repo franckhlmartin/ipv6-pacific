@@ -41,6 +41,9 @@ domains:
   - domain: urbanisme.gov.pf
     organization: "Direction de l'urbanisme"
     sector: Government
+  - domain: upf.pf
+    organization: University of French Polynesia
+    sector: Education
   - domain: vodafone.pf
     organization: Vodafone Polynesia
     sector: Telecommunications

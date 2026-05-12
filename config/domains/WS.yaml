@@ -47,6 +47,9 @@ domains:
   - domain: mesc.gov.ws
     organization: Ministry of Education, Sport, and Culture
     sector: Government
+  - domain: nus.edu.ws
+    organization: National University of Samoa
+    sector: Education
   - domain: psc.gov.ws
     organization: Public Service Commission
     sector: Government

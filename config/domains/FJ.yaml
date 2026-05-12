@@ -34,6 +34,9 @@ domains:
   - domain: flrc.gov.fj
     organization: Fiji Law Reform Commission
     sector: Government
+  - domain: fnu.ac.fj
+    organization: Fiji National University
+    sector: Education
   - domain: foreignaffairs.gov.fj
     organization: Ministry of Foreign Affairs
     sector: Government
@@ -88,6 +91,9 @@ domains:
   - domain: telecom.com.fj
     organization: Fiji Telecommunications Holding Limited
     sector: Telecommunications
+  - domain: uof.ac.fj
+    organization: University of Fiji
+    sector: Education
   - domain: usp.ac.fj
     organization: University of the South Pacific
     sector: Education

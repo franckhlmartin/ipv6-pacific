@@ -40,6 +40,9 @@ domains:
   - domain: siscc.com.sb
     organization: Siscc Limited
     sector: Telecommunications
+  - domain: sinu.edu.sb
+    organization: Solomon Islands National University
+    sector: Education
   - domain: solkonet.com
     organization: Solko Network Limited
     sector: Telecommunications

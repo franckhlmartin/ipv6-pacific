@@ -14,6 +14,9 @@ domains:
   - domain: digicelpng.com
     organization: Digicel PNG Limited
     sector: Telecommunications
+  - domain: dwu.ac.pg
+    organization: Divine Word University
+    sector: Education
   - domain: education.gov.pg
     organization: Department of Education
     sector: Government
@@ -68,6 +71,9 @@ domains:
   - domain: treasury.gov.pg
     organization: Department of Treasury
     sector: Government
+  - domain: upng.ac.pg
+    organization: University of Papua New Guinea
+    sector: Education
   - domain: vodafone.com.pg
     organization: Vodafone PNG Limited
     sector: Telecommunications

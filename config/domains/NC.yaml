@@ -45,3 +45,6 @@ domains:
     organization: Pacific Community (SPC)
     sector: Regional
     regional: true
+  - domain: unc.nc
+    organization: University of New Caledonia
+    sector: Education

@@ -20,6 +20,9 @@ domains:
   - domain: pacificlinkvu.com
     organization: Pacific Link Vanuatu Limited
     sector: Telecommunications
+  - domain: vit.edu.vu
+    organization: Vanuatu Institute of Technology
+    sector: Education
   - domain: vodafone.com.vu
     organization: Vodafone Vanuatu Limited
     sector: Telecommunications
@@ -32,4 +35,3 @@ domains:
   - domain: investvanuatu.vu
     organization: Invest Vanuatu Limited
     sector: Government
-    

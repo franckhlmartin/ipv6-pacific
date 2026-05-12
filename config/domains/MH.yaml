@@ -1,4 +1,7 @@
 domains:
+  - domain: cmi.edu
+    organization: College of the Marshall Islands
+    sector: Education
   - domain: mof.gov.mh
     organization: Ministry of Finance, Banking and Postal Services
     sector: Government

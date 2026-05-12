@@ -2,6 +2,9 @@ domains:
   - domain: btib.gov.ck
     organization: Business Trade and Investment Board
     sector: Government
+  - domain: ci-ceit.edu.ck
+    organization: Cook Islands Centre of Excellence in Information Technology
+    sector: Education
   - domain: ck
     organization: Government of the Cook Islands
     sector: Government

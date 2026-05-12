@@ -2,6 +2,9 @@ domains:
   - domain: cfsm.gov.fm
     organization: Congress of the Federated States of Micronesia
     sector: Government
+  - domain: comfsm.fm
+    organization: College of Micronesia-FSM
+    sector: Education
   - domain: dfa.gov.fm
     organization: Department of Foreign Affairs
     sector: Government
