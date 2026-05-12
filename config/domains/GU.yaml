@@ -1,0 +1,37 @@
+domains:
+  - domain: docomopacific.com
+    organization: Docomo Pacific (Guam)
+    sector: Telecommunications
+  - domain: dphss.guam.gov
+    organization: Guam Department of Public Health and Social Services
+    sector: Government
+  - domain: gcc.edu
+    organization: Guam Community College
+    sector: Education
+  - domain: gmha.org
+    organization: Guam Memorial Hospital Authority
+    sector: Government
+  - domain: gpd.guam.gov
+    organization: Guam Police Department
+    sector: Government
+  - domain: governor.guam.gov
+    organization: Office of the Governor of Guam
+    sector: Government
+  - domain: gta.net
+    organization: GTA (telecommunications, Guam)
+    sector: Telecommunications
+  - domain: guam.gov
+    organization: Government of Guam
+    sector: Government
+  - domain: guamwaterworks.org
+    organization: Guam Waterworks Authority
+    sector: Government
+  - domain: portguam.com
+    organization: Port Authority of Guam
+    sector: Government
+  - domain: uog.edu
+    organization: University of Guam
+    sector: Education
+  - domain: visitguam.com
+    organization: Guam Visitors Bureau
+    sector: Government
