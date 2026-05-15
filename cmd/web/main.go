@@ -28,7 +28,7 @@ import (
 //go:embed templates/*.html templates/partials/*.html
 var templateFS embed.FS
 
-//go:embed static/css static/js static/img static/robots.txt static/well-known/pki-validation/starfield.html
+//go:embed static/css static/js static/img static/favicon.svg static/favicon-16px.ico static/favicon-32px.ico static/favicon-48px.ico static/robots.txt static/well-known/pki-validation/starfield.html
 var staticFS embed.FS
 
 func main() {
@@ -61,6 +61,7 @@ func main() {
 	// Use explicit GET for static assets so Go 1.22+ ServeMux does not conflict with "GET /".
 	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.FS(static))))
 	mux.Handle("GET /.well-known/", http.StripPrefix("/.well-known/", http.FileServer(http.FS(wellKnown))))
+	mux.HandleFunc("GET /favicon.ico", serveRootFaviconICO)
 	mux.HandleFunc("GET /robots.txt", serveRobotsTxt)
 	mux.HandleFunc("GET /sitemap.xml", func(w http.ResponseWriter, r *http.Request) {
 		serveSitemap(w, r, dataDir, pacific)
@@ -174,6 +175,16 @@ func applyHealthzCORS(w http.ResponseWriter) {
 	w.Header().Set("Access-Control-Allow-Origin", allow)
 	w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
 	w.Header().Set("Access-Control-Max-Age", "86400")
+}
+
+func serveRootFaviconICO(w http.ResponseWriter, r *http.Request) {
+	data, err := staticFS.ReadFile("static/favicon-32px.ico")
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+	w.Header().Set("Content-Type", "image/vnd.microsoft.icon")
+	_, _ = w.Write(data)
 }
 
 func serveRobotsTxt(w http.ResponseWriter, r *http.Request) {
