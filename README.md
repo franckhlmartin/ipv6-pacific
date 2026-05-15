@@ -2,7 +2,7 @@
 
 Go services:
 
-- **`cmd/collector`** — measures configured domains (NIST-style DNS / Mail / Web + simplified DNSSEC), ingests **APNIC Labs** `v6economy/{CC}.json`, writes `data/countries/{ISO2}.json` and `data/index.json`.
+- **`cmd/collector`** — measures configured domains (NIST-style DNS / Mail / Web + simplified DNSSEC), ingests **APNIC Labs** `v6economy/{CC}.json`, fetches **Hurricane Electric** [`bgp.he.net/country/{CC}`](https://bgp.he.net/) (BGP ASN / route-count table; stored as `bgp_he_net` in each country JSON; set **`COLLECTOR_SKIP_HE_BGP=1`** to skip and keep the last snapshot — see `.env.example`), writes `data/countries/{ISO2}.json` and `data/index.json`.
 - **`cmd/web`** — serves the Afrinic-inspired UI, JSON API, Pacific EEZ overview (`static/img/EEZ_Oceania.svg`), and a sortable home economies table; the map and Deploy % / IPv6 pref. % cells use the same red→green ramp. The header includes a **your connection** control (border colors, optional dialog with addresses seen by the service). `index.json` includes `deployment_score_pct` per economy (mean RowScore / 4 × 100). HTML pages emit canonical / Open Graph / Twitter meta tags; **`GET /og/map.png`** renders a share-preview PNG (same ramp as the map when APNIC Labs `preferred_pc_raw` is in `index.json`). **`GET /robots.txt`** is served at the site root and references **`GET /sitemap.xml`** for crawlers (submit that URL in Google Search Console / Bing). Set **`PUBLIC_SITE_URL`** when TLS terminates in front of the app so canonical, social, and sitemap URLs use the public origin (see `.env.example`).
 
 Quick start:

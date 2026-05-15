@@ -326,16 +326,16 @@ func home(tmpl *template.Template, w http.ResponseWriter, r *http.Request, dataD
 	pageTitle := "Pacific Islands IPv6 Monitor"
 	metaDesc := "Pacific Islands IPv6 Monitor — IPv6 deployment estimates for Pacific economies from DNS, mail, and web checks plus APNIC Labs capability data."
 	data := map[string]any{
-		"Index":          idx,
-		"Title":          pageTitle,
-		"BorderClass":    borderClass,
-		"FooterVariant":  "home",
-		"Generated":      gen,
-		"EEZNotice":      "EEZ overview map: Wikimedia Commons — File:EEZ_Oceania.svg (author STyx, public domain). Source: https://commons.wikimedia.org/wiki/File:EEZ_Oceania.svg",
-		"ProbeV4":        probeV4,
-		"ProbeV6":        probeV6,
-		"ShowDualProbe":  probeV4 != "" && probeV6 != "",
-		"Nonce":          httpserver.CSPNonce(r),
+		"Index":         idx,
+		"Title":         pageTitle,
+		"BorderClass":   borderClass,
+		"FooterVariant": "home",
+		"Generated":     gen,
+		"EEZNotice":     "EEZ overview map: Wikimedia Commons — File:EEZ_Oceania.svg (author STyx, public domain). Source: https://commons.wikimedia.org/wiki/File:EEZ_Oceania.svg",
+		"ProbeV4":       probeV4,
+		"ProbeV6":       probeV6,
+		"ShowDualProbe": probeV4 != "" && probeV6 != "",
+		"Nonce":         httpserver.CSPNonce(r),
 	}
 	seoMerge(r, data, pageTitle, metaDesc)
 	_ = tmpl.ExecuteTemplate(w, "home.html", data)
@@ -352,13 +352,13 @@ func aboutPage(tmpl *template.Template, w http.ResponseWriter, r *http.Request) 
 	pageTitle := "About — Pacific Islands IPv6 Monitor"
 	metaDesc := "Pacific Islands IPv6 Council and this deployment monitor — IPv6 roadmap for the Pacific, measurements, and council leadership."
 	data := map[string]any{
-		"Title":          pageTitle,
-		"BorderClass":    borderClass,
-		"FooterVariant":  "about",
-		"ProbeV4":        probeV4,
-		"ProbeV6":        probeV6,
-		"ShowDualProbe":  probeV4 != "" && probeV6 != "",
-		"Nonce":          httpserver.CSPNonce(r),
+		"Title":         pageTitle,
+		"BorderClass":   borderClass,
+		"FooterVariant": "about",
+		"ProbeV4":       probeV4,
+		"ProbeV6":       probeV6,
+		"ShowDualProbe": probeV4 != "" && probeV6 != "",
+		"Nonce":         httpserver.CSPNonce(r),
 	}
 	seoMerge(r, data, pageTitle, metaDesc)
 	_ = tmpl.ExecuteTemplate(w, "about.html", data)
@@ -403,7 +403,8 @@ func countryPage(tmpl *template.Template, w http.ResponseWriter, r *http.Request
 	statusLegend := checks.CountryLegendStatusItems()
 	locationLegend := checks.CountryLegendLocationItems()
 	scoreLegend := scoring.CountryScoreLegend()
-	log.Printf("country legend rendered iso=%s status_items=%d check_items=%d location_items=%d has_results=%t", iso, len(statusLegend), len(checkLegend), len(locationLegend), len(cf.Domains) > 0)
+	hasBGPHETable := cf.BGPHurricaneElectric != nil && len(cf.BGPHurricaneElectric.Networks) > 0
+	log.Printf("country legend rendered iso=%s status_items=%d check_items=%d location_items=%d has_results=%t has_bgp_he=%t", iso, len(statusLegend), len(checkLegend), len(locationLegend), len(cf.Domains) > 0, hasBGPHETable)
 	pageTitle := name + " — Pacific Islands IPv6 Monitor"
 	metaDesc := fmt.Sprintf("%s — IPv6 deployment estimates from DNS, mail, web checks and APNIC Labs data (Pacific Islands IPv6 Monitor).", name)
 	data := map[string]any{
@@ -418,6 +419,7 @@ func countryPage(tmpl *template.Template, w http.ResponseWriter, r *http.Request
 		"ProbeV6":         probeV6,
 		"ShowDualProbe":   probeV4 != "" && probeV6 != "",
 		"HasResults":      len(cf.Domains) > 0,
+		"HasBGPHETable":   hasBGPHETable,
 		"EconomyScorePct": economyScorePct,
 		"Generated":       cf.GeneratedAt.Format(time.RFC3339),
 		"LegendStatus":    statusLegend,
@@ -450,15 +452,15 @@ func countryComingSoon(tmpl *template.Template, w http.ResponseWriter, r *http.R
 	pageTitle := name + " — Pacific Islands IPv6 Monitor"
 	metaDesc := fmt.Sprintf("%s — Pacific Islands IPv6 Monitor; collector results for this economy are not yet published.", name)
 	data := map[string]any{
-		"ISO":            iso,
-		"Name":           name,
-		"Title":          pageTitle,
-		"BorderClass":    borderClass,
-		"FooterVariant":  "country",
-		"ProbeV4":        probeV4,
-		"ProbeV6":        probeV6,
-		"ShowDualProbe":  probeV4 != "" && probeV6 != "",
-		"Nonce":          httpserver.CSPNonce(r),
+		"ISO":           iso,
+		"Name":          name,
+		"Title":         pageTitle,
+		"BorderClass":   borderClass,
+		"FooterVariant": "country",
+		"ProbeV4":       probeV4,
+		"ProbeV6":       probeV6,
+		"ShowDualProbe": probeV4 != "" && probeV6 != "",
+		"Nonce":         httpserver.CSPNonce(r),
 	}
 	seoMerge(r, data, pageTitle, metaDesc)
 	_ = tmpl.ExecuteTemplate(w, "country_soon.html", data)

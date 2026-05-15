@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/pacific-monitor/pacific-monitor/internal/apniclabs"
+	"github.com/pacific-monitor/pacific-monitor/internal/bgphe"
 	"github.com/pacific-monitor/pacific-monitor/internal/checks"
 	"github.com/pacific-monitor/pacific-monitor/internal/config"
 	"github.com/pacific-monitor/pacific-monitor/internal/dotenv"
@@ -159,28 +160,31 @@ func collectCountry(ctx context.Context, root, dataDir string, pacific *config.P
 	}
 
 	out := filepath.Join(dataDir, "countries", strings.ToUpper(c.ISO2)+".json")
-	// Build into *.json.partial; rename to *.json only after the full pass (domains + APNIC)
+	// Build into *.json.partial; rename to *.json only after the full pass (domains + APNIC + HE BGP)
 	// so the live file — and the public site — never flip to an in-progress snapshot.
 	stagingPath := out + ".partial"
 
 	var prevAPNIC *model.APNICSnapshot
+	var prevBGPHE *model.BGPHETable
 	var prevDomains []model.DomainResult
 	if raw, err := os.ReadFile(out); err == nil {
 		var old model.CountryFile
 		if json.Unmarshal(raw, &old) == nil {
 			prevAPNIC = old.APNICLabs
+			prevBGPHE = old.BGPHurricaneElectric
 			prevDomains = old.Domains
 		}
 	}
 
-	writeCountry := func(results []model.DomainResult, ap *model.APNICSnapshot) error {
+	writeCountry := func(results []model.DomainResult, ap *model.APNICSnapshot, he *model.BGPHETable) error {
 		cf := model.CountryFile{
-			ISO2:             strings.ToUpper(c.ISO2),
-			Name:             c.Name,
-			GeneratedAt:      time.Now().UTC(),
-			CollectorVersion: model.CollectorVersion,
-			Domains:          results,
-			APNICLabs:        ap,
+			ISO2:                 strings.ToUpper(c.ISO2),
+			Name:                 c.Name,
+			GeneratedAt:          time.Now().UTC(),
+			CollectorVersion:     model.CollectorVersion,
+			Domains:              results,
+			APNICLabs:            ap,
+			BGPHurricaneElectric: he,
 		}
 		return storage.WriteJSON(stagingPath, cf)
 	}
@@ -198,7 +202,7 @@ func collectCountry(ctx context.Context, root, dataDir string, pacific *config.P
 
 	results := seedDomainResults(df, prevDomains)
 	if nDom > 0 {
-		if err := writeCountry(results, apnicCarry); err != nil {
+		if err := writeCountry(results, apnicCarry, prevBGPHE); err != nil {
 			return err
 		}
 	}
@@ -234,7 +238,7 @@ func collectCountry(ctx context.Context, root, dataDir string, pacific *config.P
 			log.Printf("[collector] %s domain %s: done in %s rollup=%s dns=%s mail=%s web=%s err=%s",
 				c.ISO2, entry.Domain, elapsed, res.RollupClass, res.DNS.Class, res.Mail.Class, res.Web.Class, errMsg)
 		}
-		if err := writeCountry(results, apnicCarry); err != nil {
+		if err := writeCountry(results, apnicCarry, prevBGPHE); err != nil {
 			return err
 		}
 		if verbose {
@@ -260,7 +264,25 @@ func collectCountry(ctx context.Context, root, dataDir string, pacific *config.P
 		ap = nil
 	}
 
-	if err := writeCountry(results, ap); err != nil {
+	var heTable *model.BGPHETable
+	if skipHEBGP() {
+		log.Printf("[collector] %s: skipping Hurricane Electric BGP (COLLECTOR_SKIP_HE_BGP)", c.ISO2)
+		heTable = prevBGPHE
+	} else {
+		log.Printf("[collector] %s: fetching Hurricane Electric bgp.he.net/country/%s …", c.ISO2, strings.ToUpper(c.ISO2))
+		hctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+		heSnap, err := bgphe.FetchCountryNetworks(hctx, c.ISO2, hc)
+		cancel()
+		if err != nil {
+			log.Printf("[collector] %s: Hurricane Electric BGP fetch failed: %v", c.ISO2, err)
+			heTable = prevBGPHE
+		} else {
+			heTable = heSnap
+			log.Printf("[collector] %s: Hurricane Electric BGP networks=%d (fetched_at=%s)", c.ISO2, len(heSnap.Networks), heSnap.FetchedAt.Format(time.RFC3339))
+		}
+	}
+
+	if err := writeCountry(results, ap, heTable); err != nil {
 		return err
 	}
 	if err := os.Rename(stagingPath, out); err != nil {
@@ -343,4 +365,9 @@ func getenv(key, def string) string {
 		return v
 	}
 	return def
+}
+
+// skipHEBGP skips bgp.he.net scraping when COLLECTOR_SKIP_HE_BGP=1 (ops kill switch).
+func skipHEBGP() bool {
+	return strings.TrimSpace(os.Getenv("COLLECTOR_SKIP_HE_BGP")) == "1"
 }

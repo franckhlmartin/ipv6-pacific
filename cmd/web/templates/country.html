@@ -44,14 +44,67 @@
     </section>
     {{end}}
 
-    <section class="country-detail-section" aria-label="Domain results">
-      <h2>Detailed IPv6 &amp; DNSSEC Service Interface Statistics</h2>
+    <section class="country-detail-section" aria-label="Economy technical detail">
+
+      {{if .HasBGPHETable}}
+      {{$he := .Country.BGPHurricaneElectric}}
+      <h2 id="bgphe-heading">BGP networks (routing visibility)</h2>
+      <p class="meta bgphe-lead">Autonomous systems listed by Hurricane Electric for economy {{.ISO}}. Values are <strong>BGP route counts</strong> (visible IPv4/IPv6 prefixes), not the same as end-user IPv6 preference—that appears in the <strong>APNIC Labs</strong> banner above when available.</p>
+      <div class="table-wrap">
+        <table class="bgphe-table sortable-table" aria-labelledby="bgphe-heading">
+          <caption class="bgphe-caption">BGP-visible networks for {{.Name}} ({{.ISO}}). <a href="{{$he.SourceURL}}" target="_blank" rel="noopener">Open listing on bgp.he.net</a>.</caption>
+          <thead>
+            <tr>
+              <th scope="col" class="sortable">
+                <button type="button" class="sort-trigger" data-sort-index="0" data-sort-mode="number" title="Sort by ASN (click again to reverse)">
+                  <span class="sort-trigger__label">ASN</span><span class="sort-indicator" aria-hidden="true"></span>
+                </button>
+              </th>
+              <th scope="col" class="sortable">
+                <button type="button" class="sort-trigger" data-sort-index="1" title="Sort by name (click again to reverse)">
+                  <span class="sort-trigger__label">Name</span><span class="sort-indicator" aria-hidden="true"></span>
+                </button>
+              </th>
+              <th scope="col" class="sortable">
+                <button type="button" class="sort-trigger" data-sort-index="2" data-sort-mode="number" title="Sort by IPv4 routes (click again to reverse)">
+                  <span class="sort-trigger__label">IPv4 routes</span><span class="sort-indicator" aria-hidden="true"></span>
+                </button>
+              </th>
+              <th scope="col" class="sortable">
+                <button type="button" class="sort-trigger" data-sort-index="3" data-sort-mode="number" title="Sort by IPv6 routes (click again to reverse)">
+                  <span class="sort-trigger__label">IPv6 routes</span><span class="sort-indicator" aria-hidden="true"></span>
+                </button>
+              </th>
+              <th scope="col" class="sortable">
+                <button type="button" class="sort-trigger" data-sort-index="4" data-sort-mode="number" title="Sort by IPv6 visibility (click again to reverse)">
+                  <span class="sort-trigger__label">IPv6 routes?</span><span class="sort-indicator" aria-hidden="true"></span>
+                </button>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {{range $he.Networks}}
+            <tr class="bgphe-row {{if gt .RoutesV6 0}}bgphe-row--v6{{else}}bgphe-row--v4-only{{end}}" aria-label="{{.ASN}}, {{if gt .RoutesV6 0}}IPv6 routes announced{{else}}IPv4 only, no IPv6 routes{{end}}">
+              <td data-sort-value="{{.ASNNumber}}"><a href="https://bgp.he.net/{{.ASN}}" target="_blank" rel="noopener">{{.ASN}}</a></td>
+              <td>{{.Name}}</td>
+              <td data-sort-value="{{.RoutesV4}}">{{.RoutesV4}}</td>
+              <td data-sort-value="{{.RoutesV6}}">{{.RoutesV6}}</td>
+              <td data-sort-value="{{if gt .RoutesV6 0}}1{{else}}0{{end}}">{{if gt .RoutesV6 0}}Yes{{else}}No{{end}}</td>
+            </tr>
+            {{end}}
+          </tbody>
+        </table>
+      </div>
+      <p class="meta bgphe-foot">Snapshot {{$he.FetchedAt.Format "2006-01-02 15:04"}} UTC. Source: <a href="{{$he.SourceURL}}" target="_blank" rel="noopener">Hurricane Electric — country {{$.ISO}}</a> (third-party routing view).</p>
+      {{end}}
+
+      <h2 id="domain-detail-heading">Detailed IPv6 &amp; DNSSEC Service Interface Statistics</h2>
 
       {{if not .HasResults}}
       <p class="empty-state">No analysis results yet. Domains are registered but have not been analysed. Run the collector to generate results.</p>
       {{else}}
       <div class="table-wrap">
-      <table class="results">
+      <table class="results sortable-table">
         <thead>
           <tr>
             <th scope="col" class="sortable">
@@ -174,7 +227,7 @@
 
   <script src="/static/js/pct-color-ramp.js"></script>
   <script src="/static/js/country-summary-strip.js"></script>
-  {{if .HasResults}}<script src="/static/js/table-sort.js"></script>{{end}}
+  {{if or .HasResults .HasBGPHETable}}<script src="/static/js/table-sort.js"></script>{{end}}
   <script nonce="{{.Nonce}}">
     window.__PROBE_V4__ = {{if .ProbeV4}}"{{.ProbeV4}}"{{else}}""{{end}};
     window.__PROBE_V6__ = {{if .ProbeV6}}"{{.ProbeV6}}"{{else}}""{{end}};

@@ -62,6 +62,12 @@ nohup ./scripts/start_collector.sh -country=FJ >> collector.log 2>&1 &
 
 Use two terminals for **web + collector** during integration testing.
 
+### Hurricane Electric BGP country table
+
+Each economy pass also downloads the public **Hurricane Electric** country networks HTML (`bgp.he.net/country/{ISO2}`), parses the ASN / route-count table, and merges it into **`bgp_he_net`** on `data/countries/{ISO2}.json`. The country page renders it above the domain results table when rows exist.
+
+Set **`COLLECTOR_SKIP_HE_BGP=1`** (see `.env.example`) to skip outbound HE requests and leave the previous snapshot in JSON (ops kill switch).
+
 ## SEO and Open Graph
 
 HTML responses include `meta`/`link` tags for description, canonical URL, Open Graph, and Twitter Cards (`cmd/web/templates/partials/seo.html`).

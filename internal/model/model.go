@@ -3,7 +3,7 @@ package model
 import "time"
 
 // CollectorVersion is embedded in generated JSON for traceability.
-const CollectorVersion = "0.1.0"
+const CollectorVersion = "0.2.0"
 
 // DeployClass matches UI color semantics (orange / blue / green).
 type DeployClass string
@@ -47,12 +47,29 @@ type DeploymentSummary struct {
 
 // CountryFile is data/countries/{ISO2}.json.
 type CountryFile struct {
-	ISO2             string         `json:"iso2"`
-	Name             string         `json:"name"`
-	GeneratedAt      time.Time      `json:"generated_at"` // UTC wall time when this file was last written
-	CollectorVersion string         `json:"collector_version"`
-	Domains          []DomainResult `json:"domains"`
-	APNICLabs        *APNICSnapshot `json:"apnic_labs,omitempty"`
+	ISO2                 string         `json:"iso2"`
+	Name                 string         `json:"name"`
+	GeneratedAt          time.Time      `json:"generated_at"` // UTC wall time when this file was last written
+	CollectorVersion     string         `json:"collector_version"`
+	Domains              []DomainResult `json:"domains"`
+	APNICLabs            *APNICSnapshot `json:"apnic_labs,omitempty"`
+	BGPHurricaneElectric *BGPHETable    `json:"bgp_he_net,omitempty"` // Hurricane Electric country BGP listing (scraped)
+}
+
+// BGPHETable is a snapshot of bgp.he.net/country/{ISO2} network rows.
+type BGPHETable struct {
+	SourceURL string            `json:"source_url"`
+	FetchedAt time.Time         `json:"fetched_at"`
+	Networks  []BGPHENetworkRow `json:"networks"`
+}
+
+// BGPHENetworkRow is one ASN row from the HE country networks table.
+type BGPHENetworkRow struct {
+	ASN       string `json:"asn"`        // e.g. AS38442
+	ASNNumber int    `json:"asn_number"` // numeric ASN for sorting
+	Name      string `json:"name"`
+	RoutesV4  int    `json:"routes_v4"`
+	RoutesV6  int    `json:"routes_v6"`
 }
 
 // DomainResult is one row in the Afrinic-style table.
