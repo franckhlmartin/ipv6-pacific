@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/pacific-monitor/pacific-monitor/internal/bgphe"
 	"github.com/pacific-monitor/pacific-monitor/internal/checks"
 	"github.com/pacific-monitor/pacific-monitor/internal/config"
 	"github.com/pacific-monitor/pacific-monitor/internal/dotenv"
@@ -47,6 +48,8 @@ func main() {
 	tmpl, err := template.New("").Funcs(template.FuncMap{
 		"rowScore":        scoring.RowScore,
 		"dnssecCellClass": scoring.DNSSECCellClass,
+		"bgpheRowClass":   bgphe.RowClass,
+		"bgpheRowAria":    bgphe.RowAriaLabel,
 	}).ParseFS(templateFS, "templates/*.html", "templates/partials/*.html")
 	if err != nil {
 		log.Fatal(err)

@@ -49,10 +49,10 @@
       {{if .HasBGPHETable}}
       {{$he := .Country.BGPHurricaneElectric}}
       <h2 id="bgphe-heading">BGP networks (routing visibility)</h2>
-      <p class="meta bgphe-lead">Autonomous systems listed by Hurricane Electric for economy {{.ISO}}. Values are <strong>BGP route counts</strong> (visible IPv4/IPv6 prefixes), not the same as end-user IPv6 preference—that appears in the <strong>APNIC Labs</strong> banner above when available.</p>
+      <p class="meta bgphe-lead">Combines <strong>Hurricane Electric</strong> BGP route visibility with per-ASN <strong>IPv6 preferred</strong> from <a href="https://stats.labs.apnic.net/ipv6/{{.ISO}}" target="_blank" rel="noopener">APNIC Labs</a> for economy {{.ISO}}. Row color uses BGP IPv6 routes when announced; otherwise IPv6 preferred. ASNs listed only by APNIC (HE route columns <strong>N/A</strong>) may not be connected to other ASNs in this economy.</p>
       <div class="table-wrap">
         <table class="bgphe-table sortable-table" aria-labelledby="bgphe-heading">
-          <caption class="bgphe-caption">BGP-visible networks for {{.Name}} ({{.ISO}}). <a href="{{$he.SourceURL}}" target="_blank" rel="noopener">Open listing on bgp.he.net</a>.</caption>
+          <caption class="bgphe-caption">BGP and APNIC per-ASN data for {{.Name}} ({{.ISO}}).{{if $he.SourceURL}} <a href="{{$he.SourceURL}}" target="_blank" rel="noopener">Hurricane Electric</a>.{{end}}{{if $he.APNICStatsSourceURL}} <a href="{{$he.APNICStatsSourceURL}}" target="_blank" rel="noopener">APNIC Labs stats</a>.{{end}}</caption>
           <thead>
             <tr>
               <th scope="col" class="sortable">
@@ -66,17 +66,22 @@
                 </button>
               </th>
               <th scope="col" class="sortable">
-                <button type="button" class="sort-trigger" data-sort-index="2" data-sort-mode="number" title="Sort by IPv4 routes (click again to reverse)">
+                <button type="button" class="sort-trigger" data-sort-index="2" data-sort-mode="number" title="Sort by IPv6 preferred (click again to reverse)">
+                  <span class="sort-trigger__label">IPv6 pref. %</span><span class="sort-indicator" aria-hidden="true"></span>
+                </button>
+              </th>
+              <th scope="col" class="sortable">
+                <button type="button" class="sort-trigger" data-sort-index="3" data-sort-mode="number" title="Sort by IPv4 routes (click again to reverse)">
                   <span class="sort-trigger__label">IPv4 routes</span><span class="sort-indicator" aria-hidden="true"></span>
                 </button>
               </th>
               <th scope="col" class="sortable">
-                <button type="button" class="sort-trigger" data-sort-index="3" data-sort-mode="number" title="Sort by IPv6 routes (click again to reverse)">
+                <button type="button" class="sort-trigger" data-sort-index="4" data-sort-mode="number" title="Sort by IPv6 routes (click again to reverse)">
                   <span class="sort-trigger__label">IPv6 routes</span><span class="sort-indicator" aria-hidden="true"></span>
                 </button>
               </th>
               <th scope="col" class="sortable">
-                <button type="button" class="sort-trigger" data-sort-index="4" data-sort-mode="number" title="Sort by IPv6 visibility (click again to reverse)">
+                <button type="button" class="sort-trigger" data-sort-index="5" data-sort-mode="number" title="Sort by IPv6 visibility (click again to reverse)">
                   <span class="sort-trigger__label">IPv6 routes?</span><span class="sort-indicator" aria-hidden="true"></span>
                 </button>
               </th>
@@ -84,18 +89,28 @@
           </thead>
           <tbody>
             {{range $he.Networks}}
-            <tr class="bgphe-row {{if gt .RoutesV6 0}}bgphe-row--v6{{else}}bgphe-row--v4-only{{end}}" aria-label="{{.ASN}}, {{if gt .RoutesV6 0}}IPv6 routes announced{{else}}IPv4 only, no IPv6 routes{{end}}">
-              <td data-sort-value="{{.ASNNumber}}"><a href="https://bgp.he.net/{{.ASN}}" target="_blank" rel="noopener">{{.ASN}}</a></td>
+            <tr class="bgphe-row {{bgpheRowClass .}}" aria-label="{{bgpheRowAria .}}">
+              <td data-sort-value="{{.ASNNumber}}">
+                {{if .HERoutesNA}}
+                <a href="https://stats.labs.apnic.net/ipv6/{{.ASN}}?c={{$.ISO}}" target="_blank" rel="noopener">{{.ASN}}</a>
+                {{else}}
+                <a href="https://bgp.he.net/{{.ASN}}" target="_blank" rel="noopener">{{.ASN}}</a>
+                {{end}}
+              </td>
               <td>{{.Name}}</td>
-              <td data-sort-value="{{.RoutesV4}}">{{.RoutesV4}}</td>
-              <td data-sort-value="{{.RoutesV6}}">{{.RoutesV6}}</td>
-              <td data-sort-value="{{if gt .RoutesV6 0}}1{{else}}0{{end}}">{{if gt .RoutesV6 0}}Yes{{else}}No{{end}}</td>
+              <td data-sort-value="{{printf "%.6f" .IPv6PreferredPct}}">{{printf "%.2f" .IPv6PreferredPct}}%</td>
+              <td data-sort-value="{{if .HERoutesNA}}-1{{else}}{{.RoutesV4}}{{end}}">{{if .HERoutesNA}}N/A{{else}}{{.RoutesV4}}{{end}}</td>
+              <td data-sort-value="{{if .HERoutesNA}}-1{{else}}{{.RoutesV6}}{{end}}">{{if .HERoutesNA}}N/A{{else}}{{.RoutesV6}}{{end}}</td>
+              <td data-sort-value="{{if .HERoutesNA}}-1{{else}}{{if gt .RoutesV6 0}}1{{else}}0{{end}}{{end}}">{{if .HERoutesNA}}N/A{{else}}{{if gt .RoutesV6 0}}Yes{{else}}No{{end}}{{end}}</td>
             </tr>
             {{end}}
           </tbody>
         </table>
       </div>
-      <p class="meta bgphe-foot">Snapshot {{$he.FetchedAt.Format "2006-01-02 15:04"}} UTC. Source: <a href="{{$he.SourceURL}}" target="_blank" rel="noopener">Hurricane Electric — country {{$.ISO}}</a> (third-party routing view).</p>
+      <p class="meta bgphe-foot">
+        {{if $he.SourceURL}}Hurricane Electric snapshot {{$he.FetchedAt.Format "2006-01-02 15:04"}} UTC (<a href="{{$he.SourceURL}}" target="_blank" rel="noopener">bgp.he.net</a>).{{end}}
+        {{if $he.APNICStatsSourceURL}} APNIC Labs per-ASN snapshot {{$he.APNICStatsFetchedAt.Format "2006-01-02 15:04"}} UTC (<a href="{{$he.APNICStatsSourceURL}}" target="_blank" rel="noopener">stats.labs.apnic.net</a>).{{end}}
+      </p>
       {{end}}
 
       <h2 id="domain-detail-heading">Detailed IPv6 &amp; DNSSEC Service Interface Statistics</h2>

@@ -56,20 +56,25 @@ type CountryFile struct {
 	BGPHurricaneElectric *BGPHETable    `json:"bgp_he_net,omitempty"` // Hurricane Electric country BGP listing (scraped)
 }
 
-// BGPHETable is a snapshot of bgp.he.net/country/{ISO2} network rows.
+// BGPHETable is a merged snapshot: HE country BGP listing plus APNIC Labs per-ASN IPv6 preference.
 type BGPHETable struct {
-	SourceURL string            `json:"source_url"`
-	FetchedAt time.Time         `json:"fetched_at"`
-	Networks  []BGPHENetworkRow `json:"networks"`
+	SourceURL            string            `json:"source_url"`
+	FetchedAt            time.Time         `json:"fetched_at"`
+	APNICStatsSourceURL  string            `json:"apnic_stats_source_url,omitempty"`
+	APNICStatsFetchedAt  time.Time         `json:"apnic_stats_fetched_at,omitempty"`
+	Networks             []BGPHENetworkRow `json:"networks"`
 }
 
-// BGPHENetworkRow is one ASN row from the HE country networks table.
+// BGPHENetworkRow is one ASN in the merged BGP / APNIC table.
 type BGPHENetworkRow struct {
-	ASN       string `json:"asn"`        // e.g. AS38442
-	ASNNumber int    `json:"asn_number"` // numeric ASN for sorting
-	Name      string `json:"name"`
-	RoutesV4  int    `json:"routes_v4"`
-	RoutesV6  int    `json:"routes_v6"`
+	ASN              string  `json:"asn"`        // e.g. AS38442
+	ASNNumber        int     `json:"asn_number"` // numeric ASN for sorting
+	Name             string  `json:"name"`
+	RoutesV4         int     `json:"routes_v4"`
+	RoutesV6         int     `json:"routes_v6"`
+	IPv6PreferredPct float64 `json:"ipv6preferred"` // APNIC Labs IPv6 preferred % (30-day smoothed)
+	HERoutesNA       bool    `json:"he_routes_na,omitempty"`
+	APNICSamples     int     `json:"apnic_samples,omitempty"`
 }
 
 // DomainResult is one row in the Afrinic-style table.

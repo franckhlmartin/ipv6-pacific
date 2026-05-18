@@ -8,7 +8,7 @@ Cross-check ideas against [`bookerpal/docs/security.md`](/Users/franck/code/book
 
 - **Untrusted HTTP input**: path segments (`/country/{iso2}`), optional query strings. No user-generated HTML stored.
 - **Untrusted data**: JSON artifacts under `data/` are written only by the collector; integrity depends on host security.
-- **Outbound**: collector fetches **APNIC Labs** JSON from an **allowlisted host** (`data1.labs.apnic.net`) over HTTPS with verification.
+- **Outbound**: collector fetches **APNIC Labs** JSON from **`data1.labs.apnic.net`**, scrapes per-ASN stats from **`stats.labs.apnic.net`**, and **Hurricane Electric** from **`bgp.he.net`** — each over HTTPS with hostname allowlists in the respective clients.
 
 ## Controls implemented
 
@@ -16,7 +16,8 @@ Cross-check ideas against [`bookerpal/docs/security.md`](/Users/franck/code/book
 - **ISO2 allowlist** for `/country/` and `/api/countries/` from `config/pacific_iso2.yaml`.
 - **Rate limiting** on `/api/*` (excluding `/api/healthz`).
 - **HTML templates** use `html/template` auto-escaping for dynamic text.
-- **APNIC client**: hostname allowlist in `internal/apniclabs`.
+- **APNIC clients**: hostname allowlists in `internal/apniclabs` (`data1.labs.apnic.net`) and `internal/apnicstats` (`stats.labs.apnic.net`).
+- **Hurricane Electric client**: hostname allowlist in `internal/bgphe` (`bgp.he.net`).
 - **`/.well-known/security.txt`** placeholder — replace contact email for production.
 
 ## Client IP in UI

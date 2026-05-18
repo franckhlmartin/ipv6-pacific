@@ -62,11 +62,13 @@ nohup ./scripts/start_collector.sh -country=FJ >> collector.log 2>&1 &
 
 Use two terminals for **web + collector** during integration testing.
 
-### Hurricane Electric BGP country table
+### Hurricane Electric BGP + APNIC per-ASN table
 
-Each economy pass also downloads the public **Hurricane Electric** country networks HTML (`bgp.he.net/country/{ISO2}`), parses the ASN / route-count table, and merges it into **`bgp_he_net`** on `data/countries/{ISO2}.json`. The country page renders it above the domain results table when rows exist.
+Each economy pass downloads the public **Hurricane Electric** country networks HTML (`bgp.he.net/country/{ISO2}`), scrapes per-ASN **IPv6 preferred** from **APNIC Labs** (`stats.labs.apnic.net/ipv6/{ISO2}` — the `drawTable()` ASN list), merges both into **`bgp_he_net`** on `data/countries/{ISO2}.json`, and the country page renders the combined table above the domain results when rows exist. APNIC-only ASNs show **N/A** for HE route columns.
 
-Set **`COLLECTOR_SKIP_HE_BGP=1`** (see `.env.example`) to skip outbound HE requests and leave the previous snapshot in JSON (ops kill switch).
+For a fast integration check use **Tokelau (`-country=TK`)**: two APNIC ASNs and three domains in config.
+
+Set **`COLLECTOR_SKIP_HE_BGP=1`** (see `.env.example`) to skip outbound HE requests and leave the previous HE snapshot in JSON (ops kill switch). Per-ASN APNIC stats are skipped when `exclude_apnic` is set on an economy.
 
 ## SEO and Open Graph
 

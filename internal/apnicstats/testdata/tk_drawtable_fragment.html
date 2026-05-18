@@ -1,0 +1,11 @@
+<script type='text/javascript'>
+  function drawTable() {
+      var table = new google.visualization.arrayToDataTable([
+        ['ASN', 'AS Name', 'IPv6 Capable', 'IPv6 Preferred', 'Samples'],
+        ["<a href=\"//stats.labs.apnic.net/ipv6/AS14593?c=TK&p=1&v=1&w=30&x=1\">AS14593</a>","SPACEX-STARLINK - Space Exploration Technologies Corporation",{v: 91.67, f:'91.67%'},{v: 88.89, f: '88.89%'},108],
+["<a href=\"//stats.labs.apnic.net/ipv6/AS55523?c=TK&p=1&v=1&w=30&x=1\">AS55523</a>","TELETOK-AS-AP Telecommunications Tokelau Corporation - Teletok",{v: 0.00, f:'0.00%'},{v: 0.00, f: '0.00%'},106]
+    ]);
+        var astable = new google.visualization.Table(document.getElementById('table_div'));
+        astable.draw(table, options);
+    };
+</script>

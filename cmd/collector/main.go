@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/pacific-monitor/pacific-monitor/internal/apniclabs"
+	"github.com/pacific-monitor/pacific-monitor/internal/apnicstats"
 	"github.com/pacific-monitor/pacific-monitor/internal/bgphe"
 	"github.com/pacific-monitor/pacific-monitor/internal/checks"
 	"github.com/pacific-monitor/pacific-monitor/internal/config"
@@ -279,6 +280,23 @@ func collectCountry(ctx context.Context, root, dataDir string, pacific *config.P
 		} else {
 			heTable = heSnap
 			log.Printf("[collector] %s: Hurricane Electric BGP networks=%d (fetched_at=%s)", c.ISO2, len(heSnap.Networks), heSnap.FetchedAt.Format(time.RFC3339))
+		}
+	}
+
+	if !c.ExcludeAPNIC {
+		log.Printf("[collector] %s: fetching APNIC Labs stats.labs.apnic.net/ipv6/%s …", c.ISO2, strings.ToUpper(c.ISO2))
+		sctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+		apnicASN, err := apnicstats.FetchCountryASNTable(sctx, c.ISO2, hc)
+		cancel()
+		if err != nil {
+			log.Printf("[collector] %s: APNIC per-ASN stats fetch failed: %v", c.ISO2, err)
+		} else {
+			heTable = bgphe.MergeWithAPNICPreferred(heTable, apnicASN)
+			nMerged := 0
+			if heTable != nil {
+				nMerged = len(heTable.Networks)
+			}
+			log.Printf("[collector] %s: merged BGP/APNIC networks=%d (apnic_asns=%d)", c.ISO2, nMerged, len(apnicASN.Rows))
 		}
 	}
 
