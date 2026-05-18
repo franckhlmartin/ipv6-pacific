@@ -49,7 +49,7 @@
       {{if .HasBGPHETable}}
       {{$he := .Country.BGPHurricaneElectric}}
       <h2 id="bgphe-heading">BGP networks (routing visibility)</h2>
-      <p class="meta bgphe-lead">Combines <strong>Hurricane Electric</strong> BGP route visibility with per-ASN <strong>IPv6 preferred</strong> from <a href="https://stats.labs.apnic.net/ipv6/{{.ISO}}" target="_blank" rel="noopener">APNIC Labs</a> for economy {{.ISO}}. Row color uses BGP IPv6 routes when announced; otherwise IPv6 preferred. ASNs listed only by APNIC (HE route columns <strong>N/A</strong>) may not be connected to other ASNs in this economy.</p>
+      <p class="meta bgphe-lead">Combines <strong>Hurricane Electric</strong> BGP route visibility with per-ASN <strong>IPv6 preferred</strong> from <a href="https://stats.labs.apnic.net/ipv6/{{.ISO}}" target="_blank" rel="noopener">APNIC Labs</a> for economy {{.ISO}}. Rows on HE are <strong>green</strong> only when IPv6 routes are announced; <strong>red</strong> when IPv4-only (even if APNIC shows some IPv6 preference). ASNs listed only by APNIC (HE columns <strong>N/A</strong>) are colored by IPv6 preferred and may not be connected to other ASNs in this economy.</p>
       <div class="table-wrap">
         <table class="bgphe-table sortable-table" aria-labelledby="bgphe-heading">
           <caption class="bgphe-caption">BGP and APNIC per-ASN data for {{.Name}} ({{.ISO}}).{{if $he.SourceURL}} <a href="{{$he.SourceURL}}" target="_blank" rel="noopener">Hurricane Electric</a>.{{end}}{{if $he.APNICStatsSourceURL}} <a href="{{$he.APNICStatsSourceURL}}" target="_blank" rel="noopener">APNIC Labs stats</a>.{{end}}</caption>
