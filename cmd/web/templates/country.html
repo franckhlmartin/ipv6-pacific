@@ -85,6 +85,16 @@
                   <span class="sort-trigger__label">IPv6 routes?</span><span class="sort-indicator" aria-hidden="true"></span>
                 </button>
               </th>
+              <th scope="col" class="sortable">
+                <button type="button" class="sort-trigger" data-sort-index="6" data-sort-mode="number" title="Sort by RPKI score (click again to reverse)">
+                  <span class="sort-trigger__label">RPKI %</span><span class="sort-indicator" aria-hidden="true"></span>
+                </button>
+              </th>
+              <th scope="col" class="sortable">
+                <button type="button" class="sort-trigger" data-sort-index="7" title="Sort by RPKI status (click again to reverse)">
+                  <span class="sort-trigger__label">RPKI status</span><span class="sort-indicator" aria-hidden="true"></span>
+                </button>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -102,6 +112,8 @@
               <td data-sort-value="{{if .HERoutesNA}}-1{{else}}{{.RoutesV4}}{{end}}">{{if .HERoutesNA}}N/A{{else}}{{.RoutesV4}}{{end}}</td>
               <td data-sort-value="{{if .HERoutesNA}}-1{{else}}{{.RoutesV6}}{{end}}">{{if .HERoutesNA}}N/A{{else}}{{.RoutesV6}}{{end}}</td>
               <td data-sort-value="{{if .HERoutesNA}}-1{{else}}{{if gt .RoutesV6 0}}1{{else}}0{{end}}{{end}}">{{if .HERoutesNA}}N/A{{else}}{{if gt .RoutesV6 0}}Yes{{else}}No{{end}}{{end}}</td>
+              <td class="col-rpki-pct" data-pct="{{rpkiPctAttr .}}" data-sort-value="{{if rpkiPctAttr .}}{{printf "%.6f" .RPKIScorePct}}{{else}}-1{{end}}" title="{{if not .RPKICheckedAt.IsZero}}RPKI sampled {{.RPKICheckedAt.Format "2006-01-02 15:04"}} UTC{{end}}">{{if rpkiPctAttr .}}{{printf "%.0f" .RPKIScorePct}}%{{else}}—{{end}}</td>
+              <td class="col-rpki-status" data-sort-value="{{rpkiStatusText .}}"><a href="{{rpkiStatURL .}}" target="_blank" rel="noopener">{{rpkiStatusText .}}</a></td>
             </tr>
             {{end}}
           </tbody>
@@ -110,6 +122,7 @@
       <p class="meta bgphe-foot">
         {{if $he.SourceURL}}Hurricane Electric snapshot {{$he.FetchedAt.Format "2006-01-02 15:04"}} UTC (<a href="{{$he.SourceURL}}" target="_blank" rel="noopener">bgp.he.net</a>).{{end}}
         {{if $he.APNICStatsSourceURL}} APNIC Labs per-ASN snapshot {{$he.APNICStatsFetchedAt.Format "2006-01-02 15:04"}} UTC (<a href="{{$he.APNICStatsSourceURL}}" target="_blank" rel="noopener">stats.labs.apnic.net</a>).{{end}}
+        RPKI columns use <a href="https://stat.ripe.net/docs/data-api/api-endpoints/rpki-validation" target="_blank" rel="noopener">RIPEstat</a> on a sample of announced prefixes (not exhaustive ROA coverage).
       </p>
       {{end}}
 
@@ -146,6 +159,11 @@
             <th scope="col">Mail</th>
             <th scope="col">Web</th>
             <th scope="col">DNSSEC</th>
+            <th scope="col" class="sortable">
+              <button type="button" class="sort-trigger" data-sort-index="8" data-sort-mode="number" title="Sort by DMARC score (click again to reverse)">
+                <span class="sort-trigger__label">DMARC</span><span class="sort-indicator" aria-hidden="true"></span>
+              </button>
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -159,6 +177,7 @@
             <td class="cell cell--{{.Mail.Class}}">{{.Mail.Display}}</td>
             <td class="cell cell--{{.Web.Class}}">{{.Web.Display}}</td>
             <td class="cell cell--{{dnssecCellClass .DNSSEC}}">{{.DNSSEC.Display}}</td>
+            <td class="col-dmarc-pct" data-pct="{{dmarcPctAttr .DMARC}}" data-sort-value="{{if eq .DMARC.State "error"}}-1{{else}}{{printf "%.6f" .DMARC.ScorePct}}{{end}}"><a href="{{dmarcMXToolboxURL .Domain}}" target="_blank" rel="noopener" title="Check DMARC on MXToolbox">{{.DMARC.Display}}</a></td>
           </tr>
           {{end}}
         </tbody>
@@ -216,6 +235,21 @@
       </ul>
       <p>{{.ScoreLegend.DNSSECRule}}</p>
       <p><strong>Economy score:</strong> {{.ScoreLegend.EconomyFormula}}</p>
+      <p class="meta">Row score does not include DMARC or RPKI in v1; those columns use the same 0–100% red→green ramp as IPv6 preferred %.</p>
+
+      <h3>DMARC ramp (domain table)</h3>
+      <ul class="legend-list">
+        {{range .DMARCRampLegend}}
+        <li class="legend-list__item"><span>{{.Label}}:</span> <span>{{.ScoreRange}} — {{.Description}}</span></li>
+        {{end}}
+      </ul>
+
+      <h3>RPKI ramp (BGP table)</h3>
+      <ul class="legend-list">
+        {{range .RPKIRampLegend}}
+        <li class="legend-list__item"><span>{{.Label}}:</span> <span>{{.ScoreRange}} — {{.Description}}</span></li>
+        {{end}}
+      </ul>
     </section>
   </main>
 
@@ -242,6 +276,7 @@
 
   <script src="/static/js/pct-color-ramp.js"></script>
   <script src="/static/js/country-summary-strip.js"></script>
+  {{if or .HasResults .HasBGPHETable}}<script src="/static/js/country-table-ramp.js"></script>{{end}}
   {{if or .HasResults .HasBGPHETable}}<script src="/static/js/table-sort.js"></script>{{end}}
   <script nonce="{{.Nonce}}">
     window.__PROBE_V4__ = {{if .ProbeV4}}"{{.ProbeV4}}"{{else}}""{{end}};

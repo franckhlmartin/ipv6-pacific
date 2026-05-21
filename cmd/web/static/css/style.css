@@ -291,6 +291,16 @@ h2 { font-size: 1.15rem; margin-top: 1.5rem; }
 .bgphe-table td {
   font-variant-numeric: tabular-nums;
 }
+.bgphe-table td.col-rpki-status a,
+.results td.col-dmarc-pct a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.bgphe-table td.col-rpki-status a:hover,
+.results td.col-dmarc-pct a:hover {
+  text-decoration-thickness: 2px;
+}
 .bgphe-row--v4-only {
   background-color: rgba(220, 38, 38, 0.1);
   box-shadow: inset 3px 0 0 0 rgba(185, 28, 28, 0.72);

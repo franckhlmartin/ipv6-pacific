@@ -55,6 +55,9 @@ func RunDomain(ctx context.Context, apex string, cfg Config, meta DomainMeta) mo
 	res.DNSSEC = checkDNSSEC(ctx, apex, cfg)
 	logStep(cfg, "DNSSEC", fmt.Sprintf("DNSResolveTimeout=%s (DNSKEY query)", dur(cfg.DNSResolveTimeout)), summarizeDNSSEC(res.DNSSEC))
 
+	res.DMARC = checkDMARC(ctx, apex, cfg)
+	logStep(cfg, "DMARC", fmt.Sprintf("DNSResolveTimeout=%s (_dmarc TXT)", dur(cfg.DNSResolveTimeout)), summarizeDMARC(res.DMARC))
+
 	res.RollupClass = Rollup(res.DNS.Class, res.Mail.Class, res.Web.Class)
 	return res
 }
@@ -99,6 +102,10 @@ func summarizeWeb(col model.ServiceColumn, err error) string {
 
 func summarizeDNSSEC(col model.DNSSECColumn) string {
 	return fmt.Sprintf("state=%s summary=%s display=%q", col.State, col.Summary, col.Display)
+}
+
+func summarizeDMARC(col model.DMARCColumn) string {
+	return fmt.Sprintf("state=%s policy=%s sp=%s score_pct=%.0f display=%q", col.State, col.Policy, col.SubdomainPolicy, col.ScorePct, col.Display)
 }
 
 func mailTimeoutDesc(cfg Config) string {

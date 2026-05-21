@@ -9,6 +9,7 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -50,6 +51,11 @@ func main() {
 		"dnssecCellClass": scoring.DNSSECCellClass,
 		"bgpheRowClass":   bgphe.RowClass,
 		"bgpheRowAria":    bgphe.RowAriaLabel,
+		"dmarcPctAttr":       dmarcPctAttr,
+		"dmarcMXToolboxURL":  dmarcMXToolboxURL,
+		"rpkiPctAttr":        rpkiPctAttr,
+		"rpkiStatURL":        rpkiStatURL,
+		"rpkiStatusText":     rpkiStatusText,
 	}).ParseFS(templateFS, "templates/*.html", "templates/partials/*.html")
 	if err != nil {
 		log.Fatal(err)
@@ -429,6 +435,8 @@ func countryPage(tmpl *template.Template, w http.ResponseWriter, r *http.Request
 		"LegendChecks":    checkLegend,
 		"LegendLocation":  locationLegend,
 		"ScoreLegend":     scoreLegend,
+		"DMARCRampLegend": scoring.DMARCRampLegend(),
+		"RPKIRampLegend":  scoring.RPKIRampLegend(),
 		"Nonce":           httpserver.CSPNonce(r),
 	}
 	seoMerge(r, data, pageTitle, metaDesc)
@@ -467,4 +475,65 @@ func countryComingSoon(tmpl *template.Template, w http.ResponseWriter, r *http.R
 	}
 	seoMerge(r, data, pageTitle, metaDesc)
 	_ = tmpl.ExecuteTemplate(w, "country_soon.html", data)
+}
+
+// dmarcPctAttr returns data-pct for ramp coloring (empty = grey).
+func dmarcPctAttr(col model.DMARCColumn) string {
+	switch col.State {
+	case "absent":
+		return "0"
+	case "present":
+		return fmt.Sprintf("%.6f", col.ScorePct)
+	default:
+		return ""
+	}
+}
+
+// rpkiPctAttr returns data-pct when sampled RPKI data exists.
+func rpkiPctAttr(row model.BGPHENetworkRow) string {
+	if row.RPKIError != "" || row.RPKICheckedPrefixes <= 0 {
+		return ""
+	}
+	return fmt.Sprintf("%.6f", row.RPKIScorePct)
+}
+
+// dmarcMXToolboxURL links to MXToolbox DMARC lookup for the apex domain.
+func dmarcMXToolboxURL(domain string) string {
+	domain = strings.TrimSpace(strings.ToLower(domain))
+	if domain == "" {
+		return "https://mxtoolbox.com/SuperTool.aspx?action=dmarc&run=toolpage"
+	}
+	v := url.Values{}
+	v.Set("action", "dmarc:"+domain)
+	v.Set("run", "toolpage")
+	return "https://mxtoolbox.com/SuperTool.aspx?" + v.Encode() + "#"
+}
+
+// rpkiStatURL links to the RIPEstat resource overview for this ASN.
+func rpkiStatURL(row model.BGPHENetworkRow) string {
+	asn := strings.TrimSpace(row.ASN)
+	if asn == "" && row.ASNNumber > 0 {
+		asn = fmt.Sprintf("AS%d", row.ASNNumber)
+	}
+	if !strings.HasPrefix(strings.ToUpper(asn), "AS") && row.ASNNumber > 0 {
+		asn = fmt.Sprintf("AS%d", row.ASNNumber)
+	}
+	if asn == "" {
+		return "https://stat.ripe.net/"
+	}
+	return "https://stat.ripe.net/resource/" + url.PathEscape(asn) + "#tab=overview"
+}
+
+// rpkiStatusText summarizes RPKI sampling for the status column.
+func rpkiStatusText(row model.BGPHENetworkRow) string {
+	if row.RPKIError != "" {
+		return row.RPKIError
+	}
+	if row.RPKICheckedPrefixes <= 0 {
+		return "—"
+	}
+	if row.RPKIWorstStatus != "" {
+		return fmt.Sprintf("%s (%d/%d valid)", row.RPKIWorstStatus, row.RPKIValid, row.RPKICheckedPrefixes)
+	}
+	return fmt.Sprintf("%d/%d valid", row.RPKIValid, row.RPKICheckedPrefixes)
 }

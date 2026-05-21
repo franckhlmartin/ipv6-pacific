@@ -63,6 +63,7 @@ func CountryLegendCheckExplanations() []LegendCheckExplanation {
 		mailLegendExplanation(),
 		webLegendExplanation(),
 		dnssecLegendExplanation(),
+		dmarcLegendExplanation(),
 	}
 }
 

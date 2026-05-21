@@ -42,7 +42,7 @@ Open **`https://127.0.0.1:8082/`** (accept the browser warning for the self-sign
 ./scripts/start_collector.sh -run-once -country=FJ
 ```
 
-**Daemon** — collects **one country immediately**, then waits `COLLECTOR_PER_COUNTRY_INTERVAL`, then continues round-robin:
+**Daemon** — collects **one country immediately**, then waits `COLLECTOR_PER_COUNTRY_INTERVAL` (default **10m** in code; production often **`4h`** via env), then continues round-robin:
 
 ```bash
 ./scripts/start_collector.sh
@@ -151,6 +151,12 @@ The app’s **`GET /api/healthz`** responses are JSON: **`{"ok":true}`** plus **
 **`GET /api/client-ip-family`** returns **`family`** (`ipv4` or `ipv6`) and **`ip`** for the browser’s connection to the **main** site when dual-stack probe URLs are not configured; that endpoint is **rate-limited** like other `/api/*` routes (see `docs/security.md`). The header shows **IPv4 only**, **IPv6 only**, or **Dual stack** (matching table legend wording) with optional details in a dialog.
 
 For **privacy and trust** assumptions when showing addresses in the UI, see **`docs/security.md`** (Client IP in UI).
+
+## DMARC and RPKI (collector v0.3+)
+
+- **DMARC**: `_dmarc.{apex}` TXT per domain in `internal/checks/dmarc.go`; stored on `DomainResult.dmarc`; country table column uses 0–100% ramp (`internal/rampscore`).
+- **RPKI**: RIPEstat `announced-prefixes` + `rpki-validation` per ASN after HE/APNIC merge (`internal/collector/rpki.go`); sampled prefix cap via `COLLECTOR_RPKI_MAX_PREFIXES_PER_ASN`. Row score / economy deployment score **unchanged** in v1.
+- **Ops**: email **stat@ripe.net** to register `RIPESTAT_SOURCEAPP` before large `run-once` bursts.
 
 ## Adding a new test column (contract)
 

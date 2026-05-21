@@ -8,7 +8,7 @@ Cross-check ideas against [`bookerpal/docs/security.md`](/Users/franck/code/book
 
 - **Untrusted HTTP input**: path segments (`/country/{iso2}`), optional query strings. No user-generated HTML stored.
 - **Untrusted data**: JSON artifacts under `data/` are written only by the collector; integrity depends on host security.
-- **Outbound**: collector fetches **APNIC Labs** JSON from **`data1.labs.apnic.net`**, scrapes per-ASN stats from **`stats.labs.apnic.net`**, and **Hurricane Electric** from **`bgp.he.net`** — each over HTTPS with hostname allowlists in the respective clients.
+- **Outbound**: collector fetches **APNIC Labs** JSON from **`data1.labs.apnic.net`**, scrapes per-ASN stats from **`stats.labs.apnic.net`**, **Hurricane Electric** from **`bgp.he.net`**, and **RIPEstat** from **`stat.ripe.net`** (RPKI sampling) — each over HTTPS with hostname allowlists in the respective clients. DMARC uses public DNS (resolver in `internal/checks`).
 
 ## Controls implemented
 
@@ -18,6 +18,7 @@ Cross-check ideas against [`bookerpal/docs/security.md`](/Users/franck/code/book
 - **HTML templates** use `html/template` auto-escaping for dynamic text.
 - **APNIC clients**: hostname allowlists in `internal/apniclabs` (`data1.labs.apnic.net`) and `internal/apnicstats` (`stats.labs.apnic.net`).
 - **Hurricane Electric client**: hostname allowlist in `internal/bgphe` (`bgp.he.net`).
+- **RIPEstat client**: hostname allowlist in `internal/ripestat` (`stat.ripe.net`); sequential requests with `sourceapp`; optional `COLLECTOR_SKIP_RPKI=1`. If daily volume regularly exceeds ~1,000 requests, register with **stat@ripe.net** (see `.env.example`).
 - **`/.well-known/security.txt`** placeholder — replace contact email for production.
 
 ## Client IP in UI

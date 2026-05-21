@@ -16,6 +16,7 @@ import (
 	"github.com/pacific-monitor/pacific-monitor/internal/apnicstats"
 	"github.com/pacific-monitor/pacific-monitor/internal/bgphe"
 	"github.com/pacific-monitor/pacific-monitor/internal/checks"
+	"github.com/pacific-monitor/pacific-monitor/internal/collector"
 	"github.com/pacific-monitor/pacific-monitor/internal/config"
 	"github.com/pacific-monitor/pacific-monitor/internal/dotenv"
 	"github.com/pacific-monitor/pacific-monitor/internal/indexbuilder"
@@ -211,7 +212,7 @@ func collectCountry(ctx context.Context, root, dataDir string, pacific *config.P
 	for i, entry := range df.Domains {
 		if verbose {
 			log.Printf("[collector] %s domain %d/%d: start %s", c.ISO2, i+1, nDom, entry.Domain)
-			log.Printf("[collector] %s | budget | DomainDeadline=%s (entire domain: DNS+Mail+Web+DNSSEC)", entry.Domain, chk.DomainDeadline)
+			log.Printf("[collector] %s | budget | DomainDeadline=%s (entire domain: DNS+Mail+Web+DNSSEC+DMARC)", entry.Domain, chk.DomainDeadline)
 		}
 		t0 := time.Now()
 		dctx, cancel := context.WithTimeout(ctx, chk.DomainDeadline)
@@ -298,6 +299,19 @@ func collectCountry(ctx context.Context, root, dataDir string, pacific *config.P
 			}
 			log.Printf("[collector] %s: merged BGP/APNIC networks=%d (apnic_asns=%d)", c.ISO2, nMerged, len(apnicASN.Rows))
 		}
+	}
+
+	if collector.SkipRPKI() {
+		log.Printf("[collector] %s: skipping RPKI (COLLECTOR_SKIP_RPKI)", c.ISO2)
+		if heTable != nil && prevBGPHE != nil {
+			mergeRPKIFromPrev(heTable, prevBGPHE)
+		}
+	} else if heTable != nil && len(heTable.Networks) > 0 {
+		log.Printf("[collector] %s: enriching BGP rows with RIPEstat RPKI …", c.ISO2)
+		rctx, cancel := context.WithTimeout(ctx, 15*time.Minute)
+		rs := collector.NewRipestatClient(hc)
+		collector.EnrichBGPRPKI(rctx, heTable, prevBGPHE, rs, verbose, c.ISO2)
+		cancel()
 	}
 
 	if err := writeCountry(results, ap, heTable); err != nil {
@@ -388,4 +402,34 @@ func getenv(key, def string) string {
 // skipHEBGP skips bgp.he.net scraping when COLLECTOR_SKIP_HE_BGP=1 (ops kill switch).
 func skipHEBGP() bool {
 	return strings.TrimSpace(os.Getenv("COLLECTOR_SKIP_HE_BGP")) == "1"
+}
+
+// mergeRPKIFromPrev copies RPKI fields from previous snapshot by ASN when RPKI collection is skipped.
+func mergeRPKIFromPrev(he *model.BGPHETable, prev *model.BGPHETable) {
+	if he == nil || prev == nil {
+		return
+	}
+	prevBy := make(map[int]model.BGPHENetworkRow)
+	for _, row := range prev.Networks {
+		if row.ASNNumber > 0 {
+			prevBy[row.ASNNumber] = row
+		}
+	}
+	for i := range he.Networks {
+		if old, ok := prevBy[he.Networks[i].ASNNumber]; ok {
+			copyRPKIRow(&he.Networks[i], &old)
+		}
+	}
+}
+
+func copyRPKIRow(dst, src *model.BGPHENetworkRow) {
+	dst.RPKICheckedPrefixes = src.RPKICheckedPrefixes
+	dst.RPKIValid = src.RPKIValid
+	dst.RPKIInvalid = src.RPKIInvalid
+	dst.RPKIUnknown = src.RPKIUnknown
+	dst.RPKIScorePct = src.RPKIScorePct
+	dst.RPKIWorstStatus = src.RPKIWorstStatus
+	dst.RPKIError = src.RPKIError
+	dst.RPKISourceURL = src.RPKISourceURL
+	dst.RPKICheckedAt = src.RPKICheckedAt
 }

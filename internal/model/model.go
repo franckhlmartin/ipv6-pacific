@@ -3,7 +3,7 @@ package model
 import "time"
 
 // CollectorVersion is embedded in generated JSON for traceability.
-const CollectorVersion = "0.2.0"
+const CollectorVersion = "0.3.0"
 
 // DeployClass matches UI color semantics (orange / blue / green).
 type DeployClass string
@@ -75,6 +75,16 @@ type BGPHENetworkRow struct {
 	IPv6PreferredPct float64 `json:"ipv6preferred"` // APNIC Labs IPv6 preferred % (30-day smoothed)
 	HERoutesNA       bool    `json:"he_routes_na,omitempty"`
 	APNICSamples     int     `json:"apnic_samples,omitempty"`
+	// RPKI (RIPEstat sampled prefix validation)
+	RPKICheckedPrefixes int       `json:"rpki_checked_prefixes,omitempty"`
+	RPKIValid           int       `json:"rpki_valid,omitempty"`
+	RPKIInvalid         int       `json:"rpki_invalid,omitempty"`
+	RPKIUnknown         int       `json:"rpki_unknown,omitempty"`
+	RPKIScorePct        float64   `json:"rpki_score_pct,omitempty"`
+	RPKIWorstStatus     string    `json:"rpki_worst_status,omitempty"` // valid, invalid, unknown
+	RPKIError           string    `json:"rpki_error,omitempty"`
+	RPKISourceURL       string    `json:"rpki_source_url,omitempty"`
+	RPKICheckedAt       time.Time `json:"rpki_checked_at,omitempty"`
 }
 
 // DomainResult is one row in the Afrinic-style table.
@@ -86,6 +96,7 @@ type DomainResult struct {
 	Mail         ServiceColumn `json:"mail"`
 	Web          ServiceColumn `json:"web"`
 	DNSSEC       DNSSECColumn  `json:"dnssec"`
+	DMARC        DMARCColumn   `json:"dmarc"`
 	RollupClass  DeployClass   `json:"rollup_class"`
 	Error        string        `json:"error,omitempty"`
 	CollectedAt  time.Time     `json:"collected_at,omitempty"` // UTC when this row's checks finished
@@ -113,6 +124,18 @@ type DNSSECColumn struct {
 	State   string `json:"state"`   // good, island, unsigned, error
 	Summary string `json:"summary"` // e.g. S/V/C shorthand when applicable
 	Display string `json:"display"`
+}
+
+// DMARCColumn stores DMARC policy from _dmarc.{apex} TXT.
+type DMARCColumn struct {
+	State           string  `json:"state"` // absent, present, error
+	Exists          bool    `json:"exists"`
+	Policy          string  `json:"policy,omitempty"`           // effective org: none, quarantine, reject
+	SubdomainPolicy string  `json:"subdomain_policy,omitempty"` // effective sp after inherit
+	RawP            string  `json:"raw_p,omitempty"`
+	RawSP           string  `json:"raw_sp,omitempty"`
+	Display         string  `json:"display"`
+	ScorePct        float64 `json:"score_pct,omitempty"` // 0-100 for UI ramp; absent=0, error=omit
 }
 
 // APNICSnapshot is merged from v6economy/{CC}.json latest row.
