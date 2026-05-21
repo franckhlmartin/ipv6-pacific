@@ -55,17 +55,13 @@ func max(a, b int) int {
 	return b
 }
 
-// RPKIScorePct maps sampled prefix validation counts to 0-100.
+// RPKIScorePct maps sampled prefix validation counts to 0-100:
+// share of prefixes RIPEstat marked valid (invalid and unknown count as non-valid).
+// Worst-case label is separate (RPKIWorstStatus) for the status column.
 // hasData is false when total==0 or err is set.
 func RPKIScorePct(valid, invalid, unknown, total int, err string) (pct float64, hasData bool) {
 	if strings.TrimSpace(err) != "" || total <= 0 {
 		return 0, false
-	}
-	if invalid > 0 {
-		return 0, true
-	}
-	if valid == total {
-		return 100, true
 	}
 	return 100 * float64(valid) / float64(total), true
 }

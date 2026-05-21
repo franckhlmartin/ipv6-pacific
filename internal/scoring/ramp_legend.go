@@ -21,9 +21,8 @@ func DMARCRampLegend() []RampLegendItem {
 // RPKIRampLegend returns RPKI column ramp semantics.
 func RPKIRampLegend() []RampLegendItem {
 	return []RampLegendItem{
-		{Label: "Invalid route sample", ScoreRange: "0%", Description: "At least one sampled prefix failed RPKI validation (RIPEstat)."},
-		{Label: "Partial / unknown", ScoreRange: "1–99%", Description: "Share of sampled prefixes with valid ROAs; unknown counts as non-valid."},
-		{Label: "All sampled valid", ScoreRange: "100%", Description: "Every sampled prefix validated as RPKI-valid."},
+		{Label: "RPKI %", ScoreRange: "0–100%", Description: "Share of sampled prefixes RIPEstat marked valid (e.g. 8/10 → 80%). Invalid and unknown prefixes lower the percentage."},
+		{Label: "RPKI status", ScoreRange: "text", Description: "Worst result in the sample (valid, invalid, or unknown) with counts — use the link for RIPEstat details."},
 		{Label: "No data", ScoreRange: "grey", Description: "RIPEstat error, no prefixes, or not yet collected."},
 	}
 }

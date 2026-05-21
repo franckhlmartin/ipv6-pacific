@@ -29,8 +29,12 @@ func TestRPKIScorePct(t *testing.T) {
 		t.Fatalf("partial valid: got %v %v", pct, ok)
 	}
 	pct, ok = RPKIScorePct(3, 1, 0, 4, "")
+	if !ok || pct != 75 {
+		t.Fatalf("mixed valid/invalid: got %v %v want 75", pct, ok)
+	}
+	pct, ok = RPKIScorePct(0, 2, 0, 10, "")
 	if !ok || pct != 0 {
-		t.Fatalf("any invalid: got %v %v", pct, ok)
+		t.Fatalf("all invalid: got %v %v", pct, ok)
 	}
 	_, ok = RPKIScorePct(0, 0, 0, 0, "")
 	if ok {

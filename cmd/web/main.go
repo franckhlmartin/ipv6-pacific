@@ -22,6 +22,7 @@ import (
 	"github.com/pacific-monitor/pacific-monitor/internal/httpserver"
 	"github.com/pacific-monitor/pacific-monitor/internal/model"
 	"github.com/pacific-monitor/pacific-monitor/internal/ogmap"
+	"github.com/pacific-monitor/pacific-monitor/internal/rampscore"
 	"github.com/pacific-monitor/pacific-monitor/internal/scoring"
 	"github.com/pacific-monitor/pacific-monitor/internal/siteurl"
 	"github.com/pacific-monitor/pacific-monitor/internal/summary"
@@ -54,6 +55,7 @@ func main() {
 		"dmarcPctAttr":       dmarcPctAttr,
 		"dmarcMXToolboxURL":  dmarcMXToolboxURL,
 		"rpkiPctAttr":        rpkiPctAttr,
+		"rpkiDisplayPct":     rpkiDisplayPct,
 		"rpkiStatURL":        rpkiStatURL,
 		"rpkiStatusText":     rpkiStatusText,
 	}).ParseFS(templateFS, "templates/*.html", "templates/partials/*.html")
@@ -489,12 +491,21 @@ func dmarcPctAttr(col model.DMARCColumn) string {
 	}
 }
 
+// rpkiDisplayPct returns the RPKI ramp percentage from sampled counts (not stored JSON).
+func rpkiDisplayPct(row model.BGPHENetworkRow) float64 {
+	pct, ok := rampscore.RPKIScorePct(row.RPKIValid, row.RPKIInvalid, row.RPKIUnknown, row.RPKICheckedPrefixes, row.RPKIError)
+	if !ok {
+		return 0
+	}
+	return pct
+}
+
 // rpkiPctAttr returns data-pct when sampled RPKI data exists.
 func rpkiPctAttr(row model.BGPHENetworkRow) string {
 	if row.RPKIError != "" || row.RPKICheckedPrefixes <= 0 {
 		return ""
 	}
-	return fmt.Sprintf("%.6f", row.RPKIScorePct)
+	return fmt.Sprintf("%.6f", rpkiDisplayPct(row))
 }
 
 // dmarcMXToolboxURL links to MXToolbox DMARC lookup for the apex domain.

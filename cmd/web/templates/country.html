@@ -112,7 +112,7 @@
               <td data-sort-value="{{if .HERoutesNA}}-1{{else}}{{.RoutesV4}}{{end}}">{{if .HERoutesNA}}N/A{{else}}{{.RoutesV4}}{{end}}</td>
               <td data-sort-value="{{if .HERoutesNA}}-1{{else}}{{.RoutesV6}}{{end}}">{{if .HERoutesNA}}N/A{{else}}{{.RoutesV6}}{{end}}</td>
               <td data-sort-value="{{if .HERoutesNA}}-1{{else}}{{if gt .RoutesV6 0}}1{{else}}0{{end}}{{end}}">{{if .HERoutesNA}}N/A{{else}}{{if gt .RoutesV6 0}}Yes{{else}}No{{end}}{{end}}</td>
-              <td class="col-rpki-pct" data-pct="{{rpkiPctAttr .}}" data-sort-value="{{if rpkiPctAttr .}}{{printf "%.6f" .RPKIScorePct}}{{else}}-1{{end}}" title="{{if not .RPKICheckedAt.IsZero}}RPKI sampled {{.RPKICheckedAt.Format "2006-01-02 15:04"}} UTC{{end}}">{{if rpkiPctAttr .}}{{printf "%.0f" .RPKIScorePct}}%{{else}}—{{end}}</td>
+              <td class="col-rpki-pct" data-pct="{{rpkiPctAttr .}}" data-sort-value="{{if rpkiPctAttr .}}{{printf "%.6f" (rpkiDisplayPct .)}}{{else}}-1{{end}}" title="{{if not .RPKICheckedAt.IsZero}}RPKI sampled {{.RPKICheckedAt.Format "2006-01-02 15:04"}} UTC{{end}}">{{if rpkiPctAttr .}}{{printf "%.0f" (rpkiDisplayPct .)}}%{{else}}—{{end}}</td>
               <td class="col-rpki-status" data-sort-value="{{rpkiStatusText .}}"><a href="{{rpkiStatURL .}}" target="_blank" rel="noopener">{{rpkiStatusText .}}</a></td>
             </tr>
             {{end}}

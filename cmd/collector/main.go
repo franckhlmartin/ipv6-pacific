@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"math/rand/v2"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -30,7 +31,7 @@ func main() {
 	runOnce := flag.Bool("run-once", false, "collect then exit: all countries, or only --country if set")
 	verbose := flag.Bool("verbose", false, "per-domain progress logs (defaults on when using -run-once)")
 	root := flag.String("C", ".", "project root (contains config/ and data/)")
-	countryFlag := flag.String("country", "", "ISO2 code (e.g. FJ): with daemon, run this country first then continue round-robin; with -run-once, collect only this country")
+	countryFlag := flag.String("country", "", "ISO2 code (e.g. FJ): with daemon, run this country first then continue in shuffled order; with -run-once, collect only this country")
 	flag.Parse()
 	if *runOnce {
 		*verbose = true
@@ -61,25 +62,26 @@ func main() {
 	t := time.NewTicker(interval)
 	defer t.Stop()
 
-	startIdx, err := startingIndex(pacific, strings.TrimSpace(strings.ToUpper(*countryFlag)))
+	schedule, err := countrySchedule(pacific.Countries, strings.TrimSpace(strings.ToUpper(*countryFlag)))
 	if err != nil {
 		log.Fatal(err)
 	}
-	c0 := pacific.Countries[startIdx]
+	logSchedule("collector daemon", schedule)
+	c0 := schedule[0]
 	if *countryFlag != "" {
-		log.Printf("collector daemon: first collection %s (%s), then every %v rotating", c0.ISO2, c0.Name, interval)
+		log.Printf("collector daemon: first collection %s (%s), then every %v in shuffled order", c0.ISO2, c0.Name, interval)
 	} else {
-		log.Printf("collector daemon: first collection %s (%s) immediately, then every %v", c0.ISO2, c0.Name, interval)
+		log.Printf("collector daemon: first collection %s (%s) immediately, then every %v in shuffled order", c0.ISO2, c0.Name, interval)
 	}
 
 	if err := collectCountry(ctx, *root, dataDir, pacific, c0, chk, httpClient, *verbose); err != nil {
 		log.Printf("[collector] country %s: %v", c0.ISO2, err)
 	}
 
-	next := (startIdx + 1) % len(pacific.Countries)
+	next := 1
 	for {
 		<-t.C
-		c := pacific.Countries[next%len(pacific.Countries)]
+		c := schedule[next%len(schedule)]
 		next++
 		if err := collectCountry(ctx, *root, dataDir, pacific, c, chk, httpClient, *verbose); err != nil {
 			log.Printf("[collector] country %s: %v", c.ISO2, err)
@@ -87,17 +89,37 @@ func main() {
 	}
 }
 
-// startingIndex returns index of --country or 0; validates ISO is in the Pacific list.
-func startingIndex(pacific *config.PacificList, iso string) (int, error) {
-	if iso == "" {
-		return 0, nil
-	}
-	for i, c := range pacific.Countries {
-		if strings.EqualFold(c.ISO2, iso) {
-			return i, nil
+// countrySchedule returns a shuffled copy of countries. When firstISO is set, that economy
+// is collected first and the rest are shuffled (so restarts spread work across the list).
+func countrySchedule(countries []config.PacificCountry, firstISO string) ([]config.PacificCountry, error) {
+	out := make([]config.PacificCountry, len(countries))
+	copy(out, countries)
+	if firstISO != "" {
+		idx := -1
+		for i, c := range out {
+			if strings.EqualFold(c.ISO2, firstISO) {
+				idx = i
+				break
+			}
 		}
+		if idx < 0 {
+			return nil, fmt.Errorf("unknown country %q (not in config/pacific_iso2.yaml)", firstISO)
+		}
+		first := out[idx]
+		out = append(out[:idx], out[idx+1:]...)
+		rand.Shuffle(len(out), func(i, j int) { out[i], out[j] = out[j], out[i] })
+		return append([]config.PacificCountry{first}, out...), nil
 	}
-	return 0, fmt.Errorf("unknown country %q (not in config/pacific_iso2.yaml)", iso)
+	rand.Shuffle(len(out), func(i, j int) { out[i], out[j] = out[j], out[i] })
+	return out, nil
+}
+
+func logSchedule(prefix string, schedule []config.PacificCountry) {
+	order := make([]string, len(schedule))
+	for i, c := range schedule {
+		order[i] = c.ISO2
+	}
+	log.Printf("%s: rotation order (shuffled): %s", prefix, strings.Join(order, ", "))
 }
 
 func runOncePass(ctx context.Context, root, dataDir string, pacific *config.PacificList, chk checks.Config, hc *http.Client, iso string, verbose bool) error {
@@ -113,7 +135,12 @@ func runOncePass(ctx context.Context, root, dataDir string, pacific *config.Paci
 		return nil
 	}
 	log.Printf("[collector] run-once: all %d economies from config/pacific_iso2.yaml", len(pacific.Countries))
-	return runPass(ctx, root, dataDir, pacific, chk, hc, verbose)
+	schedule, err := countrySchedule(pacific.Countries, "")
+	if err != nil {
+		return err
+	}
+	logSchedule("[collector] run-once", schedule)
+	return runPass(ctx, root, dataDir, pacific, schedule, chk, hc, verbose)
 }
 
 func countryByISO(pacific *config.PacificList, iso string) (config.PacificCountry, error) {
@@ -126,14 +153,14 @@ func countryByISO(pacific *config.PacificList, iso string) (config.PacificCountr
 	return zero, fmt.Errorf("unknown country %q (not in config/pacific_iso2.yaml)", iso)
 }
 
-func runPass(ctx context.Context, root, dataDir string, pacific *config.PacificList, chk checks.Config, hc *http.Client, verbose bool) error {
-	for i, c := range pacific.Countries {
-		log.Printf("[collector] run-once: [%d/%d] starting %s (%s)", i+1, len(pacific.Countries), c.ISO2, c.Name)
+func runPass(ctx context.Context, root, dataDir string, pacific *config.PacificList, schedule []config.PacificCountry, chk checks.Config, hc *http.Client, verbose bool) error {
+	for i, c := range schedule {
+		log.Printf("[collector] run-once: [%d/%d] starting %s (%s)", i+1, len(schedule), c.ISO2, c.Name)
 		if err := collectCountry(ctx, root, dataDir, pacific, c, chk, hc, verbose); err != nil {
 			log.Printf("[collector] country %s: %v", c.ISO2, err)
 		}
 	}
-	log.Printf("[collector] run-once: finished all %d economies", len(pacific.Countries))
+	log.Printf("[collector] run-once: finished all %d economies", len(schedule))
 	return nil
 }
 

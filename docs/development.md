@@ -42,13 +42,13 @@ Open **`https://127.0.0.1:8082/`** (accept the browser warning for the self-sign
 ./scripts/start_collector.sh -run-once -country=FJ
 ```
 
-**Daemon** — collects **one country immediately**, then waits `COLLECTOR_PER_COUNTRY_INTERVAL` (default **10m** in code; production often **`4h`** via env), then continues round-robin:
+**Daemon** — collects **one country immediately**, then waits `COLLECTOR_PER_COUNTRY_INTERVAL` (default **10m** in code; production often **`4h`** via env), then continues through the rest in a **shuffled** order (new order each restart):
 
 ```bash
 ./scripts/start_collector.sh
 ```
 
-**Daemon, start the rotation with Fiji first** (next tick continues after FJ in `pacific_iso2.yaml` order):
+**Daemon, start the rotation with Fiji first** (remaining economies in a shuffled order):
 
 ```bash
 ./scripts/start_collector.sh -country=FJ
