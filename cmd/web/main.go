@@ -100,10 +100,12 @@ func main() {
 	healthz := func(w http.ResponseWriter, r *http.Request) {
 		applyHealthzCORS(w)
 		w.Header().Set("Content-Type", "application/json")
+		ip, family := httpserver.ClientIPFamily(r)
 		payload := struct {
-			OK bool   `json:"ok"`
-			IP string `json:"ip,omitempty"`
-		}{OK: true, IP: httpserver.RemoteIP(r)}
+			OK     bool   `json:"ok"`
+			IP     string `json:"ip,omitempty"`
+			Family string `json:"family"`
+		}{OK: true, IP: ip, Family: family}
 		_ = json.NewEncoder(w).Encode(payload)
 	}
 	mux.HandleFunc("GET /api/healthz", healthz)
@@ -113,13 +115,10 @@ func main() {
 	})
 	mux.HandleFunc("GET /api/client-ip-family", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		v := "ipv4"
-		if httpserver.IsIPv6Client(r) {
-			v = "ipv6"
-		}
+		ip, family := httpserver.ClientIPFamily(r)
 		_ = json.NewEncoder(w).Encode(map[string]string{
-			"family": v,
-			"ip":     httpserver.RemoteIP(r),
+			"family": family,
+			"ip":     ip,
 		})
 	})
 
@@ -151,6 +150,11 @@ func main() {
 	} else {
 		log.Print("web: dual-stack border probes not configured — UI will call /api/client-ip-family only; set both PROBE_V4_URL and PROBE_V6_URL in .env (see docs/development.md)")
 	}
+	if strings.TrimSpace(os.Getenv("PROBE_DS_URL")) != "" {
+		log.Print("web: dual-stack preferred probe configured (PROBE_DS_URL set)")
+	} else {
+		log.Print("web: PROBE_DS_URL unset — connection dialog will not show preferred stack for this site")
+	}
 
 	if strings.TrimSpace(os.Getenv("PUBLIC_SITE_URL")) == "" {
 		log.Print("web: PUBLIC_SITE_URL is unset — canonical and Open Graph URLs use each request's Host; set PUBLIC_SITE_URL when behind a reverse proxy (see .env.example)")
@@ -174,6 +178,10 @@ func getenv(k, d string) string {
 		return v
 	}
 	return d
+}
+
+func probeURLsFromEnv() (v4, v6, ds string) {
+	return os.Getenv("PROBE_V4_URL"), os.Getenv("PROBE_V6_URL"), os.Getenv("PROBE_DS_URL")
 }
 
 // applyHealthzCORS allows fetch() from the main site to probe hostnames that serve the same /api/healthz.
@@ -332,8 +340,7 @@ func home(tmpl *template.Template, w http.ResponseWriter, r *http.Request, dataD
 	if httpserver.IsIPv6Client(r) {
 		borderClass = "border--ipv6"
 	}
-	probeV4 := os.Getenv("PROBE_V4_URL")
-	probeV6 := os.Getenv("PROBE_V6_URL")
+	probeV4, probeV6, probeDS := probeURLsFromEnv()
 	pageTitle := "Pacific Islands IPv6 Monitor"
 	metaDesc := "Pacific Islands IPv6 Monitor — IPv6 deployment estimates for Pacific economies from DNS, mail, and web checks plus APNIC Labs capability data."
 	data := map[string]any{
@@ -345,6 +352,7 @@ func home(tmpl *template.Template, w http.ResponseWriter, r *http.Request, dataD
 		"EEZNotice":     "EEZ overview map: Wikimedia Commons — File:EEZ_Oceania.svg (author STyx, public domain). Source: https://commons.wikimedia.org/wiki/File:EEZ_Oceania.svg",
 		"ProbeV4":       probeV4,
 		"ProbeV6":       probeV6,
+		"ProbeDS":       probeDS,
 		"ShowDualProbe": probeV4 != "" && probeV6 != "",
 		"Nonce":         httpserver.CSPNonce(r),
 	}
@@ -358,8 +366,7 @@ func aboutPage(tmpl *template.Template, w http.ResponseWriter, r *http.Request) 
 	if httpserver.IsIPv6Client(r) {
 		borderClass = "border--ipv6"
 	}
-	probeV4 := os.Getenv("PROBE_V4_URL")
-	probeV6 := os.Getenv("PROBE_V6_URL")
+	probeV4, probeV6, probeDS := probeURLsFromEnv()
 	pageTitle := "About — Pacific Islands IPv6 Monitor"
 	metaDesc := "Pacific Islands IPv6 Council and this deployment monitor — IPv6 roadmap for the Pacific, measurements, and council leadership."
 	data := map[string]any{
@@ -368,6 +375,7 @@ func aboutPage(tmpl *template.Template, w http.ResponseWriter, r *http.Request) 
 		"FooterVariant": "about",
 		"ProbeV4":       probeV4,
 		"ProbeV6":       probeV6,
+		"ProbeDS":       probeDS,
 		"ShowDualProbe": probeV4 != "" && probeV6 != "",
 		"Nonce":         httpserver.CSPNonce(r),
 	}
@@ -406,8 +414,7 @@ func countryPage(tmpl *template.Template, w http.ResponseWriter, r *http.Request
 	if httpserver.IsIPv6Client(r) {
 		borderClass = "border--ipv6"
 	}
-	probeV4 := os.Getenv("PROBE_V4_URL")
-	probeV6 := os.Getenv("PROBE_V6_URL")
+	probeV4, probeV6, probeDS := probeURLsFromEnv()
 	sum := summary.FromDomains(cf.Domains)
 	economyScorePct := scoring.EconomyDeploymentScorePct(cf.Domains)
 	checkLegend := checks.CountryLegendCheckExplanations()
@@ -428,6 +435,7 @@ func countryPage(tmpl *template.Template, w http.ResponseWriter, r *http.Request
 		"FooterVariant":   "country",
 		"ProbeV4":         probeV4,
 		"ProbeV6":         probeV6,
+		"ProbeDS":         probeDS,
 		"ShowDualProbe":   probeV4 != "" && probeV6 != "",
 		"HasResults":      len(cf.Domains) > 0,
 		"HasBGPHETable":   hasBGPHETable,
@@ -460,8 +468,7 @@ func countryComingSoon(tmpl *template.Template, w http.ResponseWriter, r *http.R
 	if httpserver.IsIPv6Client(r) {
 		borderClass = "border--ipv6"
 	}
-	probeV4 := os.Getenv("PROBE_V4_URL")
-	probeV6 := os.Getenv("PROBE_V6_URL")
+	probeV4, probeV6, probeDS := probeURLsFromEnv()
 	pageTitle := name + " — Pacific Islands IPv6 Monitor"
 	metaDesc := fmt.Sprintf("%s — Pacific Islands IPv6 Monitor; collector results for this economy are not yet published.", name)
 	data := map[string]any{
@@ -472,6 +479,7 @@ func countryComingSoon(tmpl *template.Template, w http.ResponseWriter, r *http.R
 		"FooterVariant": "country",
 		"ProbeV4":       probeV4,
 		"ProbeV6":       probeV6,
+		"ProbeDS":       probeDS,
 		"ShowDualProbe": probeV4 != "" && probeV6 != "",
 		"Nonce":         httpserver.CSPNonce(r),
 	}

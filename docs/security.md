@@ -23,9 +23,9 @@ Cross-check ideas against [`bookerpal/docs/security.md`](/Users/franck/code/book
 
 ## Client IP in UI
 
-The site may show **the visitor’s address as seen by the server** (header control → dialog: IPv4 and/or IPv6 rows; **Not available** when a probe fails or returns no `ip`). Addresses come from **`internal/httpserver.RemoteIP`**, which prefers **`X-Forwarded-For`** (first hop) when set. **Misconfigured proxies** can make the value wrong (edge IP, not the browser). Align with the **nginx** example in this doc (`proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for`).
+The site may show **the visitor’s address as seen by the server** (header control → dialog: **Preferred for this site**, IPv4, and/or IPv6 rows; **Not available** when a probe fails or returns no `ip`). Addresses come from **`internal/httpserver.RemoteIP`**, which prefers **`X-Forwarded-For`** (first hop) when set. **Misconfigured proxies** can make the value wrong (edge IP, not the browser). Align with the **nginx** example in this doc (`proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for`).
 
-**`GET /api/healthz`** embeds **`ip`** in JSON for cross-origin reads used by the dual-stack probe; CORS defaults to **`Access-Control-Allow-Origin: *`** unless **`HEALTHZ_CORS_ALLOW_ORIGIN`** is set. In production, **restricting** that variable to the **canonical site origin** reduces cross-site exfiltration of the response body to arbitrary malicious origins (see `docs/development.md`).
+**`GET /api/healthz`** embeds **`ip`** and **`family`** (`ipv4` or `ipv6`) in JSON for cross-origin reads used by v4, v6, and dual-stack (`PROBE_DS_URL`) probes; CORS defaults to **`Access-Control-Allow-Origin: *`** unless **`HEALTHZ_CORS_ALLOW_ORIGIN`** is set. In production, **restricting** that variable to the **canonical site origin** reduces cross-site exfiltration of the response body to arbitrary malicious origins (see `docs/development.md`).
 
 **`GET /api/client-ip-family`** exposes **`ip`** and **`family`** and is **subject to rate limiting** (unlike `/api/healthz`). No extra logging is added for modal-only use beyond normal request logs.
 

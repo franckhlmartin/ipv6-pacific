@@ -14,10 +14,19 @@
     return String(v);
   }
 
+  function formatPreferred(p) {
+    if (!p || !p.ip) return 'Not available';
+    var fam =
+      p.family === 'ipv6' ? 'IPv6' : p.family === 'ipv4' ? 'IPv4' : '';
+    if (fam) return String(p.ip) + ' (' + fam + ')';
+    return String(p.ip);
+  }
+
   window.__updateConnStatus = function (state) {
     var btn = $('conn-status-btn');
     var dd4 = $('conn-status-ipv4');
     var dd6 = $('conn-status-ipv6');
+    var ddPref = $('conn-status-preferred');
     if (!btn || !dd4 || !dd6) return;
 
     var mode = state.mode;
@@ -35,6 +44,7 @@
 
     dd4.textContent = formatAddr(state.ipv4);
     dd6.textContent = formatAddr(state.ipv6);
+    if (ddPref) ddPref.textContent = formatPreferred(state.preferred);
   };
 
   function init() {

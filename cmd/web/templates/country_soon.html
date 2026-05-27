@@ -43,6 +43,10 @@
       <p class="conn-status-dialog__note">Addresses reflect what our servers see for each request. With NAT, VPNs, or proxies they may show a client, edge, or shared address—not your device’s only possible address.</p>
       <dl class="conn-status-dialog__addrs">
         <div class="conn-status-dialog__row">
+          <dt>Preferred for this site</dt>
+          <dd id="conn-status-preferred">Not available</dd>
+        </div>
+        <div class="conn-status-dialog__row">
           <dt>IPv4</dt>
           <dd id="conn-status-ipv4">Not available</dd>
         </div>
@@ -58,6 +62,7 @@
   <script nonce="{{.Nonce}}">
     window.__PROBE_V4__ = {{if .ProbeV4}}"{{.ProbeV4}}"{{else}}""{{end}};
     window.__PROBE_V6__ = {{if .ProbeV6}}"{{.ProbeV6}}"{{else}}""{{end}};
+    window.__PROBE_DS__ = {{if .ProbeDS}}"{{.ProbeDS}}"{{else}}""{{end}};
   </script>
   <script src="/static/js/conn-status-ui.js"></script>
   <script src="/static/js/border.js"></script>

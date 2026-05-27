@@ -22,12 +22,22 @@ func CSPNonce(r *http.Request) string {
 	return v
 }
 
-// ConnectSrcFromProbeEnv returns extra CSP connect-src tokens (scheme://host) for PROBE_V4_URL /
-// PROBE_V6_URL so the border script can fetch() those origins.
+// ClientIPFamily returns the client address and inet family (ipv4 or ipv6) as seen by the server.
+func ClientIPFamily(r *http.Request) (ip, family string) {
+	ip = RemoteIP(r)
+	family = "ipv4"
+	if IsIPv6Client(r) {
+		family = "ipv6"
+	}
+	return ip, family
+}
+
+// ConnectSrcFromProbeEnv returns extra CSP connect-src tokens (scheme://host) for PROBE_V4_URL,
+// PROBE_V6_URL, and PROBE_DS_URL so the border script can fetch() those origins.
 func ConnectSrcFromProbeEnv() []string {
 	seen := make(map[string]struct{})
 	var out []string
-	for _, key := range []string{"PROBE_V4_URL", "PROBE_V6_URL"} {
+	for _, key := range []string{"PROBE_V4_URL", "PROBE_V6_URL", "PROBE_DS_URL"} {
 		raw := strings.TrimSpace(os.Getenv(key))
 		if raw == "" {
 			continue

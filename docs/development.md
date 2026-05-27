@@ -142,13 +142,21 @@ Put a reverse proxy in front if you terminate public TLS elsewhere; see `docs/se
 
 ## TLS / dual-stack border
 
-Optional env **`PROBE_V4_URL`** and **`PROBE_V6_URL`** must point to two distinct hostnames that resolve **A-only** and **AAAA-only** respectively, with TLS SAN coverage, for the blue “dual-stack” browser border. Without them, the UI falls back to **IPv4 vs IPv6 connection** coloring only.
+Three optional probe URLs (full `https://host/.../api/healthz` paths, TLS SAN coverage):
 
-At startup, **`pacific-web` logs** either that dual-stack probes are configured or that it will use **`/api/client-ip-family` only**. The HTML should contain non-empty `window.__PROBE_V4__` / `window.__PROBE_V6__` (the inline bootstrap runs **before** `border.js`); probe **`fetch()` requests go to those hostnames**, so they appear in **those vhosts’** access logs, not necessarily on `pacific.ipv6forum.com`. **`Content-Security-Policy` `connect-src`** is extended automatically from `PROBE_*` origins so those fetches are permitted.
+| Env | Hostname role | Purpose |
+|-----|----------------|---------|
+| **`PROBE_V4_URL`** | A-only (e.g. `ipv4.pacific.ipv6forum.com`) | Can the browser reach the service over IPv4? |
+| **`PROBE_V6_URL`** | AAAA-only (e.g. `ipv6.pacific.ipv6forum.com`) | Can the browser reach the service over IPv6? |
+| **`PROBE_DS_URL`** | Dual-stack (e.g. `pacific.ipv6forum.com`) | Which stack did the browser **prefer** for this site? |
 
-The app’s **`GET /api/healthz`** responses are JSON: **`{"ok":true}`** plus **`"ip"`** (client address as seen by that request, using the same **`RemoteIP`** / **`X-Forwarded-For`** rules as elsewhere) when known. The border script uses **`ip`** from each probe response in the **connection details** modal. Responses include **`Access-Control-Allow-Origin`** (default `*`, override with **`HEALTHZ_CORS_ALLOW_ORIGIN`**) so the main page can read the body cross-origin. If a **reverse proxy** answers `/api/healthz` without forwarding to `pacific-web`, add the same CORS headers (or proxy to the app) on the **ipv4 / ipv6 probe** vhosts and include **`ip`** in the JSON if operators synthesize the response.
+**`PROBE_V4_URL`** and **`PROBE_V6_URL`** together enable the blue “dual-stack” browser border. Without both, the UI falls back to **IPv4 vs IPv6 connection** coloring via **`/api/client-ip-family`**. **`PROBE_DS_URL`** is independent: it fills the dialog **Preferred for this site** row when set.
 
-**`GET /api/client-ip-family`** returns **`family`** (`ipv4` or `ipv6`) and **`ip`** for the browser’s connection to the **main** site when dual-stack probe URLs are not configured; that endpoint is **rate-limited** like other `/api/*` routes (see `docs/security.md`). The header shows **IPv4 only**, **IPv6 only**, or **Dual stack** (matching table legend wording) with optional details in a dialog.
+At startup, **`pacific-web` logs** probe configuration. The HTML injects `window.__PROBE_V4__`, `window.__PROBE_V6__`, and `window.__PROBE_DS__` (inline bootstrap **before** `border.js`). Probe **`fetch()`** requests hit those hostnames’ access logs. **`Content-Security-Policy` `connect-src`** is extended automatically from all three `PROBE_*` origins.
+
+**`GET /api/healthz`** responses are JSON: **`{"ok":true,"ip":"...","family":"ipv4"|"ipv6"}`** (client address and inet family as seen on that request, using **`RemoteIP`** / **`X-Forwarded-For`**). The border script uses **`ip`** from v4/v6 probes in the dialog IPv4/IPv6 rows and **`ip`** + **`family`** from the DS probe for **Preferred for this site**. Responses include **`Access-Control-Allow-Origin`** (default `*`, override with **`HEALTHZ_CORS_ALLOW_ORIGIN`**) so the main page can read the body cross-origin. If a **reverse proxy** answers `/api/healthz` without forwarding to `pacific-web`, proxy to the app (or mirror CORS + JSON shape) on **ipv4**, **ipv6**, and **dual-stack** vhosts.
+
+**`GET /api/client-ip-family`** returns **`family`** and **`ip`** for the browser’s connection to the **page origin** when v4/v6 probes are not configured; that endpoint is **rate-limited** like other `/api/*` routes (see `docs/security.md`). The header shows **IPv4 only**, **IPv6 only**, or **Dual stack** (matching table legend wording) with optional details in a dialog.
 
 For **privacy and trust** assumptions when showing addresses in the UI, see **`docs/security.md`** (Client IP in UI).
 
