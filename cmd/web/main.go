@@ -98,7 +98,7 @@ func main() {
 		w.Write([]byte("Contact: mailto:security@example.com\nPreferred-Languages: en\n"))
 	})
 	healthz := func(w http.ResponseWriter, r *http.Request) {
-		applyHealthzCORS(w)
+		httpserver.HealthzCORSAllowOrigin(w, r)
 		w.Header().Set("Content-Type", "application/json")
 		ip, family := httpserver.ClientIPFamily(r)
 		payload := struct {
@@ -110,7 +110,7 @@ func main() {
 	}
 	mux.HandleFunc("GET /api/healthz", healthz)
 	mux.HandleFunc("OPTIONS /api/healthz", func(w http.ResponseWriter, r *http.Request) {
-		applyHealthzCORS(w)
+		httpserver.HealthzCORSAllowOrigin(w, r)
 		w.WriteHeader(http.StatusNoContent)
 	})
 	mux.HandleFunc("GET /api/client-ip-family", func(w http.ResponseWriter, r *http.Request) {
@@ -182,18 +182,6 @@ func getenv(k, d string) string {
 
 func probeURLsFromEnv() (v4, v6, ds string) {
 	return os.Getenv("PROBE_V4_URL"), os.Getenv("PROBE_V6_URL"), os.Getenv("PROBE_DS_URL")
-}
-
-// applyHealthzCORS allows fetch() from the main site to probe hostnames that serve the same /api/healthz.
-// Set HEALTHZ_CORS_ALLOW_ORIGIN to a single origin (e.g. https://pacific.ipv6forum.com); default is *.
-func applyHealthzCORS(w http.ResponseWriter) {
-	allow := strings.TrimSpace(os.Getenv("HEALTHZ_CORS_ALLOW_ORIGIN"))
-	if allow == "" {
-		allow = "*"
-	}
-	w.Header().Set("Access-Control-Allow-Origin", allow)
-	w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
-	w.Header().Set("Access-Control-Max-Age", "86400")
 }
 
 func serveRootFaviconICO(w http.ResponseWriter, r *http.Request) {

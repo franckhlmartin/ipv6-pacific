@@ -22,6 +22,31 @@ func CSPNonce(r *http.Request) string {
 	return v
 }
 
+// HealthzCORSAllowOrigin sets Access-Control-Allow-Origin for GET /api/healthz probe fetches.
+// HEALTHZ_CORS_ALLOW_ORIGIN may be *, one origin, or comma-separated origins. When the request
+// sends Origin and it matches an entry in the list, that origin is echoed (required for CORS).
+func HealthzCORSAllowOrigin(w http.ResponseWriter, r *http.Request) {
+	cfg := strings.TrimSpace(os.Getenv("HEALTHZ_CORS_ALLOW_ORIGIN"))
+	allow := "*"
+	if cfg != "" {
+		allow = cfg
+	}
+	if r != nil {
+		origin := strings.TrimSpace(r.Header.Get("Origin"))
+		if origin != "" && cfg != "" && cfg != "*" {
+			for _, part := range strings.Split(cfg, ",") {
+				if strings.TrimSpace(part) == origin {
+					allow = origin
+					break
+				}
+			}
+		}
+	}
+	w.Header().Set("Access-Control-Allow-Origin", allow)
+	w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+	w.Header().Set("Access-Control-Max-Age", "86400")
+}
+
 // ClientIPFamily returns the client address and inet family (ipv4 or ipv6) as seen by the server.
 func ClientIPFamily(r *http.Request) (ip, family string) {
 	ip = RemoteIP(r)

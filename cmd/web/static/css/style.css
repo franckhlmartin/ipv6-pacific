@@ -69,6 +69,7 @@ h2 { font-size: 1.15rem; margin-top: 1.5rem; }
   align-items: center;
   gap: 0.5rem;
   min-height: 44px;
+  max-width: 11.5rem;
   padding: 0.35rem 0.65rem;
   font: inherit;
   font-size: 0.875rem;
@@ -79,6 +80,25 @@ h2 { font-size: 1.15rem; margin-top: 1.5rem; }
   border-radius: 8px;
   cursor: pointer;
   text-align: left;
+}
+
+.conn-status-btn__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+  line-height: 1.2;
+  min-width: 0;
+}
+
+.conn-status-btn__pref {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.conn-status-btn__pref[hidden] {
+  display: none;
 }
 
 .conn-status-btn:disabled {
@@ -110,6 +130,22 @@ h2 { font-size: 1.15rem; margin-top: 1.5rem; }
 
 .conn-status-btn--dual .conn-status-btn__swatch {
   background: var(--color-dual);
+}
+
+.conn-status-btn--dual.conn-status-btn--pref-ipv4 .conn-status-btn__swatch {
+  background: linear-gradient(
+    135deg,
+    var(--color-ipv4-only) 55%,
+    var(--color-dual) 55%
+  );
+}
+
+.conn-status-btn--dual.conn-status-btn--pref-ipv6 .conn-status-btn__swatch {
+  background: linear-gradient(
+    135deg,
+    var(--color-ipv6-only) 55%,
+    var(--color-dual) 55%
+  );
 }
 
 .conn-status-dialog {

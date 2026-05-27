@@ -55,6 +55,17 @@ func TestConnectSrcFromProbeEnv_includesDS(t *testing.T) {
 	}
 }
 
+func TestHealthzCORSAllowOrigin_reflectsMatchingOrigin(t *testing.T) {
+	t.Setenv("HEALTHZ_CORS_ALLOW_ORIGIN", "https://pacific.example.com,https://127.0.0.1:8082")
+	rec := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, "/api/healthz", nil)
+	req.Header.Set("Origin", "https://127.0.0.1:8082")
+	HealthzCORSAllowOrigin(rec, req)
+	if got := rec.Header().Get("Access-Control-Allow-Origin"); got != "https://127.0.0.1:8082" {
+		t.Fatalf("got ACAO %q", got)
+	}
+}
+
 func TestConnectSrcFromProbeEnv_empty(t *testing.T) {
 	for _, k := range []string{"PROBE_V4_URL", "PROBE_V6_URL", "PROBE_DS_URL"} {
 		_ = os.Unsetenv(k)
