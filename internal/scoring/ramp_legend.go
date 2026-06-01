@@ -11,7 +11,7 @@ type RampLegendItem struct {
 func DMARCRampLegend() []RampLegendItem {
 	return []RampLegendItem{
 		{Label: "No DMARC record", ScoreRange: "0%", Description: "No _dmarc TXT at the domain apex (NXDOMAIN or no v=DMARC1 in answers)."},
-		{Label: "Lookup failed", ScoreRange: "grey", Description: "DNS timeout or non-NXDOMAIN error; use the MXToolbox link to re-check."},
+		{Label: "Lookup failed", ScoreRange: "grey", Description: "DNS timeout or non-NXDOMAIN error; use the dmarcian link to re-check."},
 		{Label: "p=none (monitoring)", ScoreRange: "25%", Description: "Record published; organizational policy is none."},
 		{Label: "quarantine", ScoreRange: "75%", Description: "Stricter of p= and sp= is quarantine."},
 		{Label: "reject", ScoreRange: "100%", Description: "Stricter of p= and sp= is reject."},

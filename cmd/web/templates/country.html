@@ -177,7 +177,7 @@
             <td class="cell cell--{{.Mail.Class}}">{{.Mail.Display}}</td>
             <td class="cell cell--{{.Web.Class}}">{{.Web.Display}}</td>
             <td class="cell cell--{{dnssecCellClass .DNSSEC}}">{{.DNSSEC.Display}}</td>
-            <td class="col-dmarc-pct" data-pct="{{dmarcPctAttr .DMARC}}" data-sort-value="{{if eq .DMARC.State "error"}}-1{{else}}{{printf "%.6f" .DMARC.ScorePct}}{{end}}"><a href="{{dmarcMXToolboxURL .Domain}}" target="_blank" rel="noopener" title="Check DMARC on MXToolbox">{{.DMARC.Display}}</a></td>
+            <td class="col-dmarc-pct" data-pct="{{dmarcPctAttr .DMARC}}" data-sort-value="{{if eq .DMARC.State "error"}}-1{{else}}{{printf "%.6f" .DMARC.ScorePct}}{{end}}"><a href="{{dmarcInspectorURL .Domain}}" target="_blank" rel="noopener" title="Check DMARC on dmarcian">{{.DMARC.Display}}</a></td>
           </tr>
           {{end}}
         </tbody>

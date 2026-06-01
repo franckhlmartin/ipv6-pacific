@@ -53,7 +53,7 @@ func main() {
 		"bgpheRowClass":   bgphe.RowClass,
 		"bgpheRowAria":    bgphe.RowAriaLabel,
 		"dmarcPctAttr":       dmarcPctAttr,
-		"dmarcMXToolboxURL":  dmarcMXToolboxURL,
+		"dmarcInspectorURL":  dmarcInspectorURL,
 		"rpkiPctAttr":        rpkiPctAttr,
 		"rpkiDisplayPct":     rpkiDisplayPct,
 		"rpkiStatURL":        rpkiStatURL,
@@ -504,16 +504,15 @@ func rpkiPctAttr(row model.BGPHENetworkRow) string {
 	return fmt.Sprintf("%.6f", rpkiDisplayPct(row))
 }
 
-// dmarcMXToolboxURL links to MXToolbox DMARC lookup for the apex domain.
-func dmarcMXToolboxURL(domain string) string {
+// dmarcInspectorURL links to dmarcian DMARC Inspector for the apex domain.
+func dmarcInspectorURL(domain string) string {
 	domain = strings.TrimSpace(strings.ToLower(domain))
 	if domain == "" {
-		return "https://mxtoolbox.com/SuperTool.aspx?action=dmarc&run=toolpage"
+		return "https://dmarcian.com/dmarc-inspector/"
 	}
 	v := url.Values{}
-	v.Set("action", "dmarc:"+domain)
-	v.Set("run", "toolpage")
-	return "https://mxtoolbox.com/SuperTool.aspx?" + v.Encode() + "#"
+	v.Set("domain", domain)
+	return "https://dmarcian.com/dmarc-inspector/?" + v.Encode()
 }
 
 // rpkiStatURL links to the RIPEstat resource overview for this ASN.
