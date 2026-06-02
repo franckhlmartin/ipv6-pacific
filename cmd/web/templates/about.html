@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="/static/css/style.css"/>
 </head>
 <body class="{{.BorderClass}}">
+  {{template "ipv6PreOutageBanner" .}}
   {{template "cookieBanner" .}}
   <header class="site-header">
     <div class="site-header__lead">
@@ -45,6 +46,14 @@
         <p>— Latif Ladid, IPv6 Forum President</p>
       </blockquote>
       <p><a href="https://lnkd.in/dgXWqhyG" target="_blank" rel="noopener">Read the release</a></p>
+    </section>
+
+    <section class="country-detail-section" aria-labelledby="ipv6-day-drill">
+      <h2 id="ipv6-day-drill">Monthly 6/6 IPv4 drill</h2>
+      <p>On the <strong>6th of every month (UTC)</strong>, this site runs a planned 24-hour IPv4 maintenance window on <code>pacific.ipv6forum.com</code>. During that window, connections over IPv4 receive an intentional “use IPv6 instead” signal while the service remains available over IPv6.</p>
+      <p>The drill supports the Pacific Islands IPv6 Council’s work to measure how much traffic and tooling still depends on IPv4 before a longer-term transition. It follows the HTTP signaling described in the <a href="https://github.com/franckhlmartin/ietf-draft-retry-over-ipv6/blob/main/draft-martin-retry-over-ipv6.md" target="_blank" rel="noopener">retry-over-IPv6 Internet-Draft</a> (status code 566, <code>Retry-Over-IPv6</code>, and related headers).</p>
+      <p>If you cannot reach this site on the 6th, your network or device may not be using IPv6 yet. Contact your Internet provider or IT help desk and ask whether IPv6 is enabled for your connection.</p>
+      <p class="meta">Operators can disable an active drill with <code>IPV4_OUTAGE_SKIP=1</code> in the server environment. See <code>docs/development.md</code> in the project repository for testing and metrics.</p>
     </section>
 
     <section class="country-detail-section" aria-labelledby="about-why-v6">

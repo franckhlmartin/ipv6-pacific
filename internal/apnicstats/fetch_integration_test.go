@@ -3,6 +3,7 @@ package apnicstats
 import (
 	"context"
 	"net/http"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -11,6 +12,9 @@ import (
 func TestFetchCountryASNTable_liveTK(t *testing.T) {
 	if testing.Short() {
 		t.Skip("live fetch")
+	}
+	if os.Getenv("APNIC_LIVE_TEST") != "1" {
+		t.Skip("set APNIC_LIVE_TEST=1 to enable live fetch")
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()

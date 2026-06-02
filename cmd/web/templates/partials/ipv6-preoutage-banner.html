@@ -1,0 +1,35 @@
+{{define "ipv6PreOutageBanner"}}
+  {{if .PreOutageBanner}}
+  <div id="ipv6-preoutage-banner" class="ipv6-preoutage-banner" role="status" aria-live="polite">
+    <div class="ipv6-preoutage-banner__inner">
+      <p class="ipv6-preoutage-banner__text">
+        Planned IPv4 maintenance on the <strong>6th of this month (UTC)</strong> for this site.
+        The monitor stays available over IPv6.
+        {{if gt .PreOutageDaysUntil 0}}The drill starts in <strong>{{.PreOutageDaysUntil}}</strong> day{{if ne .PreOutageDaysUntil 1}}s{{end}}.{{end}}
+        <a href="/about#ipv6-day-drill">Learn more</a>
+      </p>
+      <button type="button" class="ipv6-preoutage-banner__dismiss" id="ipv6-preoutage-dismiss" aria-label="Dismiss notice">Dismiss</button>
+    </div>
+  </div>
+  <script nonce="{{.Nonce}}">
+    (function () {
+      var key = 'ipv6-preoutage-dismissed';
+      var el = document.getElementById('ipv6-preoutage-banner');
+      if (!el) return;
+      try {
+        if (sessionStorage.getItem(key) === '1') {
+          el.hidden = true;
+          return;
+        }
+      } catch (e) {}
+      var btn = document.getElementById('ipv6-preoutage-dismiss');
+      if (btn) {
+        btn.addEventListener('click', function () {
+          el.hidden = true;
+          try { sessionStorage.setItem(key, '1'); } catch (e) {}
+        });
+      }
+    })();
+  </script>
+  {{end}}
+{{end}}

@@ -29,6 +29,14 @@ The site may show **the visitor’s address as seen by the server** (header cont
 
 **`GET /api/client-ip-family`** exposes **`ip`** and **`family`** and is **subject to rate limiting** (unlike `/api/healthz`). No extra logging is added for modal-only use beyond normal request logs.
 
+## Monthly IPv4 outage (566)
+
+The **6/6 IPv4 drill** (`internal/ipv4outage`) classifies clients using the same **`X-Forwarded-For`** (first hop) / **`RemoteIP`** rules as the connection UI. **Only trust this policy when nginx is the sole component setting `X-Forwarded-For`** toward `pacific-web` — do not forward client-supplied XFF from the Internet.
+
+566 responses include **`Cache-Control: private, no-store`**, **`X-Content-Type-Options: nosniff`**, and the draft retry headers. **`Retry-Over-IPv6-Token`** values are logged for metrics, not used for authentication. **`566.html` is not registered as a public route** (rendered only by middleware).
+
+See **`docs/development.md`** (Monthly 6/6 IPv4 outage) for ops variables and testing.
+
 ## Supply chain
 
 CI runs `go vet ./...` and `go test ./...`. Periodically run **`govulncheck ./...`** with an up-to-date Go toolchain; advisories depend on the standard library version you compile with.

@@ -661,6 +661,44 @@ h2 { font-size: 1.15rem; margin-top: 1.5rem; }
   font-weight: 600;
 }
 
+/* Pre-outage notice (UTC days 4–5) */
+.ipv6-preoutage-banner {
+  background: #eff6ff;
+  border-bottom: 1px solid #bfdbfe;
+  padding: 0.65rem 1rem;
+}
+.ipv6-preoutage-banner__inner {
+  max-width: 56rem;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+.ipv6-preoutage-banner__text {
+  margin: 0;
+  flex: 1 1 16rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: #1e3a5f;
+}
+.ipv6-preoutage-banner__dismiss {
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 0.35rem 0.85rem;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 1px solid #93c5fd;
+  background: #fff;
+  cursor: pointer;
+}
+.ipv6-preoutage-banner[hidden] {
+  display: none !important;
+}
+
 /* Cookie notice — fixed bottom bar */
 .cookie-banner {
   position: fixed;

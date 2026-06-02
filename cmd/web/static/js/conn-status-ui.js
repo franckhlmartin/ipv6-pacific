@@ -2,7 +2,8 @@
   var MODE_LABEL = {
     ipv4: 'IPv4 only',
     ipv6: 'IPv6 only',
-    dual: 'Dual stack'
+    dual: 'Dual stack',
+    ipv4outage: 'IPv4 maintenance today'
   };
 
   function $(id) {
@@ -80,7 +81,7 @@
       'conn-status-btn--pref-ipv4',
       'conn-status-btn--pref-ipv6'
     );
-    if (mode === 'ipv4') btn.classList.add('conn-status-btn--ipv4');
+    if (mode === 'ipv4' || mode === 'ipv4outage') btn.classList.add('conn-status-btn--ipv4');
     if (mode === 'ipv6') btn.classList.add('conn-status-btn--ipv6');
     if (mode === 'dual') btn.classList.add('conn-status-btn--dual');
     if (mode === 'dual' && preferred && preferred.family === 'ipv4') {

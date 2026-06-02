@@ -21,12 +21,29 @@
     return 'ipv4';
   }
 
+  function hasRetryOverIPv6(res) {
+    if (!res || !res.headers) return false;
+    var h = res.headers.get('Retry-Over-IPv6');
+    return h === '?1' || h === '1';
+  }
+
+  function isIPv4OutageResponse(res) {
+    if (!res) return false;
+    if (res.status === 566) return true;
+    return res.status === 503 && hasRetryOverIPv6(res);
+  }
+
   function parseHealthzBody(body) {
     var ok = !!(body && body.ok);
     var ip = body && typeof body.ip === 'string' && body.ip !== '' ? body.ip : null;
     var family =
       body && (body.family === 'ipv4' || body.family === 'ipv6') ? body.family : null;
-    return { ok: ok, ip: ip, family: family };
+    return { ok: ok, ip: ip, family: family, ipv4Outage: !!(body && body.ipv4Outage) };
+  }
+
+  function notifyIPv4Outage() {
+    applyBorderClass('border--ipv4');
+    notify('ipv4outage', null, null, null);
   }
 
   function probeMeta(settled) {
@@ -34,6 +51,9 @@
       return Promise.resolve({ ok: false, ip: null, family: null });
     }
     var res = settled.value;
+    if (isIPv4OutageResponse(res)) {
+      return Promise.resolve({ ok: false, ip: null, family: null, ipv4Outage: true });
+    }
     if (!res.ok) {
       return Promise.resolve({ ok: false, ip: null, family: null });
     }
@@ -53,6 +73,9 @@
   function fetchSameOriginHealthz(signal) {
     return fetch('/api/healthz', { credentials: 'same-origin', signal: signal })
       .then(function (res) {
+        if (isIPv4OutageResponse(res)) {
+          return { ok: false, ip: null, family: null, ipv4Outage: true };
+        }
         if (!res.ok) {
           return { ok: false, ip: null, family: null };
         }
@@ -109,6 +132,10 @@
     ]).then(function (pair) {
       var j = pair[0];
       var hz = pair[1];
+      if (hz && hz.ipv4Outage) {
+        notifyIPv4Outage();
+        return;
+      }
       var preferred = preferredFromMeta(hz);
       var ip = typeof j.ip === 'string' ? j.ip : '';
       var ipVal = ip !== '' ? ip : null;
@@ -170,6 +197,10 @@
         var ipVal = ip !== '' ? ip : null;
         return fillPreferredFromSameOrigin(preferredFromMeta(dsMeta), ctlFallback.signal).then(
           function (preferred) {
+            if (preferred && preferred.ipv4Outage) {
+              notifyIPv4Outage();
+              return;
+            }
             if (j.family === 'ipv6') {
               applyBorderClass('border--ipv6');
               notify('ipv6', null, ipVal, preferred);
@@ -213,6 +244,10 @@
     })
     .then(function (out) {
       var metas = out.metas;
+      if (metas.some(function (m) { return m && m.ipv4Outage; })) {
+        notifyIPv4Outage();
+        return;
+      }
       var ok4 = metas[0].ok;
       var ok6 = metas[1].ok;
       var ip4 = metas[0].ip;

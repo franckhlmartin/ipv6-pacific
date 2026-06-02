@@ -20,6 +20,7 @@ import (
 	"github.com/pacific-monitor/pacific-monitor/internal/config"
 	"github.com/pacific-monitor/pacific-monitor/internal/dotenv"
 	"github.com/pacific-monitor/pacific-monitor/internal/httpserver"
+	"github.com/pacific-monitor/pacific-monitor/internal/ipv4outage"
 	"github.com/pacific-monitor/pacific-monitor/internal/model"
 	"github.com/pacific-monitor/pacific-monitor/internal/ogmap"
 	"github.com/pacific-monitor/pacific-monitor/internal/rampscore"
@@ -62,6 +63,13 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	tmpl566, err := template.New("566.html").ParseFS(templateFS, "templates/566.html")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	outageCfg := ipv4outage.LoadConfig()
+	ipv4outage.WarnForceInProduction(outageCfg)
 
 	static, _ := fs.Sub(staticFS, "static")
 	wellKnown, _ := fs.Sub(staticFS, "static/well-known")
@@ -123,7 +131,7 @@ func main() {
 	})
 
 	probeConnect := httpserver.ConnectSrcFromProbeEnv()
-	handler := httpserver.SecurityHeaders(probeConnect, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	app := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ip := httpserver.RemoteIP(r)
 		if strings.HasPrefix(r.URL.Path, "/og/") && !ogRL.Allow(ip) {
 			http.Error(w, "too many requests", http.StatusTooManyRequests)
@@ -134,7 +142,9 @@ func main() {
 			return
 		}
 		mux.ServeHTTP(w, r)
-	}))
+	})
+	handler := httpserver.SecurityHeaders(probeConnect,
+		ipv4outage.Middleware(outageCfg, tmpl566, nil, app))
 
 	certFile := tlsCertPath(root, getenv("TLS_CERT_FILE", "certs/cert.pem"))
 	keyFile := tlsCertPath(root, getenv("TLS_KEY_FILE", "certs/key.pem"))
@@ -178,6 +188,12 @@ func getenv(k, d string) string {
 		return v
 	}
 	return d
+}
+
+func mergeOutagePageData(data map[string]any) {
+	now := time.Now()
+	data["PreOutageBanner"] = ipv4outage.InPreOutageWindow(now)
+	data["PreOutageDaysUntil"] = ipv4outage.DaysUntilOutage(now)
 }
 
 func probeURLsFromEnv() (v4, v6, ds string) {
@@ -345,6 +361,7 @@ func home(tmpl *template.Template, w http.ResponseWriter, r *http.Request, dataD
 		"Nonce":         httpserver.CSPNonce(r),
 	}
 	seoMerge(r, data, pageTitle, metaDesc)
+	mergeOutagePageData(data)
 	_ = tmpl.ExecuteTemplate(w, "home.html", data)
 }
 
@@ -368,6 +385,7 @@ func aboutPage(tmpl *template.Template, w http.ResponseWriter, r *http.Request) 
 		"Nonce":         httpserver.CSPNonce(r),
 	}
 	seoMerge(r, data, pageTitle, metaDesc)
+	mergeOutagePageData(data)
 	_ = tmpl.ExecuteTemplate(w, "about.html", data)
 }
 

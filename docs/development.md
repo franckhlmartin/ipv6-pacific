@@ -162,6 +162,39 @@ At startup, **`pacific-web` logs** probe configuration. The HTML injects `window
 
 For **privacy and trust** assumptions when showing addresses in the UI, see **`docs/security.md`** (Client IP in UI).
 
+## Monthly 6/6 IPv4 outage
+
+On **UTC calendar day 6** of each month (00:00:00–23:59:59 UTC), the **main dual-stack hostname** (`pacific.ipv6forum.com`, or the host from **`PUBLIC_SITE_URL`** / **`IPV4_OUTAGE_HOST`**) returns HTTP **566 (IPv4 Unavailable)** to **IPv4** clients for idempotent requests (`GET`, `HEAD`, `OPTIONS`). IPv6 clients receive normal responses. Signaling follows [draft-martin-retry-over-ipv6](https://github.com/franckhlmartin/ietf-draft-retry-over-ipv6/blob/main/draft-martin-retry-over-ipv6.md) (`Retry-Over-IPv6`, `IPv4-Unavailable-Until`, optional `Retry-Over-IPv6-Token`, and RFC 9457 JSON for `/api/*`).
+
+Implementation: **`internal/ipv4outage`** middleware in **`cmd/web/main.go`** (runs before the mux). IPv4 users see HTML from **`cmd/web/templates/566.html`** on the **same URL** (not a redirect). Probe vhosts (`ipv4.pacific…`, `ipv6.pacific…`) are **not** affected.
+
+| Variable | Purpose |
+|----------|---------|
+| **`IPV4_OUTAGE_SKIP=1`** | Emergency rollback (no 566 for the month) |
+| **`IPV4_OUTAGE_FORCE=1`** | Test 566 outside day 6 (remove in production) |
+| **`IPV4_OUTAGE_HOST`** | Override hostname when **`PUBLIC_SITE_URL`** is unset |
+
+**Crawler exemptions** (still HTTP 200 on IPv4 during the drill): `/robots.txt`, `/sitemap.xml`, `/og/map.png`.
+
+**Advance notice:** UTC days **4–5** show an optional banner on `/` and `/about`. Permanent copy: `/about#ipv6-day-drill`.
+
+**Local test** (with **`IPV4_OUTAGE_FORCE=1`** in `.env.local`):
+
+```bash
+curl -sk -H 'Host: pacific.ipv6forum.com' -H 'X-Forwarded-For: 203.0.113.1' https://127.0.0.1:8082/
+curl -sk -H 'Host: pacific.ipv6forum.com' -H 'X-Forwarded-For: 203.0.113.1' https://127.0.0.1:8082/api/index.json
+curl -sk -H 'Host: pacific.ipv6forum.com' -H 'X-Forwarded-For: 2001:db8::1' https://127.0.0.1:8082/
+```
+
+**Post-drill metrics** (journald or log files):
+
+```bash
+grep 'ipv4_outage event=566' /var/log/… | wc -l
+grep 'ipv4_outage event=recovery' /var/log/… | wc -l
+```
+
+**Production rollout:** deploy `pacific-web`, set **`PUBLIC_SITE_URL`**, confirm **`IPV4_OUTAGE_FORCE`** is unset, restart **`ipv6-pacific-web`**. Announce the drill externally before the first event.
+
 ## DMARC and RPKI (collector v0.3+)
 
 - **DMARC**: `_dmarc.{apex}` TXT per domain in `internal/checks/dmarc.go`; stored on `DomainResult.dmarc`; country table column uses 0–100% ramp (`internal/rampscore`).
