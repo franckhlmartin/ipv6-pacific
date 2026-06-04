@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your IPv6 connection status</title>
+  <style>{{.InlineCSS}}</style>
+</head>
+<body class="conn-status-iframe-doc">
+  {{template "connStatusWidget" .}}
+  <script nonce="{{.Nonce}}">{{.InlineJS}}</script>
+</body>
+</html>

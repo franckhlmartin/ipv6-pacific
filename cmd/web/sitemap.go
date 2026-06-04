@@ -47,6 +47,7 @@ func serveSitemap(w http.ResponseWriter, r *http.Request, dataDir string, pacifi
 	}
 	rows = append(rows, pathMod{path: "/", modUTC: homeMod, hasMod: homeHas})
 	rows = append(rows, pathMod{path: "/about"})
+	rows = append(rows, pathMod{path: "/embed"})
 
 	var isos []string
 	if pacific != nil {

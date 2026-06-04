@@ -15,12 +15,28 @@ var crawlerExemptPaths = map[string]struct{}{
 	"/og/map.png":  {},
 }
 
+var embedExemptPaths = map[string]struct{}{
+	"/embed/conn-status":          {},
+	"/embed/conn-status/details":  {},
+	"/embed/conn-status.js":       {},
+	"/static/css/conn-status-embed.css": {},
+}
+
 // IsCrawlerExemptPath skips 566 for SEO/crawler assets.
 func IsCrawlerExemptPath(path string) bool {
 	if path == "" {
 		path = "/"
 	}
 	_, ok := crawlerExemptPaths[path]
+	return ok
+}
+
+// IsEmbedExemptPath skips 566 for third-party embed assets on the main host.
+func IsEmbedExemptPath(path string) bool {
+	if path == "" {
+		path = "/"
+	}
+	_, ok := embedExemptPaths[path]
 	return ok
 }
 
@@ -61,6 +77,9 @@ func ShouldBlock(r *http.Request, cfg Config, now time.Time) bool {
 		return false
 	}
 	if IsCrawlerExemptPath(r.URL.Path) {
+		return false
+	}
+	if IsEmbedExemptPath(r.URL.Path) {
 		return false
 	}
 	if isLoopbackClient(r) {

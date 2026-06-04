@@ -23,13 +23,16 @@
     p { margin: 0.85rem 0; }
     a { color: #0645ad; }
     .meta { font-size: 0.9rem; opacity: 0.85; }
+    {{.InlineCSS}}
   </style>
 </head>
 <body>
+  {{template "connStatusWidget" .}}
   <h1>This site is not available on your current Internet connection</h1>
   <p>The Internet is moving to a newer protocol generation called IPv6. This service is not reachable over the older generation (IPv4) on your network. You probably cannot fix this yourself.</p>
   <p>Contact your Internet provider or your organization's IT help desk and say: "I cannot reach this site — it may require IPv6, but my system does not seem to work with IPv6." Ask them why IPv6 is not working for you and whether they can enable it.</p>
   <p>If this is a planned maintenance window, service over the older connection may resume after <strong>{{.ResumePlain}}</strong>.</p>
   <p class="meta"><a href="{{.AboutURL}}">About the Pacific Islands IPv6 Monitor and our monthly IPv6 drill</a></p>
+  <script nonce="{{.Nonce}}">{{.InlineJS}}</script>
 </body>
 </html>

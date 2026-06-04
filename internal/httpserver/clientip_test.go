@@ -66,11 +66,22 @@ func TestHealthzCORSAllowOrigin_reflectsMatchingOrigin(t *testing.T) {
 	}
 }
 
-func TestConnectSrcFromProbeEnv_empty(t *testing.T) {
-	for _, k := range []string{"PROBE_V4_URL", "PROBE_V6_URL", "PROBE_DS_URL"} {
+func TestConnectSrcFromProbeEnv_defaults(t *testing.T) {
+	for _, k := range []string{"PROBE_V4_URL", "PROBE_V6_URL", "PROBE_DS_URL", "PUBLIC_SITE_URL"} {
 		_ = os.Unsetenv(k)
 	}
-	if len(ConnectSrcFromProbeEnv()) != 0 {
-		t.Fatal("expected no connect-src tokens")
+	got := ConnectSrcFromProbeEnv()
+	want := map[string]bool{
+		"https://ipv4.pacific.ipv6forum.com": true,
+		"https://ipv6.pacific.ipv6forum.com": true,
+		"https://pacific.ipv6forum.com":      true,
+	}
+	if len(got) != len(want) {
+		t.Fatalf("got %v want 3 origins", got)
+	}
+	for _, token := range got {
+		if !want[token] {
+			t.Fatalf("unexpected token %q in %v", token, got)
+		}
 	}
 }

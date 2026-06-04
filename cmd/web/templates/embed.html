@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{.Title}}</title>
+  {{template "seo" .}}
+  {{template "analyticsHead" .}}
+  <link rel="stylesheet" href="/static/css/style.css"/>
+</head>
+<body class="{{.BorderClass}}">
+  {{template "ipv6PreOutageBanner" .}}
+  {{template "cookieBanner" .}}
+  <header class="site-header">
+    <div class="site-header__lead">
+      <h1>{{.Title}}</h1>
+      <p class="meta">Add a live IPv6 connection indicator to your site — free embed from the Pacific Islands IPv6 Monitor.</p>
+    </div>
+    <div class="site-header__conn">
+      {{template "connStatusButton" .}}
+    </div>
+  </header>
+
+  <main class="embed-page">
+    <section class="embed-preview-section">
+      <h2>Live preview</h2>
+      <p class="meta">Try both embed styles side by side. The iframe opens connection details in a popup window; the script embed shows an in-page dialog on your site.</p>
+      <div class="embed-preview-grid">
+        <div class="embed-preview-item">
+          <h3>iframe embed</h3>
+          <div class="embed-preview-wrap">
+            <iframe
+              src="/embed/conn-status"
+              title="Your IPv6 connection status"
+              width="185"
+              height="48"
+              style="border:0;overflow:hidden"
+              loading="eager"
+            ></iframe>
+          </div>
+        </div>
+        <div class="embed-preview-item">
+          <h3>Script embed</h3>
+          <div class="embed-preview-wrap">
+            <div id="embed-preview-script"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>iframe embed (recommended)</h2>
+      <p class="meta">Copy and paste into your HTML. Connection details open in a small popup — no iframe resizing required.</p>
+      <pre class="embed-snippet"><code>{{.IframeSnippet}}</code></pre>
+    </section>
+
+    <section>
+      <h2>Script embed (advanced)</h2>
+      <p class="meta">The widget mounts on your page and opens an in-page dialog. Your page CSP must allow <code>script-src</code> {{range $i, $o := .CSPScriptOrigins}}{{if $i}}, {{end}}<code>{{$o}}</code>{{end}} and <code>connect-src</code>: <code>{{.ProbeV4}}</code> <code>{{.ProbeV6}}</code> <code>{{.ProbeDS}}</code>.</p>
+      <pre class="embed-snippet"><code>{{.ScriptSnippet}}</code></pre>
+    </section>
+
+    <section>
+      <h2>Operators</h2>
+      <p class="meta">Production nginx, CSP, and 6/6 drill notes: <a href="https://github.com/franckhlmartin/ipv6-pacific/blob/main/docs/embed.md">docs/embed.md</a> in the repository.</p>
+    </section>
+  </main>
+
+  {{template "siteFooter" .}}
+
+  {{template "connStatusDialog" .}}
+
+  <script nonce="{{.Nonce}}">
+    window.__PROBE_V4__ = {{if .ProbeV4}}"{{.ProbeV4}}"{{else}}""{{end}};
+    window.__PROBE_V6__ = {{if .ProbeV6}}"{{.ProbeV6}}"{{else}}""{{end}};
+    window.__PROBE_DS__ = {{if .ProbeDS}}"{{.ProbeDS}}"{{else}}""{{end}};
+  </script>
+  <script src="/static/js/conn-status-probe.js"></script>
+  <script src="/static/js/conn-status-ui.js"></script>
+  <script src="/static/js/border.js"></script>
+  <link rel="stylesheet" href="/static/css/conn-status-embed.css">
+  <script async src="/embed/conn-status.js" data-mount="#embed-preview-script"></script>
+  <script src="/static/js/cookie-consent.js" defer></script>
+</body>
+</html>

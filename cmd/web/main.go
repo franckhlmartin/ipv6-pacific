@@ -23,6 +23,7 @@ import (
 	"github.com/pacific-monitor/pacific-monitor/internal/ipv4outage"
 	"github.com/pacific-monitor/pacific-monitor/internal/model"
 	"github.com/pacific-monitor/pacific-monitor/internal/ogmap"
+	"github.com/pacific-monitor/pacific-monitor/internal/probeurls"
 	"github.com/pacific-monitor/pacific-monitor/internal/rampscore"
 	"github.com/pacific-monitor/pacific-monitor/internal/scoring"
 	"github.com/pacific-monitor/pacific-monitor/internal/siteurl"
@@ -63,10 +64,18 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	tmpl566, err := template.New("566.html").ParseFS(templateFS, "templates/566.html")
+	tmpl566, err := template.New("566.html").ParseFS(templateFS, "templates/566.html", "templates/partials/conn-status.html")
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	probeV4, probeV6, probeDS := probeURLsFromEnv()
+	publicSiteURL := strings.TrimSpace(os.Getenv("PUBLIC_SITE_URL"))
+	connBundle, err := loadConnStatusBundle(probeV4, probeV6, probeDS, publicSiteURL)
+	if err != nil {
+		log.Fatalf("conn-status embed bundle: %v", err)
+	}
+	enrich566 := enrich566Page(connBundle, publicSiteURL)
 
 	outageCfg := ipv4outage.LoadConfig()
 	ipv4outage.WarnForceInProduction(outageCfg)
@@ -87,6 +96,16 @@ func main() {
 	})
 	mux.HandleFunc("GET /og/map.png", func(w http.ResponseWriter, r *http.Request) {
 		serveOGMapPNG(w, r, dataDir)
+	})
+	mux.HandleFunc("GET /embed", func(w http.ResponseWriter, r *http.Request) { embedPage(tmpl, w, r) })
+	mux.HandleFunc("GET /embed/conn-status", func(w http.ResponseWriter, r *http.Request) {
+		serveEmbedConnStatus(tmpl, connBundle, w, r, publicSiteURL)
+	})
+	mux.HandleFunc("GET /embed/conn-status/details", func(w http.ResponseWriter, r *http.Request) {
+		serveEmbedConnStatusDetails(tmpl, connBundle, w, r, publicSiteURL)
+	})
+	mux.HandleFunc("GET /embed/conn-status.js", func(w http.ResponseWriter, r *http.Request) {
+		serveEmbedScript(w, connBundle)
 	})
 	mux.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) { home(tmpl, w, r, dataDir, pacific) })
 	mux.HandleFunc("GET /about", func(w http.ResponseWriter, r *http.Request) { aboutPage(tmpl, w, r) })
@@ -144,7 +163,7 @@ func main() {
 		mux.ServeHTTP(w, r)
 	})
 	handler := httpserver.SecurityHeaders(probeConnect,
-		ipv4outage.Middleware(outageCfg, tmpl566, nil, app))
+		ipv4outage.Middleware(outageCfg, tmpl566, enrich566, nil, app))
 
 	certFile := tlsCertPath(root, getenv("TLS_CERT_FILE", "certs/cert.pem"))
 	keyFile := tlsCertPath(root, getenv("TLS_KEY_FILE", "certs/key.pem"))
@@ -155,15 +174,15 @@ func main() {
 		log.Fatalf("TLS key not readable at %s (PROJECT_ROOT=%q): %v", keyFile, root, err)
 	}
 
-	if pv4, pv6 := os.Getenv("PROBE_V4_URL"), os.Getenv("PROBE_V6_URL"); pv4 != "" && pv6 != "" {
+	if strings.TrimSpace(os.Getenv("PROBE_V4_URL")) != "" && strings.TrimSpace(os.Getenv("PROBE_V6_URL")) != "" {
 		log.Print("web: dual-stack border probes configured (PROBE_V4_URL and PROBE_V6_URL set)")
 	} else {
-		log.Print("web: dual-stack border probes not configured — UI will call /api/client-ip-family only; set both PROBE_V4_URL and PROBE_V6_URL in .env (see docs/development.md)")
+		log.Printf("web: dual-stack border probes using defaults for %s (override with PROBE_V4_URL / PROBE_V6_URL in .env)", probeurls.SiteHost())
 	}
 	if strings.TrimSpace(os.Getenv("PROBE_DS_URL")) != "" {
 		log.Print("web: dual-stack preferred probe configured (PROBE_DS_URL set)")
 	} else {
-		log.Print("web: PROBE_DS_URL unset — connection dialog will not show preferred stack for this site")
+		log.Printf("web: PROBE_DS_URL unset — using default https://%s/api/healthz for preferred stack", probeurls.SiteHost())
 	}
 
 	if strings.TrimSpace(os.Getenv("PUBLIC_SITE_URL")) == "" {
@@ -197,7 +216,8 @@ func mergeOutagePageData(data map[string]any) {
 }
 
 func probeURLsFromEnv() (v4, v6, ds string) {
-	return os.Getenv("PROBE_V4_URL"), os.Getenv("PROBE_V6_URL"), os.Getenv("PROBE_DS_URL")
+	cfg := probeurls.Load()
+	return cfg.V4, cfg.V6, cfg.DS
 }
 
 func serveRootFaviconICO(w http.ResponseWriter, r *http.Request) {

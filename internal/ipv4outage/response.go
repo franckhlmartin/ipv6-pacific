@@ -22,9 +22,17 @@ type ProblemDetails struct {
 
 // Page566Data is passed to 566.html.
 type Page566Data struct {
-	ResumePlain string
-	AboutURL    string
+	ResumePlain       string
+	AboutURL          string
+	Nonce             string
+	InlineCSS         template.CSS
+	InlineJS          template.JS
+	ConnStatusVariant string
+	SiteURL           string
 }
+
+// Page566Enricher adds conn-status bundle fields before rendering 566.html.
+type Page566Enricher func(r *http.Request, data *Page566Data)
 
 // ProblemDetails566 builds the machine-readable 566 body.
 func ProblemDetails566(until time.Time) ProblemDetails {
@@ -54,7 +62,7 @@ func set566Headers(w http.ResponseWriter, until time.Time, token string) {
 }
 
 // Serve566 writes a draft-compliant 566 response.
-func Serve566(w http.ResponseWriter, r *http.Request, tmpl *template.Template, until time.Time, token string) {
+func Serve566(w http.ResponseWriter, r *http.Request, tmpl *template.Template, until time.Time, token string, enrich Page566Enricher) {
 	set566Headers(w, until, token)
 	w.WriteHeader(statusIPv4Unavailable)
 
@@ -70,8 +78,12 @@ func Serve566(w http.ResponseWriter, r *http.Request, tmpl *template.Template, u
 		return
 	}
 	data := Page566Data{
-		ResumePlain: until.UTC().Format("2 January 2006, 00:00 UTC"),
-		AboutURL:    "/about#ipv6-day-drill",
+		ResumePlain:       until.UTC().Format("2 January 2006, 00:00 UTC"),
+		AboutURL:          "/about#ipv6-day-drill",
+		ConnStatusVariant: "outage566",
+	}
+	if enrich != nil {
+		enrich(r, &data)
 	}
 	_ = tmpl.Execute(w, data)
 }

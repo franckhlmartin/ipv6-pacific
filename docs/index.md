@@ -6,8 +6,9 @@ Project “memory” for humans and Cursor-style agents: **start here**, then **
 
 | Topic | Document |
 |--------|----------|
-| Dev setup, scripts, running collector/web, SEO / sitemap, **6/6 IPv4 drill** | [development.md](development.md) |
+| Dev setup, scripts, running collector/web, SEO / sitemap, **6/6 IPv4 drill**, **embed widget** | [development.md](development.md) |
 | Security notes | [security.md](security.md) |
+| **Embed widget** (iframe / script, nginx, drill exemptions) | [embed.md](embed.md) |
 | Commits / PR workflow | [commit-workflow.md](commit-workflow.md) |
 | **`config/`**, economies list, **`domains/{ISO2}.yaml`**, regional HQ rules | [config-and-domains.md](config-and-domains.md) |
 

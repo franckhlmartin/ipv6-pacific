@@ -222,6 +222,68 @@ h2 { font-size: 1.15rem; margin-top: 1.5rem; }
   outline-offset: 2px;
 }
 
+.conn-status-dialog__embed {
+  margin: 0 0 1rem;
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.conn-status-dialog__embed[hidden] {
+  display: none;
+}
+
+.embed-page {
+  padding: 0 1.25rem 2rem;
+  max-width: 52rem;
+}
+
+.embed-page section {
+  margin: 2rem 0;
+}
+
+.embed-preview-section h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+
+.embed-preview-grid {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+}
+
+.embed-preview-item {
+  min-width: 0;
+}
+
+.embed-preview-wrap {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.embed-preview-wrap iframe {
+  display: block;
+  max-width: 100%;
+}
+
+.embed-snippet {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-x: auto;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.embed-snippet code {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
 .eez-map-wrap {
   margin-inline: auto;
   width: fit-content;

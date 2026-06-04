@@ -7,7 +7,7 @@ import (
 )
 
 // Middleware enforces monthly IPv4 outage policy before the application mux.
-func Middleware(cfg Config, tmpl566 *template.Template, now func() time.Time, next http.Handler) http.Handler {
+func Middleware(cfg Config, tmpl566 *template.Template, enrich Page566Enricher, now func() time.Time, next http.Handler) http.Handler {
 	if now == nil {
 		now = time.Now
 	}
@@ -28,7 +28,7 @@ func Middleware(cfg Config, tmpl566 *template.Template, now func() time.Time, ne
 			}
 			until := UnavailableUntil(t)
 			Log566(r, token)
-			Serve566(w, r, tmpl566, until, token)
+			Serve566(w, r, tmpl566, until, token, enrich)
 			return
 		}
 

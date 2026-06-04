@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your IPv6 connection status</title>
+  <style>{{.InlineCSS}}</style>
+</head>
+<body class="conn-status-details-page">
+  <div class="ipv6-pacific-conn conn-status-details" data-variant="embedDetails">
+    <div class="conn-status-details-panel">
+      <p class="conn-status-details__badge" data-conn-mode aria-live="polite">Checking…</p>
+      <h1 class="conn-status-dialog__title">Your connection</h1>
+      <p class="conn-status-dialog__subtitle">How we categorized your connection to the Pacific IPv6 probe network.</p>
+      <p class="conn-status-dialog__note">Addresses reflect what our servers see for each request. With NAT, VPNs, or proxies they may show a client, edge, or shared address—not your device’s only possible address.</p>
+      <dl class="conn-status-dialog__addrs">
+        <div class="conn-status-dialog__row">
+          <dt>Preferred for this site</dt>
+          <dd data-conn-preferred>Not available</dd>
+        </div>
+        <div class="conn-status-dialog__row">
+          <dt>IPv4</dt>
+          <dd data-conn-ipv4>Not available</dd>
+        </div>
+        <div class="conn-status-dialog__row">
+          <dt>IPv6</dt>
+          <dd data-conn-ipv6>Not available</dd>
+        </div>
+      </dl>
+      <button type="button" class="conn-status-details__close">Close</button>
+    </div>
+    <p class="conn-status-attribution">
+      <a href="{{.SiteURL}}/">Pacific Islands IPv6 Monitor</a>
+    </p>
+  </div>
+  <script nonce="{{.Nonce}}">{{.InlineDetailsJS}}</script>
+</body>
+</html>

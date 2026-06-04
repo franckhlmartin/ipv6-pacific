@@ -89,6 +89,24 @@ func TestShouldBlock_loopbackExempt(t *testing.T) {
 	}
 }
 
+func TestShouldBlock_embedExempt(t *testing.T) {
+	cfg := Config{OutageHost: "pacific.ipv6forum.com"}
+	now := time.Date(2026, 6, 6, 10, 0, 0, 0, time.UTC)
+	for _, path := range []string{
+		"/embed/conn-status",
+		"/embed/conn-status/details",
+		"/embed/conn-status.js",
+		"/static/css/conn-status-embed.css",
+	} {
+		req := httptest.NewRequest(http.MethodGet, path, nil)
+		req.Host = "pacific.ipv6forum.com"
+		req.Header.Set("X-Forwarded-For", "203.0.113.1")
+		if ShouldBlock(req, cfg, now) {
+			t.Fatalf("embed exempt %s", path)
+		}
+	}
+}
+
 func TestShouldBlock_crawlerExempt(t *testing.T) {
 	cfg := Config{OutageHost: "pacific.ipv6forum.com"}
 	now := time.Date(2026, 6, 6, 10, 0, 0, 0, time.UTC)
@@ -124,7 +142,7 @@ func TestServe566_headersAndHTML(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	req.Header.Set("Accept", "text/html")
 	rec := httptest.NewRecorder()
-	Serve566(rec, req, tmpl, until, "tok123")
+		Serve566(rec, req, tmpl, until, "tok123", nil)
 	if rec.Code != 566 {
 		t.Fatalf("status=%d", rec.Code)
 	}
@@ -144,7 +162,7 @@ func TestServe566_problemJSON(t *testing.T) {
 	until := UnavailableUntil(now)
 	req := httptest.NewRequest(http.MethodGet, "/api/index.json", nil)
 	rec := httptest.NewRecorder()
-	Serve566(rec, req, nil, until, "abc")
+	Serve566(rec, req, nil, until, "abc", nil)
 	if rec.Code != 566 {
 		t.Fatalf("status=%d", rec.Code)
 	}
@@ -165,7 +183,7 @@ func TestMiddleware_blocksIPv4(t *testing.T) {
 		hit = true
 		w.WriteHeader(http.StatusOK)
 	})
-	h := Middleware(cfg, tmpl, now, next)
+	h := Middleware(cfg, tmpl, nil, now, next)
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	req.Host = "pacific.ipv6forum.com"
 	req.Header.Set("X-Forwarded-For", "198.51.100.10")

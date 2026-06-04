@@ -29,6 +29,14 @@ The site may show **the visitor’s address as seen by the server** (header cont
 
 **`GET /api/client-ip-family`** exposes **`ip`** and **`family`** and is **subject to rate limiting** (unlike `/api/healthz`). No extra logging is added for modal-only use beyond normal request logs.
 
+## Embed widget
+
+Third-party sites can embed the connection-status control via **`GET /embed/conn-status`** (iframe) or **`GET /embed/conn-status.js`** (script tag). Probe URLs are baked into the script at server startup — embedders cannot retarget probes.
+
+- Cross-site embed requires **`HEALTHZ_CORS_ALLOW_ORIGIN=*`** (or unset) on **probe vhosts** so browsers can read healthz JSON from arbitrary origins.
+- During the **6/6 IPv4 drill**, embed asset paths are exempt from 566 (see [embed.md](embed.md)); the **566 HTML page** includes an inlined widget (not a public route).
+- Full operator guide: [embed.md](embed.md).
+
 ## Monthly IPv4 outage (566)
 
 The **6/6 IPv4 drill** (`internal/ipv4outage`) classifies clients using the same **`X-Forwarded-For`** (first hop) / **`RemoteIP`** rules as the connection UI. **Only trust this policy when nginx is the sole component setting `X-Forwarded-For`** toward `pacific-web` — do not forward client-supplied XFF from the Internet.
@@ -73,8 +81,7 @@ server {
     ssl_ciphers ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384;
     ssl_prefer_server_ciphers off;
 
-    # Security headers
-    add_header X-Frame-Options DENY;
+    # Security headers (X-Frame-Options only on location / — see embed locations below)
     add_header X-Content-Type-Options nosniff;
     add_header X-XSS-Protection "1; mode=block";
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
@@ -97,7 +104,39 @@ server {
     brotli_comp_level 6;
     brotli_min_length 256;
 
+    # --- Embed widget (third-party iframe) ---
+    # Go sets CSP frame-ancestors * on /embed/conn-status; do NOT send X-Frame-Options here.
+    location = /embed/conn-status {
+        proxy_pass https://localhost:8082;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        add_header X-Content-Type-Options nosniff;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    }
+
+    location = /embed/conn-status.js {
+        proxy_pass https://localhost:8082;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        add_header X-Content-Type-Options nosniff;
+    }
+
+    location = /static/css/conn-status-embed.css {
+        proxy_pass https://localhost:8082;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        add_header X-Content-Type-Options nosniff;
+    }
+
     location / {
+        add_header X-Frame-Options DENY always;
+        add_header X-Content-Type-Options nosniff;
         proxy_pass https://localhost:8082;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -126,3 +165,12 @@ server {
 ```
 
 Reload nginx after changes: `sudo nginx -t && sudo systemctl reload nginx`.
+
+Verify embed framing:
+
+```bash
+curl -sI https://pacific.ipv6forum.com/embed/conn-status | grep -i frame
+curl -sI https://pacific.ipv6forum.com/ | grep -i frame
+```
+
+The iframe path must **not** return `X-Frame-Options: DENY`; the home page must still deny framing.

@@ -1,0 +1,310 @@
+.ipv6-pacific-conn {
+  --status-ipv4-only-rgb: 255, 165, 0;
+  --status-dual-stack-rgb: 0, 0, 255;
+  --status-ipv6-only-rgb: 0, 128, 0;
+  --color-ipv4-only: rgb(var(--status-ipv4-only-rgb));
+  --color-dual: rgb(var(--status-dual-stack-rgb));
+  --color-ipv6-only: rgb(var(--status-ipv6-only-rgb));
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  line-height: 1.5;
+}
+
+.ipv6-pacific-conn .conn-status-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  max-width: 11.5rem;
+  padding: 0.35rem 0.65rem;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: inherit;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.ipv6-pacific-conn .conn-status-btn__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+  line-height: 1.2;
+  min-width: 0;
+}
+
+.ipv6-pacific-conn .conn-status-btn__pref {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.ipv6-pacific-conn .conn-status-btn__pref[hidden] {
+  display: none;
+}
+
+.ipv6-pacific-conn .conn-status-btn:disabled {
+  cursor: wait;
+  opacity: 0.88;
+}
+
+.ipv6-pacific-conn .conn-status-btn:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.ipv6-pacific-conn .conn-status-btn__swatch {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 3px;
+  flex-shrink: 0;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #94a3b8;
+}
+
+.ipv6-pacific-conn .conn-status-btn--ipv4 .conn-status-btn__swatch {
+  background: var(--color-ipv4-only);
+}
+
+.ipv6-pacific-conn .conn-status-btn--ipv6 .conn-status-btn__swatch {
+  background: var(--color-ipv6-only);
+}
+
+.ipv6-pacific-conn .conn-status-btn--dual .conn-status-btn__swatch {
+  background: var(--color-dual);
+}
+
+.ipv6-pacific-conn .conn-status-btn--dual.conn-status-btn--pref-ipv4 .conn-status-btn__swatch {
+  background: linear-gradient(
+    135deg,
+    var(--color-ipv4-only) 55%,
+    var(--color-dual) 55%
+  );
+}
+
+.ipv6-pacific-conn .conn-status-btn--dual.conn-status-btn--pref-ipv6 .conn-status-btn__swatch {
+  background: linear-gradient(
+    135deg,
+    var(--color-ipv6-only) 55%,
+    var(--color-dual) 55%
+  );
+}
+
+.ipv6-pacific-conn .conn-status-dialog {
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+  max-width: min(32rem, calc(100vw - 2rem));
+  color: #111;
+  background: #fff;
+}
+
+.ipv6-pacific-conn .conn-status-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.ipv6-pacific-conn .conn-status-dialog__inner {
+  padding: 1.25rem 1.35rem;
+}
+
+.ipv6-pacific-conn .conn-status-dialog__title {
+  margin: 0 0 0.35rem;
+  font-size: 1.15rem;
+}
+
+.ipv6-pacific-conn .conn-status-dialog__subtitle {
+  margin: 0 0 0.75rem;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.ipv6-pacific-conn .conn-status-dialog__note {
+  margin: 0 0 1rem;
+  font-size: 0.82rem;
+  color: #666;
+  line-height: 1.45;
+}
+
+.ipv6-pacific-conn .conn-status-dialog__addrs {
+  margin: 0 0 1.1rem;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: 0.75rem;
+  row-gap: 0.5rem;
+  font-size: 0.92rem;
+}
+
+.ipv6-pacific-conn .conn-status-dialog__row {
+  display: contents;
+}
+
+.ipv6-pacific-conn .conn-status-dialog__row dt {
+  font-weight: 600;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.ipv6-pacific-conn .conn-status-dialog__row dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  word-break: break-all;
+}
+
+.ipv6-pacific-conn .conn-status-dialog__embed {
+  margin: 0 0 1rem;
+  font-size: 0.85rem;
+}
+
+.ipv6-pacific-conn .conn-status-dialog__embed[hidden] {
+  display: none;
+}
+
+.ipv6-pacific-conn .conn-status-dialog__close {
+  font: inherit;
+  font-weight: 600;
+  padding: 0.45rem 0.9rem;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  cursor: pointer;
+}
+
+.ipv6-pacific-conn .conn-status-dialog__close:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.ipv6-pacific-conn .conn-status-attribution {
+  margin: 0.35rem 0 0;
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+.ipv6-pacific-conn .conn-status-attribution[hidden] {
+  display: none;
+}
+
+.ipv6-pacific-conn .conn-status-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.75rem;
+}
+
+.ipv6-pacific-conn[data-variant="embedScript"] .conn-status-header {
+  margin-bottom: 0;
+}
+
+.conn-status-iframe-doc {
+  margin: 0;
+  overflow: hidden;
+}
+
+.conn-status-iframe-doc .conn-status-attribution {
+  display: none;
+}
+
+.conn-status-iframe-doc .conn-status-header {
+  margin-bottom: 0;
+}
+
+.conn-status-iframe-doc .conn-status-dialog {
+  display: none;
+}
+
+.conn-status-details-page {
+  margin: 0;
+  padding: 1.25rem;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  line-height: 1.5;
+  color: #111;
+  background: #fff;
+}
+
+.conn-status-details-panel {
+  max-width: 32rem;
+}
+
+.conn-status-details__badge {
+  display: inline-block;
+  margin: 0 0 0.75rem;
+  padding: 0.25rem 0.55rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.conn-status-details__close {
+  font: inherit;
+  font-weight: 600;
+  padding: 0.45rem 0.9rem;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  cursor: pointer;
+}
+
+.conn-status-details__close:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .conn-status-details-page {
+    color: #eee;
+    background: #1a1a1a;
+  }
+
+  .conn-status-details__badge {
+    background: #334155;
+    color: #e2e8f0;
+  }
+
+  .conn-status-details__close {
+    background: #2a2a2a;
+    border-color: #444;
+    color: #eee;
+  }
+
+  .ipv6-pacific-conn .conn-status-btn {
+    background: #1e293b;
+    border-color: #334155;
+    color: #eee;
+  }
+
+  .ipv6-pacific-conn .conn-status-btn__pref {
+    color: #94a3b8;
+  }
+
+  .ipv6-pacific-conn .conn-status-dialog {
+    color: #eee;
+    background: #1a1a1a;
+  }
+
+  .ipv6-pacific-conn .conn-status-dialog__subtitle {
+    color: #aaa;
+  }
+
+  .ipv6-pacific-conn .conn-status-dialog__note {
+    color: #999;
+  }
+
+  .ipv6-pacific-conn .conn-status-dialog__close {
+    background: #2a2a2a;
+    border-color: #444;
+    color: #eee;
+  }
+
+  .ipv6-pacific-conn .conn-status-attribution {
+    color: #94a3b8;
+  }
+
+  .ipv6-pacific-conn .conn-status-dialog__embed a {
+    color: #8cb4ff;
+  }
+}

@@ -17,12 +17,7 @@
       <p class="meta">Has data · Last collected {{.Generated}}</p>
     </div>
     <div class="site-header__conn">
-      <button type="button" class="conn-status-btn" id="conn-status-btn"
-        aria-expanded="false" aria-haspopup="dialog" aria-controls="conn-status-dialog"
-        aria-busy="true" aria-disabled="true" disabled>
-        <span class="conn-status-btn__swatch" aria-hidden="true"></span>
-        <span class="conn-status-btn__label">Checking…</span>
-      </button>
+      {{template "connStatusButton" .}}
     </div>
   </header>
 
@@ -255,28 +250,7 @@
 
   {{template "siteFooter" .}}
 
-  <dialog id="conn-status-dialog" class="conn-status-dialog" aria-labelledby="conn-status-dialog-title">
-    <div class="conn-status-dialog__inner">
-      <h2 id="conn-status-dialog-title" class="conn-status-dialog__title">Your connection to this site</h2>
-      <p class="conn-status-dialog__subtitle">How we categorized your connection.</p>
-      <p class="conn-status-dialog__note">Addresses reflect what our servers see for each request. With NAT, VPNs, or proxies they may show a client, edge, or shared address—not your device’s only possible address.</p>
-      <dl class="conn-status-dialog__addrs">
-        <div class="conn-status-dialog__row">
-          <dt>Preferred for this site</dt>
-          <dd id="conn-status-preferred">Not available</dd>
-        </div>
-        <div class="conn-status-dialog__row">
-          <dt>IPv4</dt>
-          <dd id="conn-status-ipv4">Not available</dd>
-        </div>
-        <div class="conn-status-dialog__row">
-          <dt>IPv6</dt>
-          <dd id="conn-status-ipv6">Not available</dd>
-        </div>
-      </dl>
-      <button type="button" class="conn-status-dialog__close">Close</button>
-    </div>
-  </dialog>
+  {{template "connStatusDialog" .}}
 
   <script src="/static/js/pct-color-ramp.js"></script>
   <script src="/static/js/country-summary-strip.js"></script>
@@ -287,6 +261,7 @@
     window.__PROBE_V6__ = {{if .ProbeV6}}"{{.ProbeV6}}"{{else}}""{{end}};
     window.__PROBE_DS__ = {{if .ProbeDS}}"{{.ProbeDS}}"{{else}}""{{end}};
   </script>
+  <script src="/static/js/conn-status-probe.js"></script>
   <script src="/static/js/conn-status-ui.js"></script>
   <script src="/static/js/border.js"></script>
   <script src="/static/js/cookie-consent.js" defer></script>

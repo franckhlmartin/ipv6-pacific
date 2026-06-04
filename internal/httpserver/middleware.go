@@ -7,11 +7,12 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"net/url"
 	"os"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/pacific-monitor/pacific-monitor/internal/probeurls"
 )
 
 type cspNonceKey struct{}
@@ -57,32 +58,14 @@ func ClientIPFamily(r *http.Request) (ip, family string) {
 	return ip, family
 }
 
-// ConnectSrcFromProbeEnv returns extra CSP connect-src tokens (scheme://host) for PROBE_V4_URL,
-// PROBE_V6_URL, and PROBE_DS_URL so the border script can fetch() those origins.
+// ConnectSrcFromProbeEnv returns extra CSP connect-src tokens (scheme://host) for probe URLs.
 func ConnectSrcFromProbeEnv() []string {
-	seen := make(map[string]struct{})
-	var out []string
-	for _, key := range []string{"PROBE_V4_URL", "PROBE_V6_URL", "PROBE_DS_URL"} {
-		raw := strings.TrimSpace(os.Getenv(key))
-		if raw == "" {
-			continue
-		}
-		u, err := url.Parse(raw)
-		if err != nil || u.Host == "" {
-			continue
-		}
-		scheme := u.Scheme
-		if scheme == "" {
-			scheme = "https"
-		}
-		token := scheme + "://" + u.Host
-		if _, ok := seen[token]; ok {
-			continue
-		}
-		seen[token] = struct{}{}
-		out = append(out, token)
-	}
-	return out
+	return probeurls.Origins(probeurls.Load())
+}
+
+// embedFrameablePath returns true for routes that may be embedded in third-party iframes.
+func embedFrameablePath(path string) bool {
+	return path == "/embed/conn-status"
 }
 
 // SecurityHeaders adds baseline headers (CSP is relaxed for Leaflet from self + map tiles).
@@ -113,7 +96,7 @@ func SecurityHeaders(extraConnectSrc []string, h http.Handler) http.Handler {
 				connectParts = append(connectParts, o)
 			}
 		}
-		csp := strings.Join([]string{
+		cspParts := []string{
 			"default-src 'self'",
 			fmt.Sprintf("script-src 'self' https://unpkg.com https://www.googletagmanager.com 'nonce-%s'", nonce),
 			"style-src 'self' 'unsafe-inline' https://unpkg.com",
@@ -122,9 +105,14 @@ func SecurityHeaders(extraConnectSrc []string, h http.Handler) http.Handler {
 			"font-src 'self' https://unpkg.com",
 			"object-src 'none'",
 			"base-uri 'self'",
-			"frame-ancestors 'none'",
-			"upgrade-insecure-requests",
-		}, "; ")
+		}
+		if embedFrameablePath(r.URL.Path) {
+			cspParts = append(cspParts, "frame-ancestors *")
+		} else {
+			cspParts = append(cspParts, "frame-ancestors 'none'")
+		}
+		cspParts = append(cspParts, "upgrade-insecure-requests")
+		csp := strings.Join(cspParts, "; ")
 		w.Header().Set("Content-Security-Policy", csp)
 		if r.TLS != nil {
 			w.Header().Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")

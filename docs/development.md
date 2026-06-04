@@ -142,7 +142,7 @@ Put a reverse proxy in front if you terminate public TLS elsewhere; see `docs/se
 
 ## TLS / dual-stack border
 
-Three optional probe URLs (full `https://host/.../api/healthz` paths, TLS SAN coverage):
+Three probe URLs (full `https://host/.../api/healthz` paths, TLS SAN coverage). When **`PROBE_*_URL`** is unset, **`internal/probeurls`** supplies defaults from **`PUBLIC_SITE_URL`** (or `pacific.ipv6forum.com`): `https://ipv4.<host>/api/healthz`, `https://ipv6.<host>/api/healthz`, and `https://<host>/api/healthz`.
 
 | Env | Hostname role | Purpose |
 |-----|----------------|---------|
@@ -150,7 +150,7 @@ Three optional probe URLs (full `https://host/.../api/healthz` paths, TLS SAN co
 | **`PROBE_V6_URL`** | AAAA-only (e.g. `ipv6.pacific.ipv6forum.com`) | Can the browser reach the service over IPv6? |
 | **`PROBE_DS_URL`** | Dual-stack (e.g. `pacific.ipv6forum.com`) | Which stack did the browser **prefer** for this site? |
 
-**`PROBE_V4_URL`** and **`PROBE_V6_URL`** together enable the blue “dual-stack” browser border. Without both, the UI falls back to **IPv4 vs IPv6 connection** coloring via **`/api/client-ip-family`**. **`PROBE_DS_URL`** is independent: it fills the dialog **Preferred for this site** row when set.
+Override any default in `.env` / `.env.local`. **`PROBE_V4_URL`** and **`PROBE_V6_URL`** together enable the blue “dual-stack” browser border.
 
 At startup, **`pacific-web` logs** probe configuration. The HTML injects `window.__PROBE_V4__`, `window.__PROBE_V6__`, and `window.__PROBE_DS__` (inline bootstrap **before** `border.js`). Probe **`fetch()`** requests hit those hostnames’ access logs. **`Content-Security-Policy` `connect-src`** is extended automatically from all three `PROBE_*` origins.
 
@@ -161,6 +161,8 @@ At startup, **`pacific-web` logs** probe configuration. The HTML injects `window
 **`GET /api/client-ip-family`** returns **`family`** and **`ip`** for the browser’s connection to the **page origin** when v4/v6 probes are not configured; that endpoint is **rate-limited** like other `/api/*` routes (see `docs/security.md`). The header shows **IPv4 only**, **IPv6 only**, or **Dual stack** (matching table legend wording) with optional details in a dialog.
 
 For **privacy and trust** assumptions when showing addresses in the UI, see **`docs/security.md`** (Client IP in UI).
+
+**Embed widget:** third-party sites can embed the connection-status control. See **[embed.md](embed.md)** for iframe/script snippets, nginx, and 566 drill exemptions.
 
 ## Monthly 6/6 IPv4 outage
 
@@ -175,6 +177,8 @@ Implementation: **`internal/ipv4outage`** middleware in **`cmd/web/main.go`** (r
 | **`IPV4_OUTAGE_HOST`** | Override hostname when **`PUBLIC_SITE_URL`** is unset |
 
 **Crawler exemptions** (still HTTP 200 on IPv4 during the drill): `/robots.txt`, `/sitemap.xml`, `/og/map.png`.
+
+**Embed exemptions** (third-party widgets keep working on IPv4 during the drill): `/embed/conn-status`, `/embed/conn-status/details`, `/embed/conn-status.js`, `/static/css/conn-status-embed.css`. The iframe document inlines CSS/JS (no `/static/js` follow-ups). **`/embed`** (instructions page) is not exempt. The **566 HTML page** includes an inlined connection-status button. See **[embed.md](embed.md)**.
 
 **Advance notice:** UTC days **4–5** show an optional banner on `/` and `/about`. Permanent copy: `/about#ipv6-day-drill`.
 
