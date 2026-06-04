@@ -55,7 +55,7 @@ Embed detection uses cross-origin `fetch()` to:
 | `PROBE_V6_URL` | IPv6-only vhost `/api/healthz` |
 | `PROBE_DS_URL` | Dual-stack vhost (preferred stack) |
 
-Keep **`HEALTHZ_CORS_ALLOW_ORIGIN=*`** (or unset) on **probe vhosts** so arbitrary embedder origins can read healthz JSON. Restricting CORS on the main dual-stack vhost is optional but must not break same-origin probes on the main site.
+Keep **`HEALTHZ_CORS_ALLOW_ORIGIN`** unset (default **`*`**) or remove **`HEALTHZ_CORS_RESTRICT`**. Do **not** set **`HEALTHZ_CORS_RESTRICT=1`** if third-party sites should embed the widget — probes on **ipv4**, **ipv6**, and the dual-stack main host must all return **`Access-Control-Allow-Origin: *`** for arbitrary embedder origins.
 
 ## Monthly 6/6 IPv4 drill
 

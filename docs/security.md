@@ -25,7 +25,7 @@ Cross-check ideas against [`bookerpal/docs/security.md`](/Users/franck/code/book
 
 The site may show **the visitor’s address as seen by the server** (header control → dialog: **Preferred for this site**, IPv4, and/or IPv6 rows; **Not available** when a probe fails or returns no `ip`). Addresses come from **`internal/httpserver.RemoteIP`**, which prefers **`X-Forwarded-For`** (first hop) when set. **Misconfigured proxies** can make the value wrong (edge IP, not the browser). Align with the **nginx** example in this doc (`proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for`).
 
-**`GET /api/healthz`** embeds **`ip`** and **`family`** (`ipv4` or `ipv6`) in JSON for cross-origin reads used by v4, v6, and dual-stack (`PROBE_DS_URL`) probes; CORS defaults to **`Access-Control-Allow-Origin: *`** unless **`HEALTHZ_CORS_ALLOW_ORIGIN`** is set. In production, **restricting** that variable to the **canonical site origin** reduces cross-site exfiltration of the response body to arbitrary malicious origins (see `docs/development.md`).
+**`GET /api/healthz`** embeds **`ip`** and **`family`** (`ipv4` or `ipv6`) in JSON for cross-origin reads used by v4, v6, and dual-stack (`PROBE_DS_URL`) probes; CORS defaults to **`Access-Control-Allow-Origin: *`**. An optional **`HEALTHZ_CORS_ALLOW_ORIGIN`** allowlist echoes a matching **`Origin`**; other origins still receive **`*`** unless **`HEALTHZ_CORS_RESTRICT=1`** (that mode blocks third-party embed). Do not set a comma-separated allowlist without understanding that embed requires open CORS on **all three** probe hostnames (including the dual-stack main host for **`PROBE_DS_URL`**).
 
 **`GET /api/client-ip-family`** exposes **`ip`** and **`family`** and is **subject to rate limiting** (unlike `/api/healthz`). No extra logging is added for modal-only use beyond normal request logs.
 
@@ -33,7 +33,7 @@ The site may show **the visitor’s address as seen by the server** (header cont
 
 Third-party sites can embed the connection-status control via **`GET /embed/conn-status`** (iframe) or **`GET /embed/conn-status.js`** (script tag). Probe URLs are baked into the script at server startup — embedders cannot retarget probes.
 
-- Cross-site embed requires **`HEALTHZ_CORS_ALLOW_ORIGIN=*`** (or unset) on **probe vhosts** so browsers can read healthz JSON from arbitrary origins.
+- Cross-site embed requires **`Access-Control-Allow-Origin: *`** on **`GET /api/healthz`** for **ipv4**, **ipv6**, and **dual-stack** probe hostnames (default). Setting **`HEALTHZ_CORS_RESTRICT=1`** disables the fallback and breaks embed on arbitrary sites.
 - During the **6/6 IPv4 drill**, embed asset paths are exempt from 566 (see [embed.md](embed.md)); the **566 HTML page** includes an inlined widget (not a public route).
 - Full operator guide: [embed.md](embed.md).
 
@@ -116,6 +116,16 @@ server {
         add_header Referrer-Policy "strict-origin-when-cross-origin" always;
     }
 
+    location = /embed/conn-status/details {
+        proxy_pass https://localhost:8082;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        add_header X-Content-Type-Options nosniff;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    }
+
     location = /embed/conn-status.js {
         proxy_pass https://localhost:8082;
         proxy_set_header Host $host;
@@ -174,3 +184,22 @@ curl -sI https://pacific.ipv6forum.com/ | grep -i frame
 ```
 
 The iframe path must **not** return `X-Frame-Options: DENY`; the home page must still deny framing.
+
+### Combined site + probe vhosts (single server block)
+
+When **`pacific.ipv6forum.com`**, **`ipv4.pacific.ipv6forum.com`**, and **`ipv6.pacific.ipv6forum.com`** share one **`server { }`** block, apply the same rules:
+
+- **Do not** set **`X-Frame-Options DENY`** at **`server`** scope — it applies to embed paths too. Set it only on **`location /`** (as above).
+- Keep dedicated **`location =`** blocks for embed paths on the main hostname (paths are served from the same upstream).
+- Probe hostnames only need **`location /`** → upstream; CORS is set by **`pacific-web`**.
+
+Verify CORS for third-party embed (expect **`access-control-allow-origin: *`** unless **`HEALTHZ_CORS_RESTRICT=1`**):
+
+```bash
+curl -sI -H "Origin: https://www.example.com" \
+  "https://ipv4.pacific.ipv6forum.com/api/healthz" | grep -i access-control-allow-origin
+curl -sI -H "Origin: https://www.example.com" \
+  "https://ipv6.pacific.ipv6forum.com/api/healthz" | grep -i access-control-allow-origin
+curl -sI -H "Origin: https://www.example.com" \
+  "https://pacific.ipv6forum.com/api/healthz" | grep -i access-control-allow-origin
+```

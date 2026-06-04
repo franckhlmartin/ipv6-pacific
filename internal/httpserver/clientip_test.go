@@ -57,12 +57,37 @@ func TestConnectSrcFromProbeEnv_includesDS(t *testing.T) {
 
 func TestHealthzCORSAllowOrigin_reflectsMatchingOrigin(t *testing.T) {
 	t.Setenv("HEALTHZ_CORS_ALLOW_ORIGIN", "https://pacific.example.com,https://127.0.0.1:8082")
+	_ = os.Unsetenv("HEALTHZ_CORS_RESTRICT")
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/healthz", nil)
 	req.Header.Set("Origin", "https://127.0.0.1:8082")
 	HealthzCORSAllowOrigin(rec, req)
 	if got := rec.Header().Get("Access-Control-Allow-Origin"); got != "https://127.0.0.1:8082" {
 		t.Fatalf("got ACAO %q", got)
+	}
+}
+
+func TestHealthzCORSAllowOrigin_embedOriginFallsBackToStar(t *testing.T) {
+	t.Setenv("HEALTHZ_CORS_ALLOW_ORIGIN", "https://pacific.example.com,https://127.0.0.1:8082")
+	_ = os.Unsetenv("HEALTHZ_CORS_RESTRICT")
+	rec := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, "/api/healthz", nil)
+	req.Header.Set("Origin", "https://www.peachymango.org")
+	HealthzCORSAllowOrigin(rec, req)
+	if got := rec.Header().Get("Access-Control-Allow-Origin"); got != "*" {
+		t.Fatalf("got ACAO %q want *", got)
+	}
+}
+
+func TestHealthzCORSAllowOrigin_restrictOmitsUnlistedOrigin(t *testing.T) {
+	t.Setenv("HEALTHZ_CORS_ALLOW_ORIGIN", "https://pacific.example.com")
+	t.Setenv("HEALTHZ_CORS_RESTRICT", "1")
+	rec := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, "/api/healthz", nil)
+	req.Header.Set("Origin", "https://www.peachymango.org")
+	HealthzCORSAllowOrigin(rec, req)
+	if got := rec.Header().Get("Access-Control-Allow-Origin"); got != "" {
+		t.Fatalf("got ACAO %q want empty", got)
 	}
 }
 
