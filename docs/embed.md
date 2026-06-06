@@ -67,6 +67,7 @@ On UTC day 6, IPv4 clients on the main dual-stack hostname receive HTTP **566** 
 | `/embed/conn-status/details` | popup details page (iframe embed) |
 | `/embed/conn-status.js` | script-tag entrypoint |
 | `/static/css/conn-status-embed.css` | script-tag stylesheet |
+| `/api/healthz` | dual-stack probe (`PROBE_DS_URL` on the main host) |
 
 The iframe page inlines all CSS/JS (no `/static/js` follow-up requests). **`/embed`** (instructions landing) is **not** exempt — IPv4 visitors may see 566 there during the drill.
 

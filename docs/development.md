@@ -178,7 +178,7 @@ Implementation: **`internal/ipv4outage`** middleware in **`cmd/web/main.go`** (r
 
 **Crawler exemptions** (still HTTP 200 on IPv4 during the drill): `/robots.txt`, `/sitemap.xml`, `/og/map.png`.
 
-**Embed exemptions** (third-party widgets keep working on IPv4 during the drill): `/embed/conn-status`, `/embed/conn-status/details`, `/embed/conn-status.js`, `/static/css/conn-status-embed.css`. The iframe document inlines CSS/JS (no `/static/js` follow-ups). **`/embed`** (instructions page) is not exempt. The **566 HTML page** includes an inlined connection-status button. See **[embed.md](embed.md)**.
+**Embed exemptions** (third-party widgets keep working on IPv4 during the drill): `/embed/conn-status`, `/embed/conn-status/details`, `/embed/conn-status.js`, `/static/css/conn-status-embed.css`, and **`/api/healthz`** on the main host (dual-stack **`PROBE_DS_URL`**). The iframe document inlines CSS/JS (no `/static/js` follow-ups). **`/embed`** (instructions page) is not exempt. The **566 HTML page** includes an inlined connection-status button. See **[embed.md](embed.md)**.
 
 **Advance notice:** UTC days **4–5** show an optional banner on `/` and `/about`. Permanent copy: `/about#ipv6-day-drill`.
 

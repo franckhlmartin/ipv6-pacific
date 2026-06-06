@@ -16,10 +16,15 @@ var crawlerExemptPaths = map[string]struct{}{
 }
 
 var embedExemptPaths = map[string]struct{}{
-	"/embed/conn-status":          {},
-	"/embed/conn-status/details":  {},
-	"/embed/conn-status.js":       {},
+	"/embed/conn-status":                {},
+	"/embed/conn-status/details":        {},
+	"/embed/conn-status.js":             {},
 	"/static/css/conn-status-embed.css": {},
+}
+
+// probeExemptPaths stay reachable on IPv4 during the drill (dual-stack PROBE_DS_URL).
+var probeExemptPaths = map[string]struct{}{
+	"/api/healthz": {},
 }
 
 // IsCrawlerExemptPath skips 566 for SEO/crawler assets.
@@ -37,6 +42,15 @@ func IsEmbedExemptPath(path string) bool {
 		path = "/"
 	}
 	_, ok := embedExemptPaths[path]
+	return ok
+}
+
+// IsProbeExemptPath skips 566 for connection probe endpoints on the main host.
+func IsProbeExemptPath(path string) bool {
+	if path == "" {
+		path = "/"
+	}
+	_, ok := probeExemptPaths[path]
 	return ok
 }
 
@@ -80,6 +94,9 @@ func ShouldBlock(r *http.Request, cfg Config, now time.Time) bool {
 		return false
 	}
 	if IsEmbedExemptPath(r.URL.Path) {
+		return false
+	}
+	if IsProbeExemptPath(r.URL.Path) {
 		return false
 	}
 	if isLoopbackClient(r) {

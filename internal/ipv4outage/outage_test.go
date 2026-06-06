@@ -107,6 +107,17 @@ func TestShouldBlock_embedExempt(t *testing.T) {
 	}
 }
 
+func TestShouldBlock_healthzExempt(t *testing.T) {
+	cfg := Config{OutageHost: "pacific.ipv6forum.com"}
+	now := time.Date(2026, 6, 6, 10, 0, 0, 0, time.UTC)
+	req := httptest.NewRequest(http.MethodGet, "/api/healthz", nil)
+	req.Host = "pacific.ipv6forum.com"
+	req.Header.Set("X-Forwarded-For", "203.0.113.1")
+	if ShouldBlock(req, cfg, now) {
+		t.Fatal("dual-stack probe healthz exempt on main host")
+	}
+}
+
 func TestShouldBlock_crawlerExempt(t *testing.T) {
 	cfg := Config{OutageHost: "pacific.ipv6forum.com"}
 	now := time.Date(2026, 6, 6, 10, 0, 0, 0, time.UTC)
