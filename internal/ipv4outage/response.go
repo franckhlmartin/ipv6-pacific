@@ -29,6 +29,7 @@ type Page566Data struct {
 	InlineJS          template.JS
 	ConnStatusVariant string
 	SiteURL           string
+	OutageToken       string
 }
 
 // Page566Enricher adds conn-status bundle fields before rendering 566.html.
@@ -81,6 +82,7 @@ func Serve566(w http.ResponseWriter, r *http.Request, tmpl *template.Template, u
 		ResumePlain:       until.UTC().Format("2 January 2006, 00:00 UTC"),
 		AboutURL:          "/about#ipv6-day-drill",
 		ConnStatusVariant: "outage566",
+		OutageToken:       token,
 	}
 	if enrich != nil {
 		enrich(r, &data)

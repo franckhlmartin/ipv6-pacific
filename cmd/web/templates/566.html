@@ -23,8 +23,8 @@
     p { margin: 0.85rem 0; }
     a { color: #0645ad; }
     .meta { font-size: 0.9rem; opacity: 0.85; }
-    {{.InlineCSS}}
   </style>
+  {{template "connStatusInlineCSS" .}}
 </head>
 <body>
   {{template "connStatusWidget" .}}
@@ -33,6 +33,6 @@
   <p>Contact your Internet provider or your organization's IT help desk and say: "I cannot reach this site — it may require IPv6, but my system does not seem to work with IPv6." Ask them why IPv6 is not working for you and whether they can enable it.</p>
   <p>This is a planned maintenance window, service over the older connection should resume after <strong>{{.ResumePlain}}</strong>.</p>
   <p class="meta"><a href="{{.AboutURL}}">About the Pacific Islands IPv6 Monitor and our monthly IPv6 drill</a></p>
-  <script nonce="{{.Nonce}}">{{.InlineJS}}</script>
+  {{template "connStatusInlineJS" .}}
 </body>
 </html>

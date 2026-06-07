@@ -190,12 +190,33 @@ curl -sk -H 'Host: pacific.ipv6forum.com' -H 'X-Forwarded-For: 203.0.113.1' http
 curl -sk -H 'Host: pacific.ipv6forum.com' -H 'X-Forwarded-For: 2001:db8::1' https://127.0.0.1:8082/
 ```
 
-**Post-drill metrics** (journald or log files):
+**Post-drill metrics** — run on the production server from `/opt/ipv6-pacific`:
 
 ```bash
-grep 'ipv4_outage event=566' /var/log/… | wc -l
-grep 'ipv4_outage event=recovery' /var/log/… | wc -l
+./scripts/ipv4_outage_report.sh --date 2026-06-06
+./scripts/ipv4_outage_report.sh --date 2026-06-06 -o /tmp/drill-2026-06-06.txt
+./scripts/ipv4_outage_report.sh --date 2026-06-06 --geo   # optional country lookup via ip-api.com (~1h)
 ```
+
+The report merges **journald** (`ipv4_outage` JSON lines from `ipv6-pacific-web`) and **nginx** access logs. Primary tables exclude **exempt paths** still reachable on IPv4 during the drill (`/api/healthz`, embed assets, crawler paths). It prints counts and **percentages** by connection stack (IPv4 vs IPv6) and a merged User-Agent family table (total, IPv4/IPv6 split, ×566 rate, unique IPs per stack). Requires `python3`, read access to `/var/log/nginx/`, and `journalctl` (often via `sudo`).
+
+Local smoke test with fixtures:
+
+```bash
+./scripts/ipv4_outage_report.sh --date 2026-06-06 \
+  --journal-file scripts/fixtures/ipv4_outage_journal.txt \
+  --nginx-log scripts/fixtures/ipv4_outage_nginx.log
+```
+
+**App log shape** (since vNext, one JSON object per line after the `ipv4_outage` prefix):
+
+```json
+{"event":"566","token":"…","path":"/","client_ip":"1.2.3.4","client_family":"ipv4","user_agent":"Mozilla/5.0…","host":"pacific.ipv6forum.com"}
+{"event":"probe","path":"/api/healthz","client_ip":"2001:db8::1","client_family":"ipv6","family":"ipv6","referer":"https://pacific…/"}
+{"event":"recovery","token":"…","client_ip":"2001:db8::1","client_family":"ipv6","user_agent":"…","host":"pacific.ipv6forum.com"}
+```
+
+The **566 page** sends `Retry-Over-IPv6-Recovery` when the IPv6 probe succeeds (`data-outage-token` on the conn-status widget). Recovery token match rate appears in the report summary.
 
 **Production rollout:** deploy `pacific-web`, set **`PUBLIC_SITE_URL`**, confirm **`IPV4_OUTAGE_FORCE`** is unset, restart **`ipv6-pacific-web`**. Announce the drill externally before the first event.
 

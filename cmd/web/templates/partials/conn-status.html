@@ -36,7 +36,7 @@
 {{end}}
 
 {{define "connStatusWidget"}}
-<div class="ipv6-pacific-conn" data-variant="{{.ConnStatusVariant}}">
+<div class="ipv6-pacific-conn" data-variant="{{.ConnStatusVariant}}"{{if .OutageToken}} data-outage-token="{{.OutageToken}}"{{end}}>
   <div class="conn-status-header">
     <button type="button" class="conn-status-btn"
       aria-expanded="false" aria-haspopup="dialog"
@@ -74,4 +74,12 @@
     </div>
   </dialog>
 </div>
+{{end}}
+
+{{define "connStatusInlineCSS"}}
+<style>{{.InlineCSS}}</style>
+{{end}}
+
+{{define "connStatusInlineJS"}}
+<script nonce="{{.Nonce}}">{{.InlineJS}}</script>
 {{end}}

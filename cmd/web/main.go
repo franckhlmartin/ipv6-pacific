@@ -125,6 +125,7 @@ func main() {
 		w.Write([]byte("Contact: mailto:security@example.com\nPreferred-Languages: en\n"))
 	})
 	healthz := func(w http.ResponseWriter, r *http.Request) {
+		ipv4outage.LogProbe(r, outageCfg, time.Now())
 		httpserver.HealthzCORSAllowOrigin(w, r)
 		w.Header().Set("Content-Type", "application/json")
 		ip, family := httpserver.ClientIPFamily(r)

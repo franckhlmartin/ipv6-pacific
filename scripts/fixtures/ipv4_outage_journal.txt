@@ -1,0 +1,4 @@
+ipv4_outage event=566 token=abc123 path=/ client_ip=203.0.113.1 host=pacific.ipv6forum.com
+ipv4_outage event=566 token=def456 path=/favicon.ico client_ip=203.0.113.1 host=pacific.ipv6forum.com
+ipv4_outage event=566 token=ghi789 path=/about client_ip=198.51.100.22 host=pacific.ipv6forum.com
+ipv4_outage event=recovery token=abc123 path=/ client_ip=2001:db8::1 host=pacific.ipv6forum.com
