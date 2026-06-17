@@ -25,9 +25,7 @@ Cross-check ideas against [`bookerpal/docs/security.md`](/Users/franck/code/book
 
 The site may show **the visitor’s address as seen by the server** (header control → dialog: **Preferred for this site**, IPv4, and/or IPv6 rows; **Not available** when a probe fails or returns no `ip`). Addresses come from **`internal/httpserver.RemoteIP`**, which prefers **`X-Forwarded-For`** (first hop) when set. **Misconfigured proxies** can make the value wrong (edge IP, not the browser). Align with the **nginx** example in this doc (`proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for`).
 
-**`GET /api/healthz`** embeds **`ip`** and **`family`** (`ipv4` or `ipv6`) in JSON for cross-origin reads used by v4, v6, and dual-stack (`PROBE_DS_URL`) probes; CORS defaults to **`Access-Control-Allow-Origin: *`**. An optional **`HEALTHZ_CORS_ALLOW_ORIGIN`** allowlist echoes a matching **`Origin`**; other origins still receive **`*`** unless **`HEALTHZ_CORS_RESTRICT=1`** (that mode blocks third-party embed). Do not set a comma-separated allowlist without understanding that embed requires open CORS on **all three** probe hostnames (including the dual-stack main host for **`PROBE_DS_URL`**).
-
-**`GET /api/client-ip-family`** exposes **`ip`** and **`family`** and is **subject to rate limiting** (unlike `/api/healthz`). No extra logging is added for modal-only use beyond normal request logs.
+**`GET /api/healthz`** embeds **`ip`** and **`family`** (`ipv4` or `ipv6`) in JSON for cross-origin reads used by v4, v6, and dual-stack (`PROBE_DS_URL`) probes, and for same-origin fallback when cross-origin probes fail. CORS defaults to **`Access-Control-Allow-Origin: *`**. An optional **`HEALTHZ_CORS_ALLOW_ORIGIN`** allowlist echoes a matching **`Origin`**; other origins still receive **`*`** unless **`HEALTHZ_CORS_RESTRICT=1`** (that mode blocks third-party embed). Do not set a comma-separated allowlist without understanding that embed requires open CORS on **all three** probe hostnames (including the dual-stack main host for **`PROBE_DS_URL`**). **`/api/healthz`** is excluded from rate limiting (unlike other `/api/*` routes).
 
 ## Embed widget
 

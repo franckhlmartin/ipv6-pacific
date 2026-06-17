@@ -102,25 +102,14 @@
   }
 
   function runSameOriginOnly(signal, onResult, onIPv4Outage) {
-    return Promise.all([
-      fetch('/api/client-ip-family', {
-        credentials: 'same-origin',
-        signal: signal,
-      }).then(function (r) {
-        return r.json();
-      }),
-      fetchSameOriginHealthz(signal),
-    ]).then(function (pair) {
-      var j = pair[0];
-      var hz = pair[1];
+    return fetchSameOriginHealthz(signal).then(function (hz) {
       if (hz && hz.ipv4Outage) {
         if (typeof onIPv4Outage === 'function') onIPv4Outage();
         return;
       }
       var preferred = preferredFromMeta(hz);
-      var ip = typeof j.ip === 'string' ? j.ip : '';
-      var ipVal = ip !== '' ? ip : null;
-      if (j.family === 'ipv6') {
+      var ipVal = hz.ip;
+      if (hz.family === 'ipv6') {
         notifyResult(onResult, 'ipv6', null, ipVal, preferred);
       } else {
         notifyResult(onResult, 'ipv4', ipVal, null, preferred);
@@ -185,20 +174,18 @@
       }, 4000);
 
       return Promise.all([
-        fetch('/api/client-ip-family', {
-          credentials: 'same-origin',
-          signal: ctlFallback.signal,
-        }).then(function (r) {
-          return r.json();
-        }),
+        fetchSameOriginHealthz(ctlFallback.signal),
         fetchDS(ds, ctlFallback.signal),
       ])
         .then(function (pair) {
           clearTimeout(toFallback);
-          var j = pair[0];
+          var hz = pair[0];
           var dsMeta = pair[1];
-          var ip = typeof j.ip === 'string' ? j.ip : '';
-          var ipVal = ip !== '' ? ip : null;
+          if (hz && hz.ipv4Outage) {
+            if (typeof onIPv4Outage === 'function') onIPv4Outage();
+            return;
+          }
+          var ipVal = hz.ip;
           return fillPreferredFromSameOrigin(
             preferredFromMeta(dsMeta),
             ctlFallback.signal
@@ -207,7 +194,7 @@
               if (typeof onIPv4Outage === 'function') onIPv4Outage();
               return;
             }
-            if (j.family === 'ipv6') {
+            if (hz.family === 'ipv6') {
               notifyResult(onResult, 'ipv6', null, ipVal, preferred);
             } else {
               notifyResult(onResult, 'ipv4', ipVal, null, preferred);

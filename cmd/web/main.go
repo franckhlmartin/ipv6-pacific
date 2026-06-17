@@ -141,14 +141,6 @@ func main() {
 		httpserver.HealthzCORSAllowOrigin(w, r)
 		w.WriteHeader(http.StatusNoContent)
 	})
-	mux.HandleFunc("GET /api/client-ip-family", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		ip, family := httpserver.ClientIPFamily(r)
-		_ = json.NewEncoder(w).Encode(map[string]string{
-			"family": family,
-			"ip":     ip,
-		})
-	})
 
 	probeConnect := httpserver.ConnectSrcFromProbeEnv()
 	app := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
