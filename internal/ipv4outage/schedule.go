@@ -2,15 +2,38 @@ package ipv4outage
 
 import "time"
 
+const preOutageNoticeDays = 7
+
 // InOutageWindow reports whether t is on UTC calendar day 6 (monthly drill).
 func InOutageWindow(t time.Time) bool {
 	return t.UTC().Day() == 6
 }
 
-// InPreOutageWindow reports UTC days 4–5 (advance notice window).
+// nextOutageStart is 00:00 UTC on the next calendar day 6 (this month or the next).
+func nextOutageStart(t time.Time) time.Time {
+	u := t.UTC()
+	y, m, _ := u.Date()
+	start := time.Date(y, m, 6, 0, 0, 0, 0, time.UTC)
+	if !u.Before(start) {
+		start = time.Date(y, m+1, 6, 0, 0, 0, 0, time.UTC)
+	}
+	return start
+}
+
+func calendarDaysUntil(from, until time.Time) int {
+	fu := from.UTC()
+	uu := until.UTC()
+	fy, fm, fd := fu.Date()
+	uy, um, ud := uu.Date()
+	fromDay := time.Date(fy, fm, fd, 0, 0, 0, 0, time.UTC)
+	untilDay := time.Date(uy, um, ud, 0, 0, 0, 0, time.UTC)
+	return int(untilDay.Sub(fromDay).Hours() / 24)
+}
+
+// InPreOutageWindow reports whether t is within the 7 calendar days before the next UTC day 6.
 func InPreOutageWindow(t time.Time) bool {
-	d := t.UTC().Day()
-	return d == 4 || d == 5
+	days := calendarDaysUntil(t, nextOutageStart(t))
+	return days >= 1 && days <= preOutageNoticeDays
 }
 
 // UnavailableUntil is the instant IPv4 service may resume (start of next UTC day).
@@ -21,12 +44,11 @@ func UnavailableUntil(t time.Time) time.Time {
 }
 
 // DaysUntilOutage returns calendar days until the next UTC day 6 from t (for pre-outage banner).
-// On day 4 returns 2; on day 5 returns 1; otherwise 0.
 func DaysUntilOutage(t time.Time) int {
 	if !InPreOutageWindow(t) {
 		return 0
 	}
-	return 6 - t.UTC().Day()
+	return calendarDaysUntil(t, nextOutageStart(t))
 }
 
 // OutageActive returns whether policy should treat the outage as enabled at t.

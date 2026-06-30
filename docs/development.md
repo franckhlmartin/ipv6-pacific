@@ -180,7 +180,7 @@ Implementation: **`internal/ipv4outage`** middleware in **`cmd/web/main.go`** (r
 
 **Embed exemptions** (third-party widgets keep working on IPv4 during the drill): `/embed/conn-status`, `/embed/conn-status/details`, `/embed/conn-status.js`, `/static/css/conn-status-embed.css`, and **`/api/healthz`** on the main host (dual-stack **`PROBE_DS_URL`**). The iframe document inlines CSS/JS (no `/static/js` follow-ups). **`/embed`** (instructions page) is not exempt. The **566 HTML page** includes an inlined connection-status button. See **[embed.md](embed.md)**.
 
-**Advance notice:** UTC days **4–5** show an optional banner on `/` and `/about`. Permanent copy: `/about#ipv6-day-drill`.
+**Advance notice:** the **7 calendar days** before each UTC day **6** show an optional banner on all main HTML pages (home, about, country, embed). Permanent copy: `/about#ipv6-day-drill`.
 
 **Local test** (with **`IPV4_OUTAGE_FORCE=1`** in `.env.local`):
 

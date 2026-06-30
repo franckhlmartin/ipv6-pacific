@@ -469,6 +469,7 @@ func countryPage(tmpl *template.Template, w http.ResponseWriter, r *http.Request
 		"Nonce":           httpserver.CSPNonce(r),
 	}
 	seoMerge(r, data, pageTitle, metaDesc)
+	mergeOutagePageData(data)
 	_ = tmpl.ExecuteTemplate(w, "country.html", data)
 }
 
@@ -503,6 +504,7 @@ func countryComingSoon(tmpl *template.Template, w http.ResponseWriter, r *http.R
 		"Nonce":         httpserver.CSPNonce(r),
 	}
 	seoMerge(r, data, pageTitle, metaDesc)
+	mergeOutagePageData(data)
 	_ = tmpl.ExecuteTemplate(w, "country_soon.html", data)
 }
 

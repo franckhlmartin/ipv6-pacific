@@ -723,7 +723,7 @@ h2 { font-size: 1.15rem; margin-top: 1.5rem; }
   font-weight: 600;
 }
 
-/* Pre-outage notice (UTC days 4–5) */
+/* Pre-outage notice (7 calendar days before UTC day 6) */
 .ipv6-preoutage-banner {
   background: #eff6ff;
   border-bottom: 1px solid #bfdbfe;

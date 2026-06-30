@@ -21,16 +21,29 @@ func TestInOutageWindow(t *testing.T) {
 }
 
 func TestInPreOutageWindow(t *testing.T) {
-	d4 := time.Date(2026, 6, 4, 0, 0, 0, 0, time.UTC)
-	d6 := time.Date(2026, 6, 6, 0, 0, 0, 0, time.UTC)
-	if !InPreOutageWindow(d4) {
-		t.Fatal("day 4 pre-outage")
+	cases := []struct {
+		t    time.Time
+		want bool
+		days int
+	}{
+		{time.Date(2026, 5, 29, 12, 0, 0, 0, time.UTC), false, 0},
+		{time.Date(2026, 5, 30, 0, 0, 0, 0, time.UTC), true, 7},
+		{time.Date(2026, 6, 1, 0, 0, 0, 0, time.UTC), true, 5},
+		{time.Date(2026, 6, 4, 0, 0, 0, 0, time.UTC), true, 2},
+		{time.Date(2026, 6, 5, 23, 59, 0, 0, time.UTC), true, 1},
+		{time.Date(2026, 6, 6, 0, 0, 0, 0, time.UTC), false, 0},
+		{time.Date(2026, 6, 30, 0, 0, 0, 0, time.UTC), true, 6},
+		{time.Date(2026, 2, 26, 0, 0, 0, 0, time.UTC), false, 0},
+		{time.Date(2026, 2, 27, 0, 0, 0, 0, time.UTC), true, 7},
 	}
-	if InPreOutageWindow(d6) {
-		t.Fatal("day 6 not pre-outage")
-	}
-	if DaysUntilOutage(d4) != 2 {
-		t.Fatalf("days until=%d want 2", DaysUntilOutage(d4))
+	for _, tc := range cases {
+		got := InPreOutageWindow(tc.t)
+		if got != tc.want {
+			t.Fatalf("%v InPreOutageWindow=%v want %v", tc.t, got, tc.want)
+		}
+		if gotDays := DaysUntilOutage(tc.t); gotDays != tc.days {
+			t.Fatalf("%v DaysUntilOutage=%d want %d", tc.t, gotDays, tc.days)
+		}
 	}
 }
 
