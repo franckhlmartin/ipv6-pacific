@@ -5,6 +5,12 @@ domains:
   - domain: iusn.nu
     organization: Internet Users Society Niue
     sector: Telecommunications
+  - domain: kaniu.nu
+    organization: Kaniu Internet
+    sector: Telecommunications
+  - domain: niue.nu
+    organization: Kaniu Internet
+    sector: Telecommunications
   - domain: mof.gov.nu
     organization: Ministry of Finance
     sector: Government
